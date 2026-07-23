@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>my little life — personal dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="content.css" />
+  <link rel="stylesheet" href="analytics.css" />
+  <link rel="stylesheet" href="details.css" />
+  <link rel="stylesheet" href="advanced.css" />
+  <link rel="stylesheet" href="mobile.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#home"><span class="brand-mark">✳</span><span>my little life</span></a>
+    <p class="side-label">your space</p>
+    <nav aria-label="Dashboard navigation">
+      <a class="active" href="#home"><span>⌂</span> Today</a>
+      <a href="#journal"><span>✎</span> Journal</a>
+      <a href="#trackers"><span>♡</span> Trackers</a>
+      <a href="#school"><span>▤</span> School & work</a>
+      <a href="#money"><span>₵</span> Finances</a>
+      <a href="#content"><span>◉</span> Content</a>
+      <a href="#analytics"><span>↗</span> Analytics</a>
+      <a href="#schoolHub"><span>▤</span> School center</a>
+      <a href="#workHub"><span>◇</span> Work</a>
+      <a href="#peopleHub"><span>♡</span> People</a>
+      <a href="#memories"><span>✦</span> Memories</a>
+    </nav>
+    <div class="sidebar-bottom"><p class="side-label">little reminder</p><p class="reminder">You are allowed to grow at your own pace.</p><span class="pink-line"></span></div>
+  </aside>
+
+  <main class="dashboard" id="home">
+    <header class="topbar"><div><p class="eyebrow">Wednesday, July 22, 2026</p><h1>Hi, Claudia <span>♡</span></h1></div><button class="avatar" aria-label="Your profile">C</button></header>
+
+    <section class="welcome-card">
+      <div><p class="eyebrow">today's energy</p><h2>Make space for<br><em>the good stuff.</em></h2><p class="welcome-copy">A gentle little check-in for your day at school, at home, and everywhere in between.</p></div>
+      <div class="sun-illustration"><span class="mini-star">✦</span><div class="sun"></div><span class="note">one day<br>at a time</span><div class="wave wave-one"></div><div class="wave wave-two"></div></div>
+    </section>
+
+    <section class="section" id="trackers"><div class="section-title"><div><p class="eyebrow">Daily check-in</p><h2>How are you feeling?</h2></div><span class="date-pill">JUL 22</span></div>
+      <div class="mood-row" role="group" aria-label="Choose your mood"><button data-mood="Radiant">☀<small>Radiant</small></button><button data-mood="Good">☺<small>Good</small></button><button data-mood="Okay">◡<small>Okay</small></button><button data-mood="Low">☾<small>Low</small></button><button data-mood="Overwhelmed">〰<small>Overwhelmed</small></button></div>
+      <div class="tracker-grid">
+        <article class="tracker-card habits"><div class="card-head"><span class="card-icon">♡</span><div><p class="eyebrow">habits</p><h3>My little wins</h3></div><span class="progress">0 / 4</span></div><div class="check-list"><label><input type="checkbox"> Drink some water</label><label><input type="checkbox"> Move my body</label><label><input type="checkbox"> Take my vitamins</label><label><input type="checkbox"> Read or revise</label></div></article>
+        <article class="tracker-card pink"><div class="card-head"><span class="card-icon">☼</span><div><p class="eyebrow">wellbeing</p><h3>Care for me</h3></div></div><div class="wellbeing-links"><button class="wellbeing-item" data-action="Prayer"><span>☽</span> Prayer / reflection <b>＋</b></button><button class="wellbeing-item" data-action="Workout"><span>♧</span> Workout <b>＋</b></button><button class="wellbeing-item" data-action="Meal"><span>♡</span> Meals today <b>＋</b></button></div></article>
+      </div>
+    </section>
+
+    <section class="life-grid section">
+      <article class="module-card schedule-card" id="school">
+        <div class="section-title"><div><p class="eyebrow">School & work</p><h2>Today's focus</h2></div><span class="module-mark">09:00</span></div>
+        <div class="focus-task"><span class="task-dot done-dot"></span><div><strong>Morning lecture</strong><small>School · 09:00 — 11:00</small></div><button aria-label="More options">···</button></div>
+        <div class="focus-task"><span class="task-dot"></span><div><strong>Finish project research</strong><small>Deep work · 14:00 — 15:30</small></div><button aria-label="More options">···</button></div>
+        <button class="module-link" id="addTask">＋ Add a task</button>
+      </article>
+      <article class="module-card meals-card">
+        <div class="section-title"><div><p class="eyebrow">Meals</p><h2>Fuel for today</h2></div><span class="module-mark">0 / 3</span></div>
+        <div class="meal-row"><span class="meal-emoji">☕</span><div><strong>Breakfast</strong><small>What did you have?</small></div><button class="log-pill" data-log="Breakfast">Log</button></div>
+        <div class="meal-row"><span class="meal-emoji">🥗</span><div><strong>Lunch</strong><small>Something nourishing</small></div><button class="log-pill" data-log="Lunch">Log</button></div>
+        <div class="meal-row"><span class="meal-emoji">🍓</span><div><strong>Dinner</strong><small>Make it easy tonight</small></div><button class="log-pill" data-log="Dinner">Log</button></div>
+      </article>
+      <article class="module-card rhythm-card">
+        <div class="section-title"><div><p class="eyebrow">Body & rhythm</p><h2>Check in</h2></div><span class="module-mark">today</span></div>
+        <div class="rhythm-line"><span>Sleep</span><div class="bar"><i style="width:72%"></i></div><b>7h 12m</b></div>
+        <div class="rhythm-line"><span>Water</span><div class="bar"><i style="width:45%"></i></div><b>3 / 7</b></div>
+        <div class="rhythm-line"><span>Movement</span><div class="bar"><i style="width:30%"></i></div><b>12 min</b></div>
+        <button class="module-link" id="editRhythm">Update my check-in →</button>
+      </article>
+    </section>
+
+    <section class="content-hub section" id="content">
+      <div class="section-title"><div><p class="eyebrow">Content corner</p><h2>Your ideas deserve a place to grow.</h2></div><button class="small-link" id="addContent">＋ Add idea</button></div>
+      <div class="content-hub-grid">
+        <article class="content-board"><div class="board-heading"><span class="board-dot pink-dot"></span><strong>Ideas</strong><span>2</span></div><div class="idea-item"><span>✦</span><div><strong>Study with me — cozy laptop setup</strong><small>TikTok · YouTube</small></div><button>···</button></div><div class="idea-item"><span>✦</span><div><strong>My realistic student morning</strong><small>Reel · vlog</small></div><button>···</button></div></article>
+        <article class="content-board"><div class="board-heading"><span class="board-dot yellow-dot"></span><strong>In progress</strong><span>1</span></div><div class="idea-item"><span>◒</span><div><strong>July reset routine</strong><small>Editing · due Friday</small></div><button>···</button></div><button class="board-link" id="addDraft">＋ Add draft</button></article>
+        <article class="content-board posted-board"><div class="board-heading"><span class="board-dot green-dot"></span><strong>Posted</strong><span>0</span></div><div class="empty-board">Your little wins<br>will live here ♡</div></article>
+      </div>
+    </section>
+
+    <section class="content-grid section" id="journal">
+      <article class="journal-card"><div class="section-title"><div><p class="eyebrow">Journal</p><h2>What’s on your mind?</h2></div><button class="round-plus js-open-modal">＋</button></div><textarea id="quickNote" placeholder="Write a thought, a memory, or just how today feels..."></textarea><div class="journal-actions"><span>private on this device</span><button class="save-note" id="saveNote">Save note ↗</button></div></article>
+      <aside class="prompt-card"><p class="eyebrow">A prompt for today</p><p class="prompt-question">What is one thing you can do today that your future self will thank you for?</p><button class="text-link js-open-modal">Start writing <span>↗</span></button></aside>
+    </section>
+
+    <section class="analytics-section section" id="analytics">
+      <div class="section-title"><div><p class="eyebrow">Content analytics</p><h2>Know what is working.</h2></div><div class="analytics-actions"><span class="date-pill">THIS WEEK</span><button class="small-link" id="updateAnalytics">Update numbers</button></div></div>
+      <div class="analytics-grid">
+        <article class="analytics-main"><div class="analytics-top"><div><p class="eyebrow">All accounts</p><h3>Weekly growth</h3></div><span class="growth-badge">↗ +12.4%</span></div><div class="chart"><div class="chart-labels"><span>1.2k</span><span>800</span><span>400</span><span>0</span></div><div class="chart-lines"><i></i><i></i><i></i><i></i><svg viewBox="0 0 550 150" preserveAspectRatio="none" aria-label="Weekly growth chart"><polyline points="0,128 72,110 145,118 218,85 290,94 365,56 435,67 550,19" fill="none" stroke="#db8b9f" stroke-width="3"/><circle cx="550" cy="19" r="5" fill="#db8b9f"/></svg><div class="chart-days"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div></div></article>
+        <div class="metric-stack"><article><p class="eyebrow">Reach</p><strong id="reachMetric">8,420</strong><span>↗ 18.2%</span></article><article><p class="eyebrow">Engagement</p><strong id="engagementMetric">6.8%</strong><span>↗ 1.4%</span></article><article><p class="eyebrow">Views</p><strong id="viewsMetric">12.7k</strong><span>↗ 22.7%</span></article></div>
+      </div>
+      <div class="analytics-bottom"><article class="best-post"><div><p class="eyebrow">Best performer</p><h3>“A realistic student morning”</h3><p>Instagram Reel <span>•</span> Posted Jul 20</p></div><strong>4,280 <small>views</small></strong></article><article class="accounts-card" id="accounts"><div class="accounts-heading"><div><p class="eyebrow">My accounts</p><h3>All your platforms, together.</h3></div><button class="account-add" id="addAccount">＋ Add account</button></div><div class="account-list" id="accountList"><div class="account-row"><span class="platform-icon instagram">◎</span><div><strong>Instagram</strong><small>@claudia.creates</small></div><b>2.4k</b></div><div class="account-row"><span class="platform-icon tiktok">♪</span><div><strong>TikTok</strong><small>@claudia.daily</small></div><b>1.8k</b></div><div class="account-row"><span class="platform-icon youtube">▶</span><div><strong>YouTube</strong><small>Claudia’s corner</small></div><b>824</b></div></div></article></div>
+    </section>
+
+    <section class="overview section" id="money"><div class="section-title"><div><p class="eyebrow">Your life, at a glance</p><h2>Keep your world together.</h2></div><button class="small-link">Customize ↗</button></div><div class="overview-grid"><article><span class="overview-icon purple">▤</span><p class="eyebrow">projects & content</p><h3>Ideas in progress</h3><p>Capture content ideas, personal projects, and things you want to build.</p><button class="overview-link js-open-modal">Add an idea →</button></article><article><span class="overview-icon coral">₵</span><p class="eyebrow">finances</p><h3>Money check</h3><p>Track spending, savings goals, subscriptions, and your weekly budget.</p><button class="overview-link js-open-modal">Log an expense →</button></article><article id="memories"><span class="overview-icon green">✦</span><p class="eyebrow">mind & relationships</p><h3>Make room for life</h3><p>Check in with your mental health, gratitude, memories, and social life.</p><button class="overview-link js-open-modal">Add a memory →</button></article></div></section>
+    <footer class="footer"><span>made for your real life</span><span><b>●</b> stored privately on this device</span></footer>
+    <section class="details-section section" id="details">
+      <div class="section-title"><div><p class="eyebrow">The rest of your life</p><h2>Small systems for feeling more together.</h2></div></div>
+      <div class="details-grid">
+        <article class="detail-card study-detail" id="planner"><div class="detail-head"><span class="detail-icon">▤</span><div><p class="eyebrow">School & work</p><h3>Plan your next move</h3></div><button class="mini-add" id="addPlanner">＋</button></div><div class="planner-progress"><span>Semester progress</span><b>64%</b><div><i></i></div></div><div id="plannerList" class="compact-list"><p><span>□</span> Submit assignment <small>Due tomorrow</small></p><p><span>□</span> Review lecture notes <small>45 min</small></p></div></article>
+        <article class="detail-card money-detail" id="finance"><div class="detail-head"><span class="detail-icon">₵</span><div><p class="eyebrow">Finances</p><h3>Money, without shame</h3></div><button class="mini-add" id="addExpense">＋</button></div><div class="balance-line"><div><small>Spent this week</small><strong id="spentTotal">₵ 0</strong></div><div><small>Weekly budget</small><strong>₵ 2,500</strong></div></div><div class="budget-bar"><i></i></div><p class="detail-hint">Log expenses honestly. Awareness is the goal.</p></article>
+        <article class="detail-card mind-detail"><div class="detail-head"><span class="detail-icon">☾</span><div><p class="eyebrow">Mental health</p><h3>How is your inner world?</h3></div></div><p class="check-question">Right now, I feel...</p><div class="feel-row"><button data-feel="calm">Calm</button><button data-feel="anxious">Anxious</button><button data-feel="tired">Tired</button><button data-feel="hopeful">Hopeful</button></div><button class="detail-link js-open-modal">Write a deeper check-in →</button></article>
+        <article class="detail-card reflection-detail"><div class="detail-head"><span class="detail-icon">✧</span><div><p class="eyebrow">Prayer & gratitude</p><h3>What are you carrying?</h3></div></div><textarea id="gratitudeNote" placeholder="Today, I am grateful for..."></textarea><button class="detail-link" id="saveGratitude">Save reflection →</button></article>
+        <article class="detail-card social-detail"><div class="detail-head"><span class="detail-icon">♡</span><div><p class="eyebrow">Social life</p><h3>Stay connected</h3></div><button class="mini-add" id="addSocial">＋</button></div><div id="socialList" class="compact-list"><p><span>♡</span> Check in with a friend <small>Today</small></p><p><span>○</span> Plan a catch-up <small>This week</small></p></div><button class="detail-link" id="addSocialLink">＋ Add a person or plan</button></article>
+        <article class="detail-card memory-detail" id="memoryVault"><div class="detail-head"><span class="detail-icon">✦</span><div><p class="eyebrow">Memories</p><h3>Keep a piece of today</h3></div><button class="mini-add" id="addMemory">＋</button></div><div class="memory-preview"><span>JUL 22</span><p id="memoryText">No memory saved yet.<br>Make one from today.</p></div></article>
+      </div>
+    </section>
+
+    <section class="advanced-section section" id="schoolHub">
+      <div class="section-title"><div><p class="eyebrow">Pharmacy school center</p><h2>Everything for your degree.</h2></div><button class="small-link" id="addUnit">＋ Add unit</button></div>
+      <div class="school-layout">
+        <article class="advanced-card timetable-card"><div class="advanced-heading"><div><p class="eyebrow">Weekly timetable</p><h3>Where you need to be</h3></div><button class="mini-add" id="addClass">＋</button></div><div class="timetable"><div></div><b>MON</b><b>TUE</b><b>WED</b><b>THU</b><b>FRI</b><span>08:00</span><i></i><i></i><i class="class-cell">Pharmaceutics<small>LT 2</small></i><i></i><i></i><span>10:00</span><i class="class-cell">Pharmacology<small>Room 4</small></i><i></i><i></i><i></i><i class="class-cell">Pharmaceutical chem.<small>Lab</small></i><span>13:00</span><i></i><i class="class-cell">Pathology<small>LT 1</small></i><i></i><i></i><i></i><span>15:00</span><i></i><i></i><i class="class-cell">Community pharmacy<small>Room 8</small></i><i></i><i></i></div></article>
+        <article class="advanced-card units-card"><div class="advanced-heading"><div><p class="eyebrow">Units & lecturers</p><h3>Your academic load</h3></div><span class="unit-count">8 / 12</span></div><div class="unit-progress"><i></i></div><div class="unit-summary"><div><strong>12</strong><small>Total units</small></div><div><strong>8</strong><small>Completed</small></div><div><strong>4</strong><small>Remaining</small></div></div><div id="unitList" class="unit-list"><div><span>PHR 302</span><strong>Pharmacology III</strong><small>Dr. Wanjiku · Year 3</small></div><div><span>PHR 304</span><strong>Pharmaceutics</strong><small>Dr. Kamau · Year 3</small></div><div><span>PHR 306</span><strong>Clinical pharmacy</strong><small>Dr. Otieno · Year 3</small></div></div></article>
+        <article class="advanced-card study-card"><div class="advanced-heading"><div><p class="eyebrow">Study & reading</p><h3>Plan your brain time</h3></div><button class="mini-add" id="addStudy">＋</button></div><div id="studyList" class="study-list"><div><strong>Pharmacology flashcards</strong><small>Today · 45 min · To review</small><span class="study-tag">PENDING</span></div><div><strong>Read: autonomic drugs</strong><small>Thursday · 30 min · Chapter 4</small><span class="study-tag done-study">READING</span></div></div><button class="detail-link" id="addReading">＋ Add reading session</button></article>
+        <article class="advanced-card project-card"><div class="advanced-heading"><div><p class="eyebrow">School project</p><h3>One place for the big work</h3></div><button class="mini-add" id="addProject">＋</button></div><p class="project-title" id="projectTitle">Pharmacovigilance research project</p><div class="project-bar"><i></i></div><div class="project-meta"><span>Research  <b>▰▰▰□□</b></span><span>Due Aug 18</span></div><div class="project-notes" id="projectNotes">Next: gather three journal articles and write the literature review.</div></article>
+        <article class="advanced-card research-card"><div class="advanced-heading"><div><p class="eyebrow">Course research vault</p><h3>Keep your references close</h3></div><button class="mini-add" id="addResearch">＋</button></div><div id="researchList" class="research-list"><p><span>PDF</span> WHO pharmacovigilance guide <small>Reference</small></p><p><span>LINK</span> Drug interactions notes <small>Useful link</small></p><p><span>NOTE</span> Questions for Dr. Wanjiku <small>Idea</small></p></div></article>
+      </div>
+    </section>
+
+    <section class="advanced-section section" id="workHub">
+      <div class="section-title"><div><p class="eyebrow">Work & business planner</p><h2>Build work that supports your life.</h2></div><button class="small-link" id="addBusiness">＋ Add business</button></div>
+      <div class="work-layout"><article class="advanced-card business-card"><div class="advanced-heading"><div><p class="eyebrow">Your businesses</p><h3>Active work</h3></div><span class="unit-count">2 active</span></div><div id="businessList" class="business-list"><div><span class="business-badge coral-badge">CC</span><section><strong>Claudia Creates</strong><small>Content & social media · Since Jan 2026</small></section><b>Growing</b></div><div><span class="business-badge purple-badge">ST</span><section><strong>Student tutoring</strong><small>Education · 6 months</small></section><b>Steady</b></div></div></article><article class="advanced-card goals-card"><div class="advanced-heading"><div><p class="eyebrow">Work goals</p><h3>This month's direction</h3></div><button class="mini-add" id="addWorkGoal">＋</button></div><div id="workGoalList" class="work-goals"><label><input type="checkbox"> Post 8 pieces of content</label><label><input type="checkbox"> Earn ₵ 5,000 from work</label><label><input type="checkbox"> Create a simple portfolio</label></div></article><article class="advanced-card work-metrics"><p class="eyebrow">Work snapshot</p><div class="work-metric-row"><span>Hours this month</span><strong>42h</strong></div><div class="work-metric-row"><span>Income this month</span><strong>₵ 3,850</strong></div><div class="work-metric-row"><span>Projects completed</span><strong>06</strong></div><button class="detail-link" id="addWorkLog">＋ Log work session</button></article></div>
+    </section>
+
+    <section class="advanced-section section" id="peopleHub">
+      <div class="section-title"><div><p class="eyebrow">People in your life</p><h2>Care for your circle.</h2></div><button class="small-link" id="addPerson">＋ Add person</button></div>
+      <div class="people-layout"><article class="advanced-card people-card"><div class="people-tabs"><button class="people-tab active">Family</button><button class="people-tab">Friends</button><button class="people-tab">Relationships</button></div><div id="peopleList" class="people-list"><div><span class="person-avatar peach">M</span><section><strong>Mum</strong><small>Last checked in: Today</small></section><button>Message →</button></div><div><span class="person-avatar lavender">A</span><section><strong>Aisha</strong><small>Last checked in: 3 days ago</small></section><button>Plan a catch-up →</button></div><div><span class="person-avatar sage">♡</span><section><strong>My relationship space</strong><small>Boundaries, needs, and hopes</small></section><button>Reflect →</button></div></div></article><article class="advanced-card connection-card"><p class="eyebrow">Connection check-in</p><h3>How do your relationships feel?</h3><div class="connection-scale"><button>🌱<small>Healthy</small></button><button>☁<small>Needs care</small></button><button>♡<small>Feeling loved</small></button><button>↺<small>Need space</small></button></div><textarea id="peopleNote" placeholder="A note about your people, boundaries, or what you need..."></textarea><button class="detail-link" id="savePeopleNote">Save private reflection →</button></article></div>
+    </section>
+
+  </main>
+  </main>
+
+  <div class="modal" id="entryModal" aria-hidden="true" role="dialog"><div class="modal-backdrop js-close-modal"></div><form class="modal-card" id="entryForm"><button class="modal-close js-close-modal" type="button">×</button><p class="eyebrow">New journal entry</p><h2>Let it all out.</h2><input id="entryTitle" type="text" placeholder="Give this thought a title" required><textarea id="entryBody" rows="6" placeholder="Write whatever feels true today..." required></textarea><button class="save-button" type="submit">Save privately <span>↗</span></button></form></div>
+  <script src="script.js"></script>
+</body>
+</html>

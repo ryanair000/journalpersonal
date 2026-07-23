@@ -1,0 +1,32 @@
+name: Validate static app
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - agent/**
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check JavaScript syntax
+        run: |
+          for file in *.js; do
+            node --check "$file"
+          done
+
+      - name: Check required encrypted-sync files
+        run: |
+          test -f cloud-sync.js
+          test -f cloud-sync.css
+          test -f supabase-config.js
+          grep -q 'AES-GCM' cloud-sync.js
+          grep -q 'PBKDF2' cloud-sync.js
+          grep -q 'journalpersonal_encrypted_sync' supabase-config.js

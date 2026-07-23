@@ -1,0 +1,102 @@
+name: Apply resources hub
+
+on:
+  push:
+    branches:
+      - agent/reliability-foundation
+    paths:
+      - .github/workflows/apply-resources.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/reliability-foundation
+
+      - name: Wire resources into dashboard
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          html = path.read_text()
+
+          if 'href="resources.css"' not in html:
+              html = html.replace(
+                  '  <link rel="stylesheet" href="reliability.css" />',
+                  '  <link rel="stylesheet" href="reliability.css" />\n  <link rel="stylesheet" href="resources.css" />',
+                  1,
+              )
+
+          if 'href="#resources"' not in html:
+              html = html.replace(
+                  '      <a href="#journal"><span>✎</span> Journal</a>\n      <a href="#trackers"><span>♡</span> Trackers</a>',
+                  '      <a href="#journal"><span>✎</span> Journal</a>\n      <a href="#resources"><span>⌘</span> Resources</a>\n      <a href="#trackers"><span>♡</span> Trackers</a>',
+                  1,
+              )
+
+          old_history = '''    <section class="journal-history section" id="journalHistory" aria-labelledby="journalHistoryTitle">
+            <div class="section-title journal-history-heading"><div><p class="eyebrow">Saved writing</p><h2 id="journalHistoryTitle">Your journal history</h2></div><div class="journal-toolbar"><button type="button" class="small-link" id="exportData">Export backup</button><button type="button" class="small-link danger-link" id="clearToday">Clear today</button></div></div>
+            <div class="journal-entry-list" id="journalEntries" aria-live="polite"></div>
+          </section>
+
+          <section class="analytics-section section" id="analytics">'''
+          new_history = '''    <section class="journal-history section" id="journalHistory" aria-labelledby="journalHistoryTitle">
+            <div class="section-title journal-history-heading"><div><p class="eyebrow">Saved writing</p><h2 id="journalHistoryTitle">Your journal history</h2></div><div class="journal-toolbar"><label class="journal-search"><span class="sr-only">Search journal entries</span><input id="journalSearch" type="search" placeholder="Search entries" autocomplete="off"></label><button type="button" class="small-link" id="importData">Import backup</button><input class="sr-only" id="importFile" type="file" accept=".json,application/json"><button type="button" class="small-link" id="exportData">Export backup</button><button type="button" class="small-link danger-link" id="clearToday">Clear today</button></div></div>
+            <div class="journal-entry-list" id="journalEntries" aria-live="polite"></div>
+          </section>
+
+          <section class="resources-hub section" id="resources" aria-labelledby="resourcesTitle">
+            <div class="section-title"><div><p class="eyebrow">Useful resources</p><h2 id="resourcesTitle">Keep important links and support close.</h2></div><button type="button" class="small-link" id="addResource">＋ Add resource</button></div>
+            <div class="resources-toolbar">
+              <label class="resource-search"><span class="sr-only">Search resources</span><input id="resourceSearch" type="search" placeholder="Search resources" autocomplete="off"></label>
+              <div class="resource-filters" role="group" aria-label="Filter resources by category">
+                <button type="button" class="active" data-resource-filter="All" aria-pressed="true">All</button>
+                <button type="button" data-resource-filter="Study" aria-pressed="false">Study</button>
+                <button type="button" data-resource-filter="Wellbeing" aria-pressed="false">Wellbeing</button>
+                <button type="button" data-resource-filter="Money" aria-pressed="false">Money</button>
+                <button type="button" data-resource-filter="Career" aria-pressed="false">Career</button>
+                <button type="button" data-resource-filter="Personal" aria-pressed="false">Personal</button>
+              </div>
+            </div>
+            <div class="resource-grid" id="resourceList" aria-live="polite"></div>
+          </section>
+
+          <section class="analytics-section section" id="analytics">'''
+
+          if 'id="resources"' not in html:
+              if old_history not in html:
+                  raise SystemExit('Journal history insertion point not found')
+              html = html.replace(old_history, new_history, 1)
+
+          old_footer = '''  <div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
+            <script src="script.js"></script>'''
+          new_footer = '''  <div class="modal" id="resourceModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="resourceModalTitle"><div class="modal-backdrop js-close-resource-modal"></div><form class="modal-card" id="resourceForm"><button class="modal-close js-close-resource-modal" type="button" aria-label="Close resource form">×</button><p class="eyebrow">New resource</p><h2 id="resourceModalTitle">Save something useful.</h2><label class="form-label" for="resourceTitle">Title</label><input id="resourceTitle" type="text" placeholder="e.g. University portal" maxlength="120" required><label class="form-label" for="resourceCategory">Category</label><select id="resourceCategory" required><option value="Study">Study</option><option value="Wellbeing">Wellbeing</option><option value="Money">Money</option><option value="Career">Career</option><option value="Personal">Personal</option></select><label class="form-label" for="resourceUrl">Link or contact</label><input id="resourceUrl" type="text" inputmode="url" placeholder="https://, mailto:, tel:, or #section"><label class="form-label" for="resourceNote">Note</label><textarea id="resourceNote" rows="4" placeholder="Why this matters or how to use it" maxlength="500"></textarea><label class="resource-pin"><input id="resourcePinned" type="checkbox"> Pin this resource</label><button class="save-button" type="submit">Save resource <span>↗</span></button></form></div>
+            <div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
+            <script src="script.js"></script>
+            <script src="resources.js"></script>'''
+
+          if 'id="resourceModal"' not in html:
+              if old_footer not in html:
+                  raise SystemExit('Footer insertion point not found')
+              html = html.replace(old_footer, new_footer, 1)
+
+          path.write_text(html)
+          PY
+
+      - name: Remove temporary workflow
+        run: rm .github/workflows/apply-resources.yml
+
+      - name: Commit dashboard wiring
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/apply-resources.yml
+          git commit -m "Wire resources hub into dashboard"
+          git push origin HEAD:agent/reliability-foundation

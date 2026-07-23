@@ -9,7 +9,7 @@ create table if not exists public.encrypted_user_state (
   kdf_iterations integer not null default 310000 check (kdf_iterations >= 210000),
   encryption_version smallint not null default 1 check (encryption_version = 1),
   client_updated_at timestamptz not null,
-  updated_at timestamptz not null default now(),
+  updated_at timestamptz generated always as (client_updated_at) stored,
   created_at timestamptz not null default now()
 );
 
@@ -17,6 +17,11 @@ alter table public.encrypted_user_state enable row level security;
 
 revoke all on table public.encrypted_user_state from anon;
 grant select, insert, update, delete on table public.encrypted_user_state to authenticated;
+
+drop policy if exists "Users can read their own encrypted state" on public.encrypted_user_state;
+drop policy if exists "Users can insert their own encrypted state" on public.encrypted_user_state;
+drop policy if exists "Users can update their own encrypted state" on public.encrypted_user_state;
+drop policy if exists "Users can delete their own encrypted state" on public.encrypted_user_state;
 
 create policy "Users can read their own encrypted state"
 on public.encrypted_user_state

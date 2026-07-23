@@ -1,0 +1,155 @@
+.cloud-account-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 0 14px;
+  margin-left: auto;
+  margin-right: 10px;
+  border: 1px solid rgba(119, 76, 95, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 253, 251, 0.74);
+  color: var(--ink);
+  font: 600 11px "DM Sans", sans-serif;
+  box-shadow: 0 10px 30px rgba(93, 61, 77, 0.08);
+  backdrop-filter: blur(16px);
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.cloud-account-button:hover { transform: translateY(-1px); border-color: rgba(185, 119, 148, .42); background: #fffdfb; }
+.cloud-account-button:focus-visible { outline: 3px solid rgba(185, 119, 148, .25); outline-offset: 3px; }
+.cloud-status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #b9adb2;
+  box-shadow: 0 0 0 4px rgba(185, 173, 178, .13);
+}
+.cloud-status-dot.large { width: 11px; height: 11px; margin-top: 3px; }
+.cloud-status-dot[data-status="synced"], .cloud-account-button[data-status="synced"] .cloud-status-dot { background: #72a080; box-shadow: 0 0 0 4px rgba(114, 160, 128, .14); }
+.cloud-status-dot[data-status="syncing"], .cloud-account-button[data-status="syncing"] .cloud-status-dot,
+.cloud-status-dot[data-status="checking"], .cloud-account-button[data-status="checking"] .cloud-status-dot { background: #b18ac5; box-shadow: 0 0 0 4px rgba(177, 138, 197, .14); animation: cloudPulse 1.2s ease-in-out infinite; }
+.cloud-status-dot[data-status="local-newer"], .cloud-account-button[data-status="local-newer"] .cloud-status-dot,
+.cloud-status-dot[data-status="cloud-newer"], .cloud-account-button[data-status="cloud-newer"] .cloud-status-dot { background: #d6a25f; box-shadow: 0 0 0 4px rgba(214, 162, 95, .15); }
+.cloud-status-dot[data-status="conflict"], .cloud-account-button[data-status="conflict"] .cloud-status-dot,
+.cloud-status-dot[data-status="error"], .cloud-account-button[data-status="error"] .cloud-status-dot { background: #cb6875; box-shadow: 0 0 0 4px rgba(203, 104, 117, .15); }
+.cloud-status-dot[data-status="locked"], .cloud-account-button[data-status="locked"] .cloud-status-dot { background: #9f8bb8; box-shadow: 0 0 0 4px rgba(159, 139, 184, .15); }
+@keyframes cloudPulse { 50% { opacity: .45; transform: scale(.8); } }
+
+.cloud-modal { display: none; position: fixed; inset: 0; z-index: 1000; padding: 24px; overflow-y: auto; }
+.cloud-modal.open { display: grid; place-items: center; }
+.cloud-modal-backdrop { position: fixed; inset: 0; background: rgba(48, 38, 48, .48); backdrop-filter: blur(10px); }
+.cloud-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 570px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 38px;
+  border: 1px solid rgba(143, 102, 120, .13);
+  border-radius: 28px;
+  background: rgba(255, 253, 251, .97);
+  color: var(--ink);
+  box-shadow: 0 34px 110px rgba(53, 37, 46, .28);
+}
+.cloud-modal-card h2 { margin: 10px 40px 10px 0; font: 500 clamp(25px, 5vw, 34px)/1.05 "Playfair Display", serif; }
+.cloud-modal-close { position: absolute; top: 20px; right: 22px; width: 38px; height: 38px; border-radius: 50%; color: #8f7f87; font-size: 25px; background: #f7eff2; }
+.cloud-modal-close:hover { color: var(--ink); background: #f0e3e8; }
+.cloud-privacy-note { margin: 0 0 21px; max-width: 470px; color: #877780; font-size: 12px; line-height: 1.62; }
+.cloud-status-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 13px;
+  margin: 0 0 22px;
+  padding: 16px 18px;
+  border: 1px solid rgba(142, 112, 126, .12);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #faf3f6, #f7f2fb);
+}
+.cloud-status-card div { display: flex; flex-direction: column; gap: 4px; }
+.cloud-status-card strong { font-size: 13px; }
+.cloud-status-card small { color: #8a7d84; font-size: 10px; line-height: 1.45; }
+.cloud-form { display: grid; gap: 10px; }
+.cloud-form label { margin-top: 5px; color: #74656d; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.cloud-form input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #e6dade;
+  border-radius: 13px;
+  background: #fff;
+  color: var(--ink);
+  font: 13px "DM Sans", sans-serif;
+  outline: none;
+}
+.cloud-form input:focus { border-color: #c18aa2; box-shadow: 0 0 0 4px rgba(193, 138, 162, .12); }
+.cloud-button-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.cloud-primary-button, .cloud-secondary-button, .cloud-danger-button {
+  min-height: 43px;
+  padding: 0 17px;
+  border-radius: 13px;
+  font: 700 11px "DM Sans", sans-serif;
+  transition: transform .16s ease, opacity .16s ease, background .16s ease;
+}
+.cloud-primary-button { background: #4a3b46; color: #fff; }
+.cloud-primary-button:hover { background: #382d35; transform: translateY(-1px); }
+.cloud-secondary-button { border: 1px solid #dfd1d7; background: #fffafc; color: #5a4a53; }
+.cloud-secondary-button:hover { border-color: #cda8b8; background: #f9eff3; transform: translateY(-1px); }
+.cloud-danger-button { background: #ad5d6b; color: #fff; }
+.cloud-danger-button:hover { background: #984d5a; transform: translateY(-1px); }
+.cloud-primary-button:disabled, .cloud-secondary-button:disabled, .cloud-danger-button:disabled, .cloud-text-button:disabled { opacity: .52; cursor: wait; transform: none; }
+.cloud-form-message { min-height: 18px; margin: 2px 0 0; color: #76686f; font-size: 11px; line-height: 1.5; }
+.cloud-form-message[data-type="error"] { color: #a84e60; }
+.cloud-form-message[data-type="success"] { color: #548364; }
+.cloud-fine-print, .cloud-warning { margin: 2px 0 0; color: #978a90; font-size: 9px; line-height: 1.55; }
+.cloud-warning { padding: 12px 14px; border-radius: 13px; background: #fbf2e7; color: #8a6f52; }
+.cloud-user-line { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 17px; padding-bottom: 14px; border-bottom: 1px solid #eee4e7; color: #95868e; font-size: 10px; }
+.cloud-user-line strong { color: var(--ink); overflow-wrap: anywhere; }
+.cloud-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.cloud-action-grid .cloud-primary-button { grid-column: 1 / -1; }
+.cloud-conflict-panel { margin-top: 15px; padding: 17px; border: 1px solid rgba(185, 99, 114, .18); border-radius: 16px; background: #fff2f3; }
+.cloud-conflict-panel strong { color: #8f4654; font-size: 12px; }
+.cloud-conflict-panel p { margin: 7px 0 0; color: #966f77; font-size: 10px; line-height: 1.5; }
+.cloud-account-footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 22px; padding-top: 15px; border-top: 1px solid #eee4e7; }
+.cloud-text-button { color: #76666f; font-size: 10px; border-bottom: 1px solid currentColor; padding-bottom: 3px; }
+.cloud-text-button.danger { color: #b15c6b; }
+.cloud-toast {
+  position: fixed;
+  z-index: 1200;
+  left: 50%;
+  bottom: 24px;
+  max-width: min(90vw, 440px);
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: #3f333b;
+  color: #fff;
+  font-size: 11px;
+  box-shadow: 0 16px 50px rgba(44, 31, 39, .25);
+  opacity: 0;
+  transform: translate(-50%, 18px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.cloud-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.cloud-toast[data-type="success"] { background: #486b55; }
+.cloud-toast[data-type="error"] { background: #9c4f5d; }
+
+@media (max-width: 800px) {
+  .cloud-account-button { margin-left: 0; margin-right: 8px; padding: 0 11px; }
+  .cloud-modal { padding: 12px; align-items: end; }
+  .cloud-modal-card { width: 100%; max-height: calc(100vh - 24px); padding: 29px 21px; border-radius: 24px; }
+  .cloud-action-grid { grid-template-columns: 1fr; }
+  .cloud-action-grid .cloud-primary-button { grid-column: auto; }
+  .cloud-account-footer { align-items: flex-start; }
+}
+
+@media (max-width: 430px) {
+  #cloudAccountLabel { display: none; }
+  .cloud-account-button { width: 38px; padding: 0; justify-content: center; }
+  .cloud-button-row > * { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-status-dot, .cloud-account-button, .cloud-toast, .cloud-primary-button, .cloud-secondary-button, .cloud-danger-button { animation: none !important; transition: none !important; }
+}

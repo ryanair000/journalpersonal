@@ -1,0 +1,287 @@
+.settings-section {
+  scroll-margin-top: 28px;
+}
+
+.settings-heading {
+  align-items: flex-start;
+}
+
+.settings-local-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border: 1px solid rgb(91 63 78 / 10%);
+  border-radius: 999px;
+  background: #fff8fa;
+  color: #846d79;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.settings-intro {
+  max-width: 720px;
+  margin: -6px 0 24px;
+  color: #77636e;
+  line-height: 1.65;
+}
+
+.settings-form {
+  display: grid;
+  gap: 20px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.settings-card {
+  display: grid;
+  align-content: start;
+  gap: 15px;
+  padding: 24px;
+  border: 1px solid rgb(91 63 78 / 10%);
+  border-radius: 24px;
+  background: #fffdfd;
+  box-shadow: 0 12px 34px rgb(91 63 78 / 7%);
+}
+
+.settings-card h3 {
+  margin: -8px 0 2px;
+}
+
+.settings-card-wide {
+  gap: 18px;
+}
+
+.settings-card-copy,
+.settings-budget-summary,
+.settings-data-status {
+  margin: 0;
+  color: #826e78;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.settings-budget-summary {
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: #fff7f9;
+}
+
+.settings-field {
+  display: grid;
+  gap: 7px;
+  color: #4f3f48;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-field input,
+.settings-field select {
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid #e8dce2;
+  border-radius: 14px;
+  background: #fff;
+  color: #3f343a;
+  padding: 11px 13px;
+  font: inherit;
+  font-weight: 450;
+  outline: none;
+}
+
+.settings-field input:focus,
+.settings-field select:focus {
+  border-color: #c9829e;
+  box-shadow: 0 0 0 4px rgb(201 130 158 / 14%);
+}
+
+.settings-field small {
+  color: #8b7782;
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.45;
+}
+
+.settings-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid rgb(91 63 78 / 10%);
+  border-radius: 16px;
+  background: #fff9fb;
+  cursor: pointer;
+}
+
+.settings-toggle:has(input:checked) {
+  border-color: #dfb6c7;
+  background: #fff4f8;
+}
+
+.settings-toggle input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: #c9829e;
+  flex: 0 0 auto;
+}
+
+.settings-toggle span {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-toggle strong {
+  color: #4f3f48;
+  font-size: 13px;
+}
+
+.settings-toggle small {
+  color: #846f79;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.settings-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.settings-status {
+  min-height: 20px;
+  margin: 0 auto 0 0;
+  color: #6f7a67;
+  font-size: 13px;
+}
+
+.settings-save {
+  border: 0;
+  cursor: pointer;
+}
+
+.settings-data-card {
+  margin-top: 20px;
+}
+
+.settings-data-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.settings-action {
+  min-height: 39px;
+  border: 1px solid #e5d8df;
+  border-radius: 999px;
+  background: #fff;
+  color: #69545f;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-action:hover,
+.settings-action:focus-visible {
+  border-color: #d5a0b5;
+  background: #fff5f8;
+  color: #985570;
+}
+
+.settings-warning {
+  color: #8a662c;
+}
+
+.settings-danger {
+  border-color: #eccbd3;
+  background: #fff8fa;
+  color: #a24e63;
+}
+
+.settings-data-status {
+  min-height: 20px;
+}
+
+body.settings-compact .section {
+  margin-top: 26px;
+}
+
+body.settings-compact .module-card,
+body.settings-compact .detail-card,
+body.settings-compact .advanced-card,
+body.settings-compact .settings-card {
+  padding: 18px;
+}
+
+body.settings-compact .tracker-grid,
+body.settings-compact .content-hub-grid,
+body.settings-compact .details-grid,
+body.settings-compact .school-layout,
+body.settings-compact .work-layout,
+body.settings-compact .people-layout {
+  gap: 12px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 820px) {
+  .settings-grid,
+  .settings-toggle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .settings-card {
+    padding: 19px;
+    border-radius: 20px;
+  }
+
+  .settings-local-pill {
+    display: none;
+  }
+
+  .settings-save-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-save {
+    width: 100%;
+  }
+
+  .settings-data-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-action {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-action,
+  .settings-toggle,
+  .settings-field input,
+  .settings-field select {
+    transition: none !important;
+  }
+}

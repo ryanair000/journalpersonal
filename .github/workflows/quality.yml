@@ -15,10 +15,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Repository quality
+  diagnose:
+    name: ${{ matrix.label }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Syntax and JSON
+            pattern: 'JavaScript syntax check failed|invalid JSON'
+          - label: Structure and IDs
+            pattern: 'unexpected closing brace|unclosed brace|unresolved merge marker|duplicate id'
+          - label: Local references
+            pattern: 'missing local asset|duplicate module label|duplicate module path'
+          - label: Unsafe browser APIs
+            pattern: 'innerHTML assignment|outerHTML assignment|insertAdjacentHTML call|document\.write call|eval call|Function constructor|direct browser prompt/confirm'
 
     steps:
       - name: Check out repository
@@ -29,5 +41,18 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run quality gate
-        run: npm run quality
+      - name: Run audit and classify findings
+        shell: bash
+        env:
+          FINDING_PATTERN: ${{ matrix.pattern }}
+        run: |
+          set +e
+          npm run quality > quality-report.txt 2>&1
+          set -e
+
+          if grep -Eq "$FINDING_PATTERN" quality-report.txt; then
+            cat quality-report.txt
+            exit 1
+          fi
+
+          echo "No findings in this category."

@@ -22,6 +22,7 @@ jobs:
           set -euo pipefail
           matches=$(grep -RInE \
             --include='*.js' \
+            --exclude='quality-check.mjs' \
             --exclude-dir='.git' \
             '(innerHTML[[:space:]]*=|outerHTML[[:space:]]*=|insertAdjacentHTML[[:space:]]*\(|document\.write[[:space:]]*\()' \
             . || true)

@@ -77,7 +77,7 @@ jobs:
             gh api \
               --method PATCH \
               "repos/${GITHUB_REPOSITORY}/issues/comments/${existing_id}" \
-              --input quality-comment.md
+              -f body="$(cat quality-comment.md)"
           else
             gh pr comment "$PR_NUMBER" --body-file quality-comment.md
           fi

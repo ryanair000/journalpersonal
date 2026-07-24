@@ -10,4 +10,6 @@ import("./dashboard.js")
   .then(() => import("./finance.js"))
   .then(() => import("./journal.js"))
   .then(() => import("./planner.js"))
+  .then(() => import("./command-center.js"))
+  .then(() => import("./growth-centers.js"))
   .catch((error) => console.error("Unable to load dashboard modules.", error));

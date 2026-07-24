@@ -1,0 +1,255 @@
+.rhythm-card .rhythm-line {
+  align-items: center;
+}
+
+.rhythm-card .rhythm-line[aria-label] {
+  border-radius: 12px;
+}
+
+.rhythm-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+
+.rhythm-quick-actions button {
+  border: 1px solid rgb(91 63 78 / 12%);
+  border-radius: 999px;
+  background: #fffafb;
+  color: #785f6d;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rhythm-quick-actions button:hover,
+.rhythm-quick-actions button:focus-visible {
+  border-color: #d6a0b6;
+  background: #fceef4;
+  color: #9d536e;
+}
+
+.rhythm-history {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(91 63 78 / 10%);
+}
+
+.rhythm-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rhythm-history-heading strong {
+  font-size: 13px;
+}
+
+.rhythm-history-heading span {
+  color: #927985;
+  font-size: 10px;
+}
+
+.rhythm-history-summary {
+  margin: 0;
+  color: #735f69;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.rhythm-history-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(78px, 1fr));
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.rhythm-day {
+  display: grid;
+  gap: 5px;
+  min-width: 78px;
+  padding: 10px;
+  border: 1px solid rgb(91 63 78 / 9%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 64%);
+}
+
+.rhythm-day strong {
+  font-size: 11px;
+}
+
+.rhythm-day span {
+  color: #78626e;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.rhythm-day .rhythm-day-empty {
+  color: #a08d96;
+  white-space: normal;
+}
+
+.rhythm-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.rhythm-dialog.open {
+  display: flex;
+}
+
+.rhythm-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgb(42 35 40 / 48%);
+  backdrop-filter: blur(4px);
+}
+
+.rhythm-form {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 100%);
+  max-height: min(800px, calc(100vh - 48px));
+  overflow-y: auto;
+  padding: 30px;
+  border: 1px solid rgb(99 70 86 / 12%);
+  border-radius: 28px;
+  background: #fffdfd;
+  box-shadow: 0 24px 80px rgb(91 63 78 / 22%);
+}
+
+.rhythm-form h2 {
+  margin: 4px 0 8px;
+}
+
+.rhythm-description {
+  margin: 0 0 22px;
+  color: #7a6671;
+  line-height: 1.55;
+}
+
+.rhythm-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgb(91 63 78 / 12%);
+  border-radius: 50%;
+  background: #fff8fa;
+  color: #67545f;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.rhythm-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.rhythm-field {
+  display: grid;
+  gap: 7px;
+  color: #4f3f48;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.rhythm-field input {
+  width: 100%;
+  border: 1px solid #e8dce2;
+  border-radius: 15px;
+  background: #fff;
+  color: #3f343a;
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 450;
+  outline: none;
+}
+
+.rhythm-field input:focus {
+  border-color: #c9829e;
+  box-shadow: 0 0 0 4px rgb(201 130 158 / 14%);
+}
+
+.rhythm-field small {
+  color: #8b7782;
+  font-weight: 450;
+  line-height: 1.4;
+}
+
+.rhythm-error {
+  min-height: 20px;
+  margin: 13px 0 0;
+  color: #aa3d59;
+  font-size: 13px;
+}
+
+.rhythm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rhythm-cancel {
+  border: 1px solid #e7d9e0;
+  border-radius: 999px;
+  background: #fff;
+  color: #69545f;
+  padding: 11px 18px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+@media (max-width: 680px) {
+  .rhythm-dialog {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .rhythm-form {
+    width: 100%;
+    max-height: 90vh;
+    padding: 26px 20px max(22px, env(safe-area-inset-bottom));
+    border-radius: 26px 26px 0 0;
+  }
+
+  .rhythm-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rhythm-footer {
+    position: sticky;
+    bottom: 0;
+    padding-top: 12px;
+    background: linear-gradient(to bottom, rgb(255 253 253 / 0%), #fffdfd 28%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rhythm-dialog,
+  .rhythm-form,
+  .rhythm-quick-actions button {
+    transition: none !important;
+  }
+}

@@ -15,44 +15,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  runner-control:
-    name: Runner control
+  quality:
+    name: Repository quality
     runs-on: ubuntu-latest
-    steps:
-      - name: Verify runner
-        run: echo "Runner is available."
+    timeout-minutes: 10
 
-  checkout-control:
-    name: Checkout control
-    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Verify files
-        run: test -f index.html && test -f script.js
 
-  node-control:
-    name: Node control
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Verify Node
-        run: node --version
 
-  audit-control:
-    name: Audit command
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Use Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Run audit
+      - name: Run quality gate
         run: npm run quality

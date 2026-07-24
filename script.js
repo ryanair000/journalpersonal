@@ -5,7 +5,8 @@
   const modulePlan = [
     { path: "./dashboard.js", label: "Dashboard", critical: true },
     { path: "./state-write-guard.js", label: "State protection" },
-    { path: "./resource-bootstrap.js", label: "Resources" },
+    { path: "./resource-bootstrap.js", label: "Resource layout" },
+    { path: "./resources.js", label: "Resource data" },
     { path: "./form-actions.js", label: "Forms" },
     { path: "./editing-actions.js", label: "Editing controls" },
     { path: "./settings.js", label: "Settings" },

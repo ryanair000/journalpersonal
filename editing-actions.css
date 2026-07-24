@@ -1,0 +1,366 @@
+.manage-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.manage-dialog.open {
+  display: flex;
+}
+
+.manage-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgb(42 35 40 / 48%);
+  backdrop-filter: blur(4px);
+  cursor: default;
+}
+
+.manage-card {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow-y: auto;
+  padding: 30px;
+  border: 1px solid rgb(99 70 86 / 12%);
+  border-radius: 28px;
+  background: #fffdfd;
+  box-shadow: 0 24px 80px rgb(91 63 78 / 22%);
+}
+
+.manage-card h2 {
+  margin: 4px 0 8px;
+}
+
+.manage-description {
+  margin: 0 0 22px;
+  color: #7a6671;
+  line-height: 1.55;
+}
+
+.manage-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgb(91 63 78 / 12%);
+  border-radius: 50%;
+  background: #fff8fa;
+  color: #67545f;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.manage-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.manage-field {
+  display: grid;
+  gap: 7px;
+  color: #4f3f48;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.manage-field input,
+.manage-field textarea,
+.manage-field select {
+  width: 100%;
+  border: 1px solid #e8dce2;
+  border-radius: 15px;
+  background: #fff;
+  color: #3f343a;
+  font: inherit;
+  font-weight: 450;
+  padding: 12px 14px;
+  outline: none;
+}
+
+.manage-field textarea {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.5;
+}
+
+.manage-field input:focus,
+.manage-field textarea:focus,
+.manage-field select:focus {
+  border-color: #c9829e;
+  box-shadow: 0 0 0 4px rgb(201 130 158 / 14%);
+}
+
+.manage-field small {
+  color: #8b7782;
+  font-weight: 450;
+}
+
+.manage-error {
+  min-height: 20px;
+  margin: 13px 0 0;
+  color: #aa3d59;
+  font-size: 13px;
+}
+
+.manage-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.manage-cancel {
+  border: 1px solid #e7d9e0;
+  border-radius: 999px;
+  background: #fff;
+  color: #69545f;
+  padding: 11px 18px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.manage-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.manage-action {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgb(91 63 78 / 12%);
+  border-radius: 9px;
+  background: #fffafb;
+  color: #735d69;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.manage-action:hover:not(:disabled),
+.manage-action:focus-visible {
+  border-color: #d5a0b5;
+  background: #fceff4;
+  color: #9d526e;
+}
+
+.manage-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.manage-action.is-complete {
+  background: #edf5ed;
+  color: #52705a;
+}
+
+.manage-edit {
+  color: #a15a75;
+}
+
+.manage-delete {
+  color: #a94f64;
+}
+
+.manage-delete.confirming {
+  width: auto;
+  padding: 0 8px;
+  background: #fff0f3;
+}
+
+.dynamic-item.managed-complete {
+  opacity: 0.62;
+}
+
+.dynamic-item.managed-complete strong,
+.dynamic-item.managed-complete > div:not(.manage-controls),
+.dynamic-item.managed-complete > small {
+  text-decoration: line-through;
+}
+
+.content-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-left: auto;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #f4eaf0;
+  color: #8b6174;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.content-status-badge.status-scheduled {
+  background: #fff3df;
+  color: #8d682e;
+}
+
+.content-status-badge.status-posted {
+  background: #e9f5eb;
+  color: #53745b;
+}
+
+#savedPosted {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#savedPosted .idea-item {
+  text-align: left;
+}
+
+.expense-history {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgb(91 63 78 / 10%);
+}
+
+.expense-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.expense-history-heading strong {
+  font-size: 14px;
+}
+
+.expense-history-heading span {
+  color: #927985;
+  font-size: 11px;
+}
+
+.expense-history-empty {
+  margin: 0;
+  color: #8a7680;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.expense-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgb(91 63 78 / 8%);
+}
+
+.expense-row:last-child {
+  border-bottom: 0;
+}
+
+.expense-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.expense-copy strong {
+  font-size: 14px;
+}
+
+.expense-copy span,
+.expense-copy small {
+  overflow: hidden;
+  color: #7f6a75;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expense-copy span {
+  font-size: 12px;
+}
+
+.expense-copy small {
+  font-size: 10px;
+}
+
+.expense-controls {
+  margin-left: auto;
+}
+
+#savedTasks > .dynamic-item,
+#savedIdeas > .dynamic-item,
+#savedDrafts > .dynamic-item,
+#savedPosted > .dynamic-item,
+#savedAccounts > .dynamic-item,
+#savedPlanner > .dynamic-item,
+#savedSocial > .dynamic-item,
+#unitList > .dynamic-item,
+#studyList > .dynamic-item,
+#researchList > .dynamic-item,
+#savedClasses > .dynamic-item,
+#businessList > .dynamic-item,
+#savedWorkGoals > .dynamic-item,
+#peopleList > .dynamic-item,
+#relationshipItems > .dynamic-item {
+  position: relative;
+}
+
+@media (max-width: 680px) {
+  .manage-dialog {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .manage-card {
+    width: 100%;
+    max-height: 88vh;
+    padding: 26px 20px max(22px, env(safe-area-inset-bottom));
+    border-radius: 26px 26px 0 0;
+  }
+
+  .manage-footer {
+    position: sticky;
+    bottom: 0;
+    padding-top: 12px;
+    background: linear-gradient(to bottom, rgb(255 253 253 / 0%), #fffdfd 28%);
+  }
+
+  .manage-controls {
+    gap: 4px;
+  }
+
+  .manage-action {
+    width: 30px;
+    height: 30px;
+  }
+
+  .expense-row {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manage-dialog,
+  .manage-card,
+  .manage-action {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}

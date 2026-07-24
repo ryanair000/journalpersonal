@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -48,8 +49,41 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Publish pull request report
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          marker='<!-- repository-quality-gate -->'
+          {
+            echo "$marker"
+            echo '## Repository quality gate'
+            echo
+            echo '```text'
+            tail -c 55000 quality-report.txt
+            echo
+            echo '```'
+          } > quality-comment.md
+
+          existing_id=$(gh api \
+            "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+            --paginate \
+            --jq ".[] | select(.body | contains(\"$marker\")) | .id" \
+            | head -n 1)
+
+          if [ -n "$existing_id" ]; then
+            gh api \
+              --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${existing_id}" \
+              --input quality-comment.md
+          else
+            gh pr comment "$PR_NUMBER" --body-file quality-comment.md
+          fi
+
       - name: Enforce quality result
         if: steps.quality.outputs.exit_code != '0'
         run: |
-          echo "The repository quality gate reported errors. Review the job summary or downloaded report."
+          echo "The repository quality gate reported errors. Review the pull request report or downloaded artifact."
           exit 1

@@ -17,6 +17,14 @@
     }
   }
 
+  function installPatchStyles() {
+    if (qs("#expansionPatchStyles")) return;
+    const style = document.createElement("style");
+    style.id = "expansionPatchStyles";
+    style.textContent = ".suite-nav-open .suite-mobile-nav-toggle{position:relative;z-index:1901}";
+    document.head.append(style);
+  }
+
   function resourceSnapshotFromDom() {
     return qsa("#resourceList .resource-card").map((card) => ({
       id: createId(),
@@ -61,6 +69,29 @@
     globalThis.location.reload();
   }, true);
 
+  document.addEventListener("click", (event) => {
+    if (!document.body.classList.contains("suite-nav-open")) return;
+    if (event.target.closest(".sidebar") || event.target.closest("#mobileNavToggle")) return;
+    qs("#mobileNavToggle")?.click();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const palette = qs("#commandPalette.open");
+    if (!palette || event.key !== "Tab") return;
+    const focusable = qsa('button, input, textarea, select, a[href], [tabindex]:not([tabindex="-1"])', palette)
+      .filter((node) => !node.disabled && node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }, true);
+
   function refreshActiveNavigation() {
     const links = qsa(".sidebar nav a[href^='#']");
     const pairs = links.map((link) => ({ link, section: qs(link.getAttribute("href")) })).filter((pair) => pair.section);
@@ -78,6 +109,27 @@
     pairs.forEach(({ section }) => observer.observe(section));
   }
 
+  function applyHiddenNavigation() {
+    const state = safeParse(localStorage.getItem(STORAGE_KEY), {});
+    const hidden = Array.isArray(state?.suite?.hiddenCenters) ? state.suite.hiddenCenters : [];
+    const mappings = {
+      reminderCenter: "#reminderCenter",
+      studyCenterPlus: "#studyCenterPlus",
+      contentCalendar: "#contentCalendar",
+      workCenterPlus: "#workCenterPlus",
+      connectionsCenter: "#connectionsCenter",
+      systemCenter: "#systemCenter"
+    };
+    Object.entries(mappings).forEach(([id, href]) => {
+      const link = qs(`.sidebar nav a[href="${href}"]`);
+      if (link) link.hidden = hidden.includes(id);
+    });
+  }
+
+  installPatchStyles();
   initialiseResourceBaseline();
-  setTimeout(refreshActiveNavigation, 350);
+  setTimeout(() => {
+    applyHiddenNavigation();
+    refreshActiveNavigation();
+  }, 350);
 })();

@@ -3,71 +3,139 @@
 (() => {
   const qs = (selector, root = document) => root.querySelector(selector);
 
+  function element(tag, options = {}) {
+    const node = document.createElement(tag);
+    if (options.className) node.className = options.className;
+    if (options.text !== undefined) node.textContent = String(options.text);
+    if (options.attrs) {
+      Object.entries(options.attrs).forEach(([name, value]) => {
+        if (value !== undefined && value !== null) node.setAttribute(name, String(value));
+      });
+    }
+    return node;
+  }
+
+  function appendField(form, labelText, field) {
+    form.append(element("label", {
+      className: "form-label",
+      text: labelText,
+      attrs: { for: field.id }
+    }));
+    form.append(field);
+  }
+
   if (!qs('link[href="resources.css"]')) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "resources.css";
+    const link = element("link", { attrs: { rel: "stylesheet", href: "resources.css" } });
     document.head.append(link);
   }
 
   const journalNav = qs('.sidebar nav a[href="#journal"]');
   if (journalNav && !qs('.sidebar nav a[href="#resources"]')) {
-    const resourceNav = document.createElement("a");
-    resourceNav.href = "#resources";
-    resourceNav.innerHTML = "<span>⌘</span> Resources";
+    const resourceNav = element("a", { attrs: { href: "#resources" } });
+    resourceNav.append(
+      element("span", { text: "⌘" }),
+      document.createTextNode(" Resources")
+    );
     journalNav.after(resourceNav);
   }
 
   const journalToolbar = qs(".journal-toolbar");
   if (journalToolbar && !qs("#journalSearch")) {
-    const search = document.createElement("label");
-    search.className = "journal-search";
-    search.innerHTML = '<span class="sr-only">Search journal entries</span><input id="journalSearch" type="search" placeholder="Search entries" autocomplete="off">';
+    const search = element("label", { className: "journal-search" });
+    search.append(
+      element("span", { className: "sr-only", text: "Search journal entries" }),
+      element("input", {
+        attrs: {
+          id: "journalSearch",
+          type: "search",
+          placeholder: "Search entries",
+          autocomplete: "off"
+        }
+      })
+    );
 
-    const importButton = document.createElement("button");
-    importButton.type = "button";
-    importButton.className = "small-link";
-    importButton.id = "importData";
-    importButton.textContent = "Import backup";
+    const importButton = element("button", {
+      className: "small-link",
+      text: "Import backup",
+      attrs: { type: "button", id: "importData" }
+    });
 
-    const fileInput = document.createElement("input");
-    fileInput.className = "sr-only";
-    fileInput.id = "importFile";
-    fileInput.type = "file";
-    fileInput.accept = ".json,application/json";
+    const fileInput = element("input", {
+      className: "sr-only",
+      attrs: {
+        id: "importFile",
+        type: "file",
+        accept: ".json,application/json"
+      }
+    });
 
     journalToolbar.prepend(search, importButton, fileInput);
   }
 
   if (!qs("#resources")) {
-    const section = document.createElement("section");
-    section.className = "resources-hub section";
-    section.id = "resources";
-    section.setAttribute("aria-labelledby", "resourcesTitle");
-    section.innerHTML = `
-      <div class="section-title">
-        <div>
-          <p class="eyebrow">Useful resources</p>
-          <h2 id="resourcesTitle">Keep important links and support close.</h2>
-        </div>
-        <button type="button" class="small-link" id="addResource">＋ Add resource</button>
-      </div>
-      <div class="resources-toolbar">
-        <label class="resource-search">
-          <span class="sr-only">Search resources</span>
-          <input id="resourceSearch" type="search" placeholder="Search resources" autocomplete="off">
-        </label>
-        <div class="resource-filters" role="group" aria-label="Filter resources by category">
-          <button type="button" class="active" data-resource-filter="All" aria-pressed="true">All</button>
-          <button type="button" data-resource-filter="Study" aria-pressed="false">Study</button>
-          <button type="button" data-resource-filter="Wellbeing" aria-pressed="false">Wellbeing</button>
-          <button type="button" data-resource-filter="Money" aria-pressed="false">Money</button>
-          <button type="button" data-resource-filter="Career" aria-pressed="false">Career</button>
-          <button type="button" data-resource-filter="Personal" aria-pressed="false">Personal</button>
-        </div>
-      </div>
-      <div class="resource-grid" id="resourceList" aria-live="polite"></div>
-    `;
+    const section = element("section", {
+      className: "resources-hub section",
+      attrs: { id: "resources", "aria-labelledby": "resourcesTitle" }
+    });
+
+    const sectionTitle = element("div", { className: "section-title" });
+    const titleCopy = element("div");
+    titleCopy.append(
+      element("p", { className: "eyebrow", text: "Useful resources" }),
+      element("h2", {
+        text: "Keep important links and support close.",
+        attrs: { id: "resourcesTitle" }
+      })
+    );
+    sectionTitle.append(
+      titleCopy,
+      element("button", {
+        className: "small-link",
+        text: "＋ Add resource",
+        attrs: { type: "button", id: "addResource" }
+      })
+    );
+
+    const toolbar = element("div", { className: "resources-toolbar" });
+    const search = element("label", { className: "resource-search" });
+    search.append(
+      element("span", { className: "sr-only", text: "Search resources" }),
+      element("input", {
+        attrs: {
+          id: "resourceSearch",
+          type: "search",
+          placeholder: "Search resources",
+          autocomplete: "off"
+        }
+      })
+    );
+
+    const filters = element("div", {
+      className: "resource-filters",
+      attrs: { role: "group", "aria-label": "Filter resources by category" }
+    });
+    ["All", "Study", "Wellbeing", "Money", "Career", "Personal"].forEach((category, index) => {
+      const button = element("button", {
+        className: index === 0 ? "active" : "",
+        text: category,
+        attrs: {
+          type: "button",
+          "data-resource-filter": category,
+          "aria-pressed": String(index === 0)
+        }
+      });
+      filters.append(button);
+    });
+
+    toolbar.append(search, filters);
+    section.append(
+      sectionTitle,
+      toolbar,
+      element("div", {
+        className: "resource-grid",
+        attrs: { id: "resourceList", "aria-live": "polite" }
+      })
+    );
 
     const analytics = qs("#analytics");
     if (analytics) analytics.before(section);
@@ -75,37 +143,83 @@
   }
 
   if (!qs("#resourceModal")) {
-    const modal = document.createElement("div");
-    modal.className = "modal";
-    modal.id = "resourceModal";
-    modal.setAttribute("aria-hidden", "true");
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "resourceModalTitle");
-    modal.innerHTML = `
-      <div class="modal-backdrop js-close-resource-modal"></div>
-      <form class="modal-card" id="resourceForm">
-        <button class="modal-close js-close-resource-modal" type="button" aria-label="Close resource form">×</button>
-        <p class="eyebrow">New resource</p>
-        <h2 id="resourceModalTitle">Save something useful.</h2>
-        <label class="form-label" for="resourceTitle">Title</label>
-        <input id="resourceTitle" type="text" placeholder="e.g. University portal" maxlength="120" required>
-        <label class="form-label" for="resourceCategory">Category</label>
-        <select id="resourceCategory" required>
-          <option value="Study">Study</option>
-          <option value="Wellbeing">Wellbeing</option>
-          <option value="Money">Money</option>
-          <option value="Career">Career</option>
-          <option value="Personal">Personal</option>
-        </select>
-        <label class="form-label" for="resourceUrl">Link or contact</label>
-        <input id="resourceUrl" type="text" inputmode="url" placeholder="https://, mailto:, tel:, or #section">
-        <label class="form-label" for="resourceNote">Note</label>
-        <textarea id="resourceNote" rows="4" placeholder="Why this matters or how to use it" maxlength="500"></textarea>
-        <label class="resource-pin"><input id="resourcePinned" type="checkbox"> Pin this resource</label>
-        <button class="save-button" type="submit">Save resource <span>↗</span></button>
-      </form>
-    `;
+    const modal = element("div", {
+      className: "modal",
+      attrs: {
+        id: "resourceModal",
+        "aria-hidden": "true",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": "resourceModalTitle"
+      }
+    });
+
+    const backdrop = element("div", { className: "modal-backdrop js-close-resource-modal" });
+    const form = element("form", { className: "modal-card", attrs: { id: "resourceForm" } });
+    form.append(
+      element("button", {
+        className: "modal-close js-close-resource-modal",
+        text: "×",
+        attrs: { type: "button", "aria-label": "Close resource form" }
+      }),
+      element("p", { className: "eyebrow", text: "New resource" }),
+      element("h2", {
+        text: "Save something useful.",
+        attrs: { id: "resourceModalTitle" }
+      })
+    );
+
+    appendField(form, "Title", element("input", {
+      attrs: {
+        id: "resourceTitle",
+        type: "text",
+        placeholder: "e.g. University portal",
+        maxlength: "120",
+        required: ""
+      }
+    }));
+
+    const categorySelect = element("select", { attrs: { id: "resourceCategory", required: "" } });
+    ["Study", "Wellbeing", "Money", "Career", "Personal"].forEach((category) => {
+      categorySelect.append(element("option", { text: category, attrs: { value: category } }));
+    });
+    appendField(form, "Category", categorySelect);
+
+    appendField(form, "Link or contact", element("input", {
+      attrs: {
+        id: "resourceUrl",
+        type: "text",
+        inputmode: "url",
+        placeholder: "https://, mailto:, tel:, or #section"
+      }
+    }));
+
+    appendField(form, "Note", element("textarea", {
+      attrs: {
+        id: "resourceNote",
+        rows: "4",
+        placeholder: "Why this matters or how to use it",
+        maxlength: "500"
+      }
+    }));
+
+    const pinLabel = element("label", { className: "resource-pin" });
+    pinLabel.append(
+      element("input", { attrs: { id: "resourcePinned", type: "checkbox" } }),
+      document.createTextNode(" Pin this resource")
+    );
+
+    const saveButton = element("button", {
+      className: "save-button",
+      attrs: { type: "submit" }
+    });
+    saveButton.append(
+      document.createTextNode("Save resource "),
+      element("span", { text: "↗" })
+    );
+
+    form.append(pinLabel, saveButton);
+    modal.append(backdrop, form);
 
     const toast = qs("#appToast");
     if (toast) toast.before(modal);

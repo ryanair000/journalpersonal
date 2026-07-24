@@ -9,4 +9,5 @@ import("./dashboard.js")
   .then(() => import("./rhythm.js"))
   .then(() => import("./finance.js"))
   .then(() => import("./journal.js"))
+  .then(() => import("./planner.js"))
   .catch((error) => console.error("Unable to load dashboard modules.", error));

@@ -1,0 +1,12 @@
+{
+  "name": "my-little-life-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A calm, local-first personal dashboard.",
+  "scripts": {
+    "quality": "node scripts/quality-check.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

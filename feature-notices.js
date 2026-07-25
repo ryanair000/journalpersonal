@@ -198,6 +198,8 @@ export function featureNoticeDiagnostics() {
   });
 }
 
+registerFeatureNotice("finance");
+
 const featureNotices = Object.freeze({
   FEATURE_NOTICE_KEYS,
   consumeFeatureNotice,

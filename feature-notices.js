@@ -199,6 +199,7 @@ export function featureNoticeDiagnostics() {
 }
 
 registerFeatureNotice("finance");
+registerFeatureNotice("journal");
 
 const featureNotices = Object.freeze({
   FEATURE_NOTICE_KEYS,

@@ -200,6 +200,7 @@ export function featureNoticeDiagnostics() {
 
 registerFeatureNotice("finance");
 registerFeatureNotice("journal");
+registerFeatureNotice("planner");
 
 const featureNotices = Object.freeze({
   FEATURE_NOTICE_KEYS,

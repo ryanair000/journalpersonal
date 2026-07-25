@@ -21,6 +21,7 @@
     { path: "./editing-actions.js", label: "Editing controls" },
     { path: "./settings.js", label: "Settings" },
     { path: "./rhythm.js", label: "Body and rhythm" },
+    { path: "./feature-notices.js", label: "Feature notices" },
     { path: "./finance.js", label: "Finance centre" },
     { path: "./journal.js", label: "Journal centre" },
     { path: "./planner.js", label: "Planner and agenda" },

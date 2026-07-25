@@ -1,12 +1,13 @@
 "use strict";
 
-import { createId, dispatch, localDateKey, qs, qsa } from "./app-core.js";
+import { createId, localDateKey, qs, qsa } from "./app-core.js";
 import { consumeNotice, setNotice } from "./command-state.js";
 import {
   STORAGE_KEYS,
   isRecord,
   readAppState,
   readJson,
+  readRaw,
   writeAppState,
   writeJson
 } from "./state-store.js";
@@ -113,14 +114,10 @@ function installTrackedReadBridge() {
 
   storagePrototype.getItem = function getItem(key) {
     const normalizedKey = String(key);
-    const value = previousGetItem.call(this, normalizedKey);
     if (this === globalThis.localStorage && TRACKED_READ_KEYS.has(normalizedKey)) {
-      dispatch("mll:storage-read", {
-        key: normalizedKey,
-        storage: "localStorage"
-      });
+      return readRaw(normalizedKey, { fallback: null });
     }
-    return value;
+    return previousGetItem.call(this, normalizedKey);
   };
 
   globalThis.__littleLifeCommandReadBridgeInstalled = true;

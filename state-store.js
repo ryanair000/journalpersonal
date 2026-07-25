@@ -9,6 +9,10 @@ export const STORAGE_KEYS = Object.freeze({
   settingsNotice: "myLittleLife.settingsNotice"
 });
 
+const storagePrototype = globalThis.Storage?.prototype;
+const nativeGetItem = storagePrototype?.getItem;
+const nativeKey = storagePrototype?.key;
+
 const metrics = {
   reads: 0,
   writes: 0,
@@ -18,9 +22,35 @@ const metrics = {
   lastError: ""
 };
 
+function isBrowserStorage(storage) {
+  try {
+    return storage === globalThis.localStorage || storage === globalThis.sessionStorage;
+  } catch {
+    return false;
+  }
+}
+
+function storageGetItem(storage, key) {
+  if (isBrowserStorage(storage) && typeof nativeGetItem === "function") {
+    return nativeGetItem.call(storage, String(key));
+  }
+  return storage.getItem(String(key));
+}
+
+function storageKey(storage, index) {
+  if (isBrowserStorage(storage) && typeof nativeKey === "function") {
+    return nativeKey.call(storage, index);
+  }
+  return storage.key(index);
+}
+
 function storageLabel(storage) {
-  if (storage === globalThis.localStorage) return "localStorage";
-  if (storage === globalThis.sessionStorage) return "sessionStorage";
+  try {
+    if (storage === globalThis.localStorage) return "localStorage";
+    if (storage === globalThis.sessionStorage) return "sessionStorage";
+  } catch {
+    // Storage access may be blocked by the browser.
+  }
   return "storage";
 }
 
@@ -33,6 +63,13 @@ function reportError(operation, key, storage, error) {
     key: String(key || ""),
     storage: storageLabel(storage),
     error: message
+  });
+}
+
+function reportRead(key, storage) {
+  dispatch("mll:storage-read", {
+    key: String(key || ""),
+    storage: storageLabel(storage)
   });
 }
 
@@ -53,7 +90,8 @@ export function readRaw(key, options = {}) {
   const fallback = options.fallback ?? null;
   try {
     metrics.reads += 1;
-    const value = storage.getItem(String(key));
+    const value = storageGetItem(storage, key);
+    if (options.notify !== false) reportRead(key, storage);
     return value === null ? fallback : value;
   } catch (error) {
     reportError("read", key, storage, error);
@@ -62,7 +100,11 @@ export function readRaw(key, options = {}) {
 }
 
 export function readJson(key, fallback, options = {}) {
-  const raw = readRaw(key, { storage: options.storage, fallback: null });
+  const raw = readRaw(key, {
+    storage: options.storage,
+    fallback: null,
+    notify: options.notify
+  });
   if (raw === null) return fallback;
   const parsed = safeJsonParse(raw, fallback);
   if (typeof options.validate === "function" && !options.validate(parsed)) {
@@ -98,7 +140,7 @@ export function writeJsonBatch(entries, options = {}) {
   const previous = new Map();
 
   try {
-    for (const [key] of prepared) previous.set(key, storage.getItem(key));
+    for (const [key] of prepared) previous.set(key, storageGetItem(storage, key));
     for (const [key, value] of prepared) storage.setItem(key, value);
     metrics.writes += prepared.length;
     if (options.notify !== false) {
@@ -163,8 +205,8 @@ export function storageDiagnostics(storage = globalThis.localStorage) {
     itemCount = storage.length;
     let characters = 0;
     for (let index = 0; index < storage.length; index += 1) {
-      const key = storage.key(index) || "";
-      characters += key.length + String(storage.getItem(key) || "").length;
+      const key = storageKey(storage, index) || "";
+      characters += key.length + String(storageGetItem(storage, key) || "").length;
     }
     bytes = characters * 2;
     available = true;

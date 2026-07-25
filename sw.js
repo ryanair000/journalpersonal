@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-little-life-v1';
+const CACHE_NAME = 'my-little-life-v2';
 const ASSETS = [
   './', './index.html', './style.css', './mobile.css', './content.css', './analytics.css',
   './details.css', './advanced.css', './settings.css', './backup.css', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './script.js', './manifest.json'

@@ -1,45 +1,25 @@
 "use strict";
 
-(() => {
-  const STORAGE_KEY = "myLittleLife.app.v2";
-  const qs = (selector, root = document) => root.querySelector(selector);
-  const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const pad = (value) => String(value).padStart(2, "0");
-  const today = new Date();
-  const dateKey = (date = today) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  const defaultTargets = { sleepMinutes: 480, waterGlasses: 7, movementMinutes: 30 };
+import { clampNumber, element, localDateKey, qs, qsa } from "./app-core.js";
+import { isRecord, readAppState, writeAppState } from "./state-store.js";
 
-  function element(tag, options = {}) {
-    const node = document.createElement(tag);
-    if (options.className) node.className = options.className;
-    if (options.text !== undefined) node.textContent = String(options.text);
-    Object.entries(options.attrs || {}).forEach(([name, value]) => {
-      if (value !== undefined && value !== null) node.setAttribute(name, String(value));
-    });
-    return node;
-  }
+(() => {
+  const today = new Date();
+  const dateKey = (date = today) => localDateKey(date);
+  const defaultTargets = { sleepMinutes: 480, waterGlasses: 7, movementMinutes: 30 };
 
   function ensureStylesheet() {
     if (qs('link[href="rhythm.css"]')) return;
     document.head.append(element("link", { attrs: { rel: "stylesheet", href: "rhythm.css" } }));
   }
 
-  function safeParse(value, fallback) {
-    try {
-      const parsed = JSON.parse(value);
-      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
   function loadState() {
-    const state = safeParse(localStorage.getItem(STORAGE_KEY), {});
+    const state = readAppState({});
     state.version = Number(state.version) || 2;
-    state.daily = state.daily && typeof state.daily === "object" ? state.daily : {};
-    state.notes = state.notes && typeof state.notes === "object" ? state.notes : { people: "", connection: "" };
-    state.settings = state.settings && typeof state.settings === "object" ? state.settings : {};
-    const savedTargets = state.settings.rhythmTargets && typeof state.settings.rhythmTargets === "object"
+    state.daily = isRecord(state.daily) ? state.daily : {};
+    state.notes = isRecord(state.notes) ? state.notes : { people: "", connection: "" };
+    state.settings = isRecord(state.settings) ? state.settings : {};
+    const savedTargets = isRecord(state.settings.rhythmTargets)
       ? state.settings.rhythmTargets
       : {};
     state.settings.rhythmTargets = {
@@ -50,14 +30,8 @@
     return state;
   }
 
-  function clampNumber(value, min, max, fallback) {
-    const number = Number(value);
-    if (!Number.isFinite(number)) return fallback;
-    return Math.min(max, Math.max(min, number));
-  }
-
   function normalizeRhythm(value) {
-    const source = value && typeof value === "object" ? value : {};
+    const source = isRecord(value) ? value : {};
     return {
       sleepMinutes: clampNumber(source.sleepMinutes, 0, 1440, 0),
       waterGlasses: clampNumber(source.waterGlasses, 0, 30, 0),
@@ -67,7 +41,7 @@
   }
 
   function getDay(state, key = dateKey()) {
-    const existing = state.daily[key] && typeof state.daily[key] === "object" ? state.daily[key] : {};
+    const existing = isRecord(state.daily[key]) ? state.daily[key] : {};
     state.daily[key] = {
       mood: "",
       habits: [false, false, false, false],
@@ -95,7 +69,7 @@
 
   function saveState(state) {
     captureUnsavedFields(state);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    writeAppState(state);
   }
 
   function showToast(message) {

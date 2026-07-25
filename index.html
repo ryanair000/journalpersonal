@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>my little life — personal dashboard</title>
+  <meta name="theme-color" content="#f4e8ea" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
@@ -12,6 +15,24 @@
   <link rel="stylesheet" href="analytics.css" />
   <link rel="stylesheet" href="details.css" />
   <link rel="stylesheet" href="advanced.css" />
+  <link rel="stylesheet" href="settings.css" />
+  <link rel="stylesheet" href="backup.css" />
+  <link rel="stylesheet" href="calendar.css" />
+  <link rel="stylesheet" href="review.css" />
+  <link rel="stylesheet" href="capture.css" />
+  <link rel="stylesheet" href="progress.css" />
+  <link rel="stylesheet" href="academic.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="vision.css" />
+  <link rel="stylesheet" href="goals.css" />
+  <link rel="stylesheet" href="habits.css" />
+  <link rel="stylesheet" href="routines.css" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="search.css" />
+  <link rel="stylesheet" href="monthly.css" />
+  <link rel="stylesheet" href="next10.css" />
+  <link rel="stylesheet" href="insights.css" />
+  <link rel="stylesheet" href="next20.css" />
   <link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
@@ -29,13 +50,27 @@
       <a href="#schoolHub"><span>▤</span> School center</a>
       <a href="#workHub"><span>◇</span> Work</a>
       <a href="#peopleHub"><span>♡</span> People</a>
+      <a href="#calendar"><span>▦</span> Calendar</a>
+      <a href="#weeklyReview"><span>↺</span> Weekly review</a>
+      <a href="#quickCapture"><span>＋</span> Quick capture</a>
+      <a href="#examTracker"><span>◇</span> Exams</a>
+      <a href="#visionBoard"><span>✧</span> Vision board</a>
+      <a href="#goalsHub"><span>◎</span> Goals</a>
+      <a href="#customHabits"><span>♡</span> My habits</a>
+      <a href="#routines"><span>↻</span> Routines</a>
+      <a href="#projectBoard"><span>◇</span> Projects</a>
+      <a href="#dashboardSearch"><span>⌕</span> Search</a>
+      <a href="#monthlySummary"><span>▥</span> Monthly summary</a>
+      <a href="#accountInsights"><span>↗</span> Account insights</a>
+      <a href="#resourceVault"><span>▧</span> Resources</a>
+      <a href="#careerTracker"><span>◇</span> Career prep</a>
       <a href="#memories"><span>✦</span> Memories</a>
     </nav>
     <div class="sidebar-bottom"><p class="side-label">little reminder</p><p class="reminder">You are allowed to grow at your own pace.</p><span class="pink-line"></span></div>
   </aside>
 
   <main class="dashboard" id="home">
-    <header class="topbar"><div><p class="eyebrow">Wednesday, July 22, 2026</p><h1>Hi, Claudia <span>♡</span></h1></div><button class="avatar" aria-label="Your profile">C</button></header>
+    <header class="topbar"><div><p class="eyebrow">Wednesday, July 22, 2026</p><h1>Hi, Claudia <span>♡</span></h1></div><div class="top-actions"><button class="settings-button" id="openSettings">⚙ Customize</button><button class="avatar" aria-label="Your profile">C</button></div></header>
 
     <section class="welcome-card">
       <div><p class="eyebrow">today's energy</p><h2>Make space for<br><em>the good stuff.</em></h2><p class="welcome-copy">A gentle little check-in for your day at school, at home, and everywhere in between.</p></div>
@@ -97,6 +132,13 @@
 
     <section class="overview section" id="money"><div class="section-title"><div><p class="eyebrow">Your life, at a glance</p><h2>Keep your world together.</h2></div><button class="small-link">Customize ↗</button></div><div class="overview-grid"><article><span class="overview-icon purple">▤</span><p class="eyebrow">projects & content</p><h3>Ideas in progress</h3><p>Capture content ideas, personal projects, and things you want to build.</p><button class="overview-link js-open-modal">Add an idea →</button></article><article><span class="overview-icon coral">₵</span><p class="eyebrow">finances</p><h3>Money check</h3><p>Track spending, savings goals, subscriptions, and your weekly budget.</p><button class="overview-link js-open-modal">Log an expense →</button></article><article id="memories"><span class="overview-icon green">✦</span><p class="eyebrow">mind & relationships</p><h3>Make room for life</h3><p>Check in with your mental health, gratitude, memories, and social life.</p><button class="overview-link js-open-modal">Add a memory →</button></article></div></section>
     <footer class="footer"><span>made for your real life</span><span><b>●</b> stored privately on this device</span></footer>
+    <section class="account-insights-section section" id="accountInsights">
+      <div class="section-title"><div><p class="eyebrow">Account insights</p><h2>See what each platform is teaching you.</h2></div><button class="small-link" id="updateAccountInsights">Update account</button></div>
+      <div class="account-selector" id="accountSelector"><button class="active" data-account="Instagram">Instagram</button><button data-account="TikTok">TikTok</button><button data-account="YouTube">YouTube</button><button data-account="Other">＋ Other account</button></div>
+      <div class="insights-grid"><article><p class="eyebrow">Followers / subscribers</p><strong id="accountFollowers">2.4k</strong><span id="accountGrowth">↗ +8.2% this month</span></article><article><p class="eyebrow">Reach</p><strong id="accountReach">4,820</strong><span>↗ +18.2%</span></article><article><p class="eyebrow">Engagement</p><strong id="accountEngagement">7.4%</strong><span>Healthy audience signal</span></article><article><p class="eyebrow">Posts this month</p><strong id="accountPosts">12</strong><span>Target: 20</span></article></div>
+      <div class="account-performance"><div><p class="eyebrow">Best content for this account</p><h3 id="accountBestContent">A realistic student morning</h3><small id="accountBestMeta">Reel · 4,280 views · 312 likes</small></div><button class="detail-link" id="addAccountPost">＋ Add performance</button></div>
+    </section>
+
     <section class="details-section section" id="details">
       <div class="section-title"><div><p class="eyebrow">The rest of your life</p><h2>Small systems for feeling more together.</h2></div></div>
       <div class="details-grid">
@@ -107,6 +149,95 @@
         <article class="detail-card social-detail"><div class="detail-head"><span class="detail-icon">♡</span><div><p class="eyebrow">Social life</p><h3>Stay connected</h3></div><button class="mini-add" id="addSocial">＋</button></div><div id="socialList" class="compact-list"><p><span>♡</span> Check in with a friend <small>Today</small></p><p><span>○</span> Plan a catch-up <small>This week</small></p></div><button class="detail-link" id="addSocialLink">＋ Add a person or plan</button></article>
         <article class="detail-card memory-detail" id="memoryVault"><div class="detail-head"><span class="detail-icon">✦</span><div><p class="eyebrow">Memories</p><h3>Keep a piece of today</h3></div><button class="mini-add" id="addMemory">＋</button></div><div class="memory-preview"><span>JUL 22</span><p id="memoryText">No memory saved yet.<br>Make one from today.</p></div></article>
       </div>
+    </section>
+
+    <section class="journal-history-section section" id="journalArchive">
+      <div class="section-title"><div><p class="eyebrow">Journal archive</p><h2>Keep the story of your days.</h2></div><div class="archive-actions"><input id="journalSearch" type="search" placeholder="Search entries"><button class="small-link" id="addArchiveEntry">＋ Add entry</button></div></div>
+      <div class="archive-entry-list" id="archiveEntryList"><article><span class="archive-entry-date">JUL 18</span><div><strong>Learning to leave some things unrushed</strong><small>Saturday notes · A quiet morning</small></div><button>···</button></article><article><span class="archive-entry-date">JUL 12</span><div><strong>On finding a rhythm that feels like mine</strong><small>Sunday thoughts · Personal</small></div><button>···</button></article></div>
+    </section>
+
+    <section class="health-log-section section" id="mealLog">
+      <div class="section-title"><div><p class="eyebrow">Meals & nourishment</p><h2>Feed yourself with care.</h2></div><button class="small-link" id="addMealLog">＋ Log meal</button></div>
+      <div class="meal-log-grid"><article class="meal-history-card"><p class="eyebrow">Today's meals</p><div id="mealLogList" class="meal-log-list"><div><span>☕</span><section><strong>Breakfast</strong><small>Not logged yet</small></section><b>—</b></div><div><span>🥗</span><section><strong>Lunch</strong><small>Not logged yet</small></section><b>—</b></div><div><span>🍓</span><section><strong>Dinner</strong><small>Not logged yet</small></section><b>—</b></div></div></article><article class="nutrition-card"><p class="eyebrow">Gentle nourishment notes</p><textarea id="nutritionNote" placeholder="How did food and energy feel today?"></textarea><button class="detail-link" id="saveNutrition">Save note →</button></article></div>
+    </section>
+
+    <section class="finance-detail-section section" id="financeBreakdown">
+      <div class="section-title"><div><p class="eyebrow">Money breakdown</p><h2>Know where it is going.</h2></div><button class="small-link" id="addCategorizedExpense">＋ Log expense</button></div>
+      <div class="finance-detail-grid"><article class="category-card"><div class="category-row"><span>Food</span><b id="foodSpend">KSh 0</b></div><div class="category-track"><i id="foodTrack"></i></div><div class="category-row"><span>Transport</span><b id="transportSpend">KSh 0</b></div><div class="category-track"><i id="transportTrack"></i></div><div class="category-row"><span>School</span><b id="schoolSpend">KSh 0</b></div><div class="category-track"><i id="schoolTrack"></i></div><div class="category-row"><span>Personal</span><b id="personalSpend">KSh 0</b></div><div class="category-track"><i id="personalTrack"></i></div></article><article class="budget-detail-card"><p class="eyebrow">Monthly budget</p><strong id="budgetDetailTotal">KSh 0</strong><small>logged this month</small><div class="budget-ring"><span id="budgetPercent">0%</span></div><p>Keep tracking without judging yourself. The picture gets clearer over time.</p></article></div>
+    </section>
+
+    <section class="study-tools-section section" id="studyTools">
+      <div class="section-title"><div><p class="eyebrow">Study tools</p><h2>Make focused time easier.</h2></div></div>
+      <div class="study-tools-grid"><article class="timetable-editor-card"><div class="advanced-heading"><div><p class="eyebrow">My added timetable</p><h3>Classes, study, exams</h3></div><button class="mini-add" id="addScheduleEntry">＋</button></div><div id="scheduleEntries" class="schedule-entries"></div></article><article class="timer-card"><p class="eyebrow">Focus timer</p><strong id="studyTimerDisplay">25:00</strong><div><button id="startStudyTimer">Start</button><button id="resetStudyTimer">Reset</button></div><small>Use a focused block, then record what you learned.</small></article><article class="study-log-card"><div class="advanced-heading"><div><p class="eyebrow">Study log</p><h3>What you covered</h3></div><button class="mini-add" id="addStudyLog">＋</button></div><div id="studySessionLog" class="study-session-log"></div></article></div>
+    </section>
+
+    <section class="exam-prep-section section" id="examPrep">
+      <div class="section-title"><div><p class="eyebrow">Exam preparation</p><h2>Prepare before the dates arrive.</h2></div><button class="small-link" id="addExamPrep">＋ Add unit prep</button></div>
+      <div class="exam-prep-list" id="examPrepList"><article><div><strong>Pharmacology XI</strong><small>BPL4203 · Dr. Samuel Wainaina</small></div><div class="prep-bar"><i style="width:20%"></i></div><b>20%</b></article><article><div><strong>Pharmaceutical Chemistry X</strong><small>BPC4202 · Dr. Epaphrodite Twahirwa</small></div><div class="prep-bar"><i style="width:10%"></i></div><b>10%</b></article><article><div><strong>Research methods</strong><small>PBCU001 · Dr. Mungoma Michael</small></div><div class="prep-bar"><i style="width:35%"></i></div><b>35%</b></article></div>
+    </section>
+
+    <section class="business-kpi-section section" id="businessKpis">
+      <div class="section-title"><div><p class="eyebrow">Business performance</p><h2>Track the work behind the dream.</h2></div><button class="small-link" id="addBusinessKpi">＋ Add KPI</button></div>
+      <div class="business-kpi-grid" id="businessKpiList"><article><p class="eyebrow">PlayMechi</p><strong>12</strong><small>posts this month</small><span>Target: 20</span></article><article><p class="eyebrow">Exampoa</p><strong>0</strong><small>website visitors</small><span>Launch phase</span></article><article><p class="eyebrow">Leridia Jewels</p><strong>0</strong><small>stock ready</small><span>Rebrand phase</span></article><article><p class="eyebrow">Medical influencing</p><strong>2027</strong><small>planned start</small><span>Attachment milestone</span></article></div>
+    </section>
+
+    <section class="people-detail-section section" id="peopleDetails">
+      <div class="section-title"><div><p class="eyebrow">People details</p><h2>Remember the things that matter.</h2></div><button class="small-link" id="addPeopleCheckin">＋ Add check-in</button></div>
+      <div class="people-detail-grid"><article class="people-filter-card"><div class="people-filter-tabs"><button class="active" data-people-filter="all">All</button><button data-people-filter="family">Family</button><button data-people-filter="friends">Friends</button><button data-people-filter="relationship">Relationship</button></div><div id="peopleCheckinList" class="people-checkin-list"><div data-person-group="family"><strong>Family birthday planning</strong><small>Next: review gifts and important dates</small><span>Family</span></div><div data-person-group="friends"><strong>Check in with Aisha</strong><small>Last check-in: 3 days ago</small><span>Friends</span></div><div data-person-group="relationship"><strong>Plan a quality-time date</strong><small>Talk about goals, needs, and future plans</small><span>Relationship</span></div></div></article><article class="people-reminder-card"><p class="eyebrow">Connection reminder</p><h3 id="connectionReminder">Who needs a little love from you?</h3><input id="peopleReminderInput" placeholder="Name or reminder"><button class="detail-link" id="savePeopleReminder">Save reminder →</button></article></div>
+    </section>
+
+    <section class="content-pipeline-section section" id="contentPipeline">
+      <div class="section-title"><div><p class="eyebrow">Content pipeline</p><h2>Plan, create, publish, learn.</h2></div><button class="small-link" id="addPipelinePost">＋ Add post</button></div>
+      <div class="pipeline-grid" id="pipelineGrid"><article><div class="pipeline-heading"><span class="board-dot pink-dot"></span><strong>Planned</strong></div></article><article><div class="pipeline-heading"><span class="board-dot yellow-dot"></span><strong>Creating</strong></div></article><article><div class="pipeline-heading"><span class="board-dot purple-dot"></span><strong>Scheduled</strong></div></article><article><div class="pipeline-heading"><span class="board-dot green-dot"></span><strong>Published</strong></div></article></div>
+    </section>
+
+    <section class="data-management-section section" id="dataManagement">
+      <div class="section-title"><div><p class="eyebrow">Data management</p><h2>Keep your space yours.</h2></div></div><div class="data-management-card"><p>Your dashboard is local-first. You can back it up, import it, or clear selected areas when you need a fresh start.</p><button id="clearJournalData">Clear journal data</button><button id="clearTrackingData">Clear tracking data</button><button id="clearAllData">Clear everything</button><span id="dataManagementStatus"></span></div>
+    </section>
+
+    <section class="resource-vault-section section" id="resourceVault">
+      <div class="section-title"><div><p class="eyebrow">Pharmacy resource vault</p><h2>Keep useful knowledge close.</h2></div><button class="small-link" id="addResource">＋ Add resource</button></div>
+      <div class="resource-grid" id="resourceList"><article><span class="resource-type">PDF</span><div><strong>WHO pharmacovigilance guide</strong><small>Reference · add a link or file note</small></div><button>Open →</button></article><article><span class="resource-type">NOTE</span><div><strong>Questions for Dr. Wanjiku</strong><small>Research · follow up</small></div><button>Review →</button></article><article><span class="resource-type">LINK</span><div><strong>Drug interactions reading list</strong><small>Pharmacology · useful links</small></div><button>Open →</button></article></div>
+    </section>
+
+    <section class="career-section section" id="careerTracker">
+      <div class="section-title"><div><p class="eyebrow">Attachment & career prep</p><h2>Prepare for the next chapter.</h2></div><button class="small-link" id="addCareerTask">＋ Add task</button></div>
+      <div class="career-grid"><article class="career-progress-card"><p class="eyebrow">Attachment readiness</p><strong>0%</strong><div class="career-bar"><i></i></div><small>Placement, documents, wardrobe, confidence</small></article><article class="career-task-card"><div id="careerTaskList" class="career-task-list"><label><input type="checkbox"> Update my CV</label><label><input type="checkbox"> Research possible placement sites</label><label><input type="checkbox"> Prepare health-influencing content ideas</label><label><input type="checkbox"> Organize professional documents</label></div></article><article class="career-note-card"><p class="eyebrow">Future professional self</p><textarea id="careerNote" placeholder="How do I want to show up in healthcare?"></textarea><button class="detail-link" id="saveCareerNote">Save reflection →</button></article></div>
+    </section>
+
+    <section class="savings-section section" id="savingsGoals">
+      <div class="section-title"><div><p class="eyebrow">Savings goals</p><h2>Give your money somewhere to go.</h2></div><button class="small-link" id="addSavingsGoal">＋ Add goal</button></div>
+      <div class="savings-grid" id="savingsList"><article><div><p class="eyebrow">Leridia launch stock</p><strong>KSh 0 <small>/ KSh 100,000</small></strong><div class="savings-bar"><i style="width:0%"></i></div><span>Target: 28 January 2027</span></div></article><article><div><p class="eyebrow">Emergency cushion</p><strong>KSh 0 <small>/ KSh 30,000</small></strong><div class="savings-bar"><i style="width:0%"></i></div><span>Small steps count</span></div></article></div>
+    </section>
+
+    <section class="due-soon-section section" id="dueSoon">
+      <div class="section-title"><div><p class="eyebrow">Due soon</p><h2>See what needs attention next.</h2></div><button class="small-link" id="addDueItem">＋ Add reminder</button></div>
+      <div class="due-list" id="dueList"><div><span class="due-date urgent-due">28 JUL</span><section><strong>Study block: Pharmacology XI</strong><small>School · preparation</small></section><b>5 days</b></div><div><span class="due-date soft-due">18 AUG</span><section><strong>Pharmacovigilance project</strong><small>School · deadline</small></section><b>25 days</b></div></div>
+    </section>
+
+    <section class="meal-history-section section" id="mealHistory">
+      <div class="section-title"><div><p class="eyebrow">Meal history</p><h2>Notice your nourishment patterns.</h2></div><span class="date-pill">THIS WEEK</span></div>
+      <div class="meal-history-grid"><article><div class="history-day"><strong>MON</strong><span>Breakfast ✓</span><span>Lunch ✓</span><span>Dinner —</span></div><div class="history-day"><strong>TUE</strong><span>Breakfast ✓</span><span>Lunch —</span><span>Dinner ✓</span></div><div class="history-day"><strong>WED</strong><span>Breakfast —</span><span>Lunch ✓</span><span>Dinner ✓</span></div></article><article class="meal-pattern-card"><p class="eyebrow">A gentle observation</p><h3 id="mealPatternText">Your meal pattern will appear as you log more days.</h3><button class="detail-link" id="addMealPattern">Add a note →</button></article></div>
+    </section>
+
+    <section class="mood-history-section section" id="moodHistory">
+      <div class="section-title"><div><p class="eyebrow">Mood history</p><h2>Listen to your inner weather.</h2></div><span class="date-pill">LAST 7 DAYS</span></div>
+      <div class="mood-history-card"><div class="mood-bars" id="moodBars"><div><i style="height:40%"></i><span>MON</span></div><div><i style="height:65%"></i><span>TUE</span></div><div><i style="height:30%"></i><span>WED</span></div><div><i style="height:75%"></i><span>THU</span></div><div><i style="height:50%"></i><span>FRI</span></div><div><i style="height:80%"></i><span>SAT</span></div><div><i style="height:60%"></i><span>SUN</span></div></div><p id="moodHistoryNote">Choose a mood each day to build a picture over time—not a judgment.</p></div>
+    </section>
+
+    <section class="calendar-section section" id="calendar">
+      <div class="section-title"><div><p class="eyebrow">Your timeline</p><h2>Make plans you can actually see.</h2></div><button class="small-link" id="addCalendarEvent">＋ Add event</button></div>
+      <div class="calendar-layout"><article class="calendar-card"><div class="calendar-heading"><button id="previousMonth">‹</button><h3 id="calendarMonth">July 2026</h3><button id="nextMonth">›</button></div><div class="calendar-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="calendar-days" id="calendarDays"></div></article><article class="upcoming-card"><div class="advanced-heading"><div><p class="eyebrow">Upcoming</p><h3>What is coming up</h3></div><span class="date-pill">NEXT 30 DAYS</span></div><div id="upcomingEvents" class="upcoming-list"><div><span class="event-date coral-event">28<span>JUL</span></span><section><strong>Study block: Pharmacology XI</strong><small>School · 14:00</small></section></div><div><span class="event-date purple-event">02<span>AUG</span></span><section><strong>Exampoa launch planning</strong><small>Work · All day</small></section></div><div><span class="event-date green-event">18<span>AUG</span></span><section><strong>Pharmacovigilance project due</strong><small>School · Deadline</small></section></div></div></article></div>
+    </section>
+
+    <section class="capture-section section" id="quickCapture">
+      <div class="section-title"><div><p class="eyebrow">Quick capture</p><h2>Put it somewhere before it disappears.</h2></div><span class="date-pill">PRIVATE</span></div>
+      <form class="capture-form" id="captureForm"><select id="captureType"><option value="journal">Journal thought</option><option value="task">School/work task</option><option value="study">Study session</option><option value="expense">Expense</option><option value="content">Content idea</option><option value="memory">Memory</option><option value="gratitude">Gratitude</option><option value="event">Calendar event</option></select><input id="captureTitle" type="text" placeholder="What do you want to remember or do?" required><input id="captureDetail" type="text" placeholder="Optional detail, time, amount, platform, or date"><button type="submit">Add to my dashboard <span>↗</span></button></form><p class="capture-hint" id="captureHint">Journal thoughts go into your private notes.</p>
+    </section>
+
+    <section class="review-section section" id="weeklyReview">
+      <div class="section-title"><div><p class="eyebrow">Weekly reset</p><h2>Notice what this week taught you.</h2></div><span class="date-pill">REFLECT + PLAN</span></div>
+      <div class="review-grid"><article class="review-card review-summary"><p class="eyebrow">Your week in numbers</p><div class="review-stats"><div><strong id="reviewHabits">0 / 4</strong><small>habits completed</small></div><div><strong id="reviewEntries">0</strong><small>journal entries</small></div><div><strong id="reviewEvents">3</strong><small>upcoming events</small></div></div><div class="review-mood"><span class="eyebrow">Mood check-ins</span><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>gentle awareness, not perfection</small></div></article><article class="review-card review-prompts"><p class="eyebrow">Look back</p><label>What made me proud this week?<textarea id="reviewProud" placeholder="Even something small counts..."></textarea></label><label>What felt heavy or needs care?<textarea id="reviewHeavy" placeholder="Be honest and kind to yourself..."></textarea></label></article><article class="review-card review-plan"><p class="eyebrow">Look forward</p><label>My top 3 priorities<textarea id="reviewPriorities" placeholder="1.&#10;2.&#10;3."></textarea></label><label>One promise to myself<textarea id="reviewPromise" placeholder="This week, I will..."></textarea></label><button class="save-button" id="saveReview" type="button">Save weekly review <span>↗</span></button></article></div>
     </section>
 
     <section class="advanced-section section" id="schoolHub">
@@ -130,10 +261,47 @@
       <div class="people-layout"><article class="advanced-card people-card"><div class="people-tabs"><button class="people-tab active">Family</button><button class="people-tab">Friends</button><button class="people-tab">Relationships</button></div><div id="peopleList" class="people-list"><div><span class="person-avatar peach">M</span><section><strong>Mum</strong><small>Last checked in: Today</small></section><button>Message →</button></div><div><span class="person-avatar lavender">A</span><section><strong>Aisha</strong><small>Last checked in: 3 days ago</small></section><button>Plan a catch-up →</button></div><div><span class="person-avatar sage">♡</span><section><strong>My relationship space</strong><small>Boundaries, needs, and hopes</small></section><button>Reflect →</button></div></div></article><article class="advanced-card connection-card"><p class="eyebrow">Connection check-in</p><h3>How do your relationships feel?</h3><div class="connection-scale"><button>🌱<small>Healthy</small></button><button>☁<small>Needs care</small></button><button>♡<small>Feeling loved</small></button><button>↺<small>Need space</small></button></div><textarea id="peopleNote" placeholder="A note about your people, boundaries, or what you need..."></textarea><button class="detail-link" id="savePeopleNote">Save private reflection →</button></article></div>
     </section>
 
-  </main>
+    <section class="vision-section section" id="visionBoard">
+      <div class="section-title"><div><p class="eyebrow">Your vision board</p><h2>Make the future feel close.</h2></div><div class="vision-actions"><button class="small-link" id="addVisionCard">＋ Add vision</button><label class="small-link upload-label">↑ Add image<input id="visionImageUpload" type="file" accept="image/*" hidden></label></div></div>
+      <p class="vision-intro">Collect the life you are building: your degree, businesses, soft-life goals, health, love, faith, and the little details that make it yours.</p><div class="vision-grid" id="visionBoardGrid"></div>
+    </section>
+
+    <section class="goals-section section" id="goalsHub">
+      <div class="section-title"><div><p class="eyebrow">Goals that move you forward</p><h2>Turn the vision into steps.</h2></div><button class="small-link" id="addGoal">＋ Add goal</button></div>
+      <div class="goals-grid"><article class="goal-card yearly-goal"><p class="eyebrow">Yearly direction</p><h3>Build a life that feels like mine.</h3><div class="goal-bar"><i></i></div><small>2026 · 38% of the way there</small></article><article class="goal-card quarter-goal"><p class="eyebrow">This quarter</p><div id="quarterGoals" class="goal-list"><label><input type="checkbox"> Prepare for Leridia rebrand</label><label><input type="checkbox"> Launch Exampoa publicly</label><label><input type="checkbox"> Finish Year 4.3 strongly</label></div></article><article class="goal-card month-goal"><p class="eyebrow">This month</p><div id="monthGoals" class="goal-list"><label><input type="checkbox"> Complete 12 study sessions</label><label><input type="checkbox"> Post consistently for PlayMechi</label><label><input type="checkbox"> Save toward business goals</label></div></article></div>
+    </section>
+
+    <section class="custom-habits-section section" id="customHabits">
+      <div class="section-title"><div><p class="eyebrow">Your own habits</p><h2>Create routines that fit your real life.</h2></div><button class="small-link" id="addCustomHabit">＋ Add habit</button></div>
+      <div class="custom-habits-card"><div id="customHabitList" class="custom-habit-list"></div><p class="habit-empty" id="habitEmpty">Add something you want to practice consistently—skincare, prayer, revision, stretching, anything.</p></div>
+    </section>
+
+    <section class="routines-section section" id="routines">
+      <div class="section-title"><div><p class="eyebrow">Recurring routines</p><h2>Give your days a gentle shape.</h2></div><button class="small-link" id="addRoutine">＋ Add routine</button></div>
+      <div class="routine-grid" id="routineList"><article><span class="routine-icon">☀</span><div><strong>Morning reset</strong><small>Prayer · water · plan the day</small></div><b>07:00</b><input type="checkbox"></article><article><span class="routine-icon purple-routine">◒</span><div><strong>Study block</strong><small>Reading or past papers</small></div><b>14:00</b><input type="checkbox"></article><article><span class="routine-icon green-routine">☾</span><div><strong>Evening close</strong><small>Journal · gratitude · prepare tomorrow</small></div><b>21:00</b><input type="checkbox"></article></div>
+    </section>
+
+    <section class="exam-section section" id="examTracker">
+      <div class="section-title"><div><p class="eyebrow">Academic milestones</p><h2>Stay ready before dates arrive.</h2></div><button class="small-link" id="addExam">＋ Add exam</button></div>
+      <div class="exam-layout"><article class="exam-card"><div class="advanced-heading"><div><p class="eyebrow">Final exams</p><h3>Dates & preparation</h3></div><span class="unit-count">DATES PENDING</span></div><div id="examList" class="exam-list"><div><span class="exam-code">BPL4203</span><section><strong>Pharmacology XI</strong><small>Final date: not released · Preparation: not started</small></section><b>TBD</b></div><div><span class="exam-code">BPC4202</span><section><strong>Pharmaceutical Chemistry X</strong><small>Final date: not released · Preparation: not started</small></section><b>TBD</b></div><div><span class="exam-code">PBCU001</span><section><strong>Research methods</strong><small>Final date: not released · Preparation: not started</small></section><b>TBD</b></div></div></article><article class="exam-card milestone-card"><p class="eyebrow">Milestones</p><div class="milestone"><span>01</span><div><strong>Complete Year 4.3</strong><small>Current academic milestone</small></div><i></i></div><div class="milestone"><span>02</span><div><strong>Start attachment</strong><small>Medical influencing begins here</small></div><i></i></div><div class="milestone"><span>03</span><div><strong>Graduate + build your career</strong><small>Long-term direction</small></div><i></i></div><button class="detail-link" id="addMilestone">＋ Add milestone</button></article></div>
+    </section>
+    <section class="project-board-section section" id="projectBoard">
+      <div class="section-title"><div><p class="eyebrow">Project board</p><h2>Move ideas into reality.</h2></div><button class="small-link" id="addBoardProject">＋ Add project</button></div>
+      <div class="kanban-grid"><article><div class="kanban-heading"><span class="board-dot pink-dot"></span><strong>To explore</strong><span>2</span></div><div class="kanban-item"><strong>Leridia rebrand moodboard</strong><small>Business · planning</small></div><div class="kanban-item"><strong>Medical influencing ideas</strong><small>Content · future</small></div></article><article><div class="kanban-heading"><span class="board-dot yellow-dot"></span><strong>In progress</strong><span>2</span></div><div class="kanban-item"><strong>Exampoa website launch</strong><small>Work · traffic + public launch</small></div><div class="kanban-item"><strong>Pharmacovigilance research</strong><small>School · literature review</small></div></article><article><div class="kanban-heading"><span class="board-dot green-dot"></span><strong>Complete</strong><span>0</span></div><div class="empty-kanban">Completed work<br>will collect here ♡</div></article></div>
+    </section>
+    <section class="monthly-summary-section section" id="monthlySummary">
+      <div class="section-title"><div><p class="eyebrow">Monthly overview</p><h2>See the bigger picture.</h2></div><span class="date-pill">JULY 2026</span></div>
+      <div class="monthly-grid"><article><span class="summary-icon coral-summary">✦</span><p class="eyebrow">Content</p><strong id="monthlyContent">0</strong><small>ideas and entries captured</small></article><article><span class="summary-icon purple-summary">◎</span><p class="eyebrow">Goals</p><strong id="monthlyGoals">0%</strong><small>monthly goals completed</small></article><article><span class="summary-icon green-summary">♡</span><p class="eyebrow">Wellbeing</p><strong id="monthlyHabits">0</strong><small>habit check-ins completed</small></article><article><span class="summary-icon gold-summary">₵</span><p class="eyebrow">Money</p><strong id="monthlyMoney">KSh 0</strong><small>logged this month</small></article></div>
+    </section>
+
+    <section class="search-section section" id="dashboardSearch">
+      <div class="section-title"><div><p class="eyebrow">Find anything</p><h2>Search your little life.</h2></div></div>
+      <div class="search-box"><span>⌕</span><input id="dashboardSearchInput" type="search" placeholder="Search units, goals, projects, people, memories..."></div><div id="searchResults" class="search-results"></div>
+    </section>
   </main>
 
   <div class="modal" id="entryModal" aria-hidden="true" role="dialog"><div class="modal-backdrop js-close-modal"></div><form class="modal-card" id="entryForm"><button class="modal-close js-close-modal" type="button">×</button><p class="eyebrow">New journal entry</p><h2>Let it all out.</h2><input id="entryTitle" type="text" placeholder="Give this thought a title" required><textarea id="entryBody" rows="6" placeholder="Write whatever feels true today..." required></textarea><button class="save-button" type="submit">Save privately <span>↗</span></button></form></div>
   <script src="script.js"></script>
+  <div class="settings-modal" id="settingsModal" aria-hidden="true" role="dialog" aria-labelledby="settingsTitle"><div class="modal-backdrop" id="settingsBackdrop"></div><form class="settings-card" id="settingsForm"><button class="modal-close" id="closeSettings" type="button">×</button><p class="eyebrow">Your dashboard</p><h2 id="settingsTitle">Make it fit your life.</h2><div class="settings-grid"><label>Display name<input id="settingName" type="text" value="Charry"></label><label>Course<input id="settingCourse" type="text" value="Pharmacy"></label><label>Year / level<input id="settingYear" type="text" value="4.3"></label><label>Total units<input id="settingTotalUnits" type="number" value="134"></label><label>Completed units<input id="settingCompletedUnits" type="number" value="76"></label><label>Study methods<input id="settingStudyMethods" type="text" value="Reading, past papers, summaries"></label><label>Relationship focus<select id="settingRelationship"><option>All areas</option><option>Communication</option><option>Quality time</option><option>Future plans</option><option>Emotional support</option></select></label><label>Currency<input id="settingCurrency" type="text" value="KSh"></label></div><button class="save-button" type="submit">Save my settings <span>↗</span></button><div class="backup-tools"><p class="eyebrow">Private backup</p><p>Move your dashboard data between your laptop and phone.</p><div><button type="button" id="exportData">↓ Export data</button><button type="button" id="importData">↑ Import backup</button><input id="importFile" type="file" accept="application/json" hidden></div></div></form></div>
 </body>
 </html>

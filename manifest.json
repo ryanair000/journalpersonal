@@ -1,0 +1,11 @@
+{
+  "name": "my little life",
+  "short_name": "my life",
+  "description": "Charry's private student life and journal dashboard.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbf8f5",
+  "theme_color": "#f4e8ea",
+  "orientation": "portrait-primary",
+  "icons": []
+}

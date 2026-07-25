@@ -1,0 +1,1 @@
+.compact-list p,.study-list>div{cursor:pointer}.completed-row{opacity:.52;text-decoration:line-through}.completed-row span,.completed-row .study-tag{color:#79a486}.completed-row:before{content:'✓';color:#79a486;margin-right:3px;text-decoration:none}.completed-row>span:first-child{display:none}

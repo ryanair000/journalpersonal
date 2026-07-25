@@ -28,6 +28,7 @@
     { path: "./command-state.js", label: "Command state" },
     { path: "./command-state-runtime.js", label: "Command state runtime" },
     { path: "./command-state-bridge.js", label: "Command state bridge" },
+    { path: "./reminder-state-bridge.js", label: "Reminder state bridge" },
     { path: "./command-center.js", label: "Command centre" },
     { path: "./command-state-ui.js", label: "Command state controls" },
     { path: "./expansion-fixes.js", label: "Integration fixes" },

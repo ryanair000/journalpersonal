@@ -26,6 +26,7 @@
     { path: "./planner.js", label: "Planner and agenda" },
     { path: "./growth-centers.js", label: "Expanded centres" },
     { path: "./command-state.js", label: "Command state" },
+    { path: "./command-state-runtime.js", label: "Command state runtime" },
     { path: "./command-center.js", label: "Command centre" },
     { path: "./command-state-ui.js", label: "Command state controls" },
     { path: "./expansion-fixes.js", label: "Integration fixes" },

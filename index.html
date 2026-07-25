@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="next10.css" />
   <link rel="stylesheet" href="insights.css" />
   <link rel="stylesheet" href="next20.css" />
+  <link rel="stylesheet" href="refinements.css" />
   <link rel="stylesheet" href="mobile.css" />
 </head>
 <body>
@@ -226,7 +227,7 @@
     </section>
 
     <section class="calendar-section section" id="calendar">
-      <div class="section-title"><div><p class="eyebrow">Your timeline</p><h2>Make plans you can actually see.</h2></div><button class="small-link" id="addCalendarEvent">＋ Add event</button></div>
+      <div class="section-title"><div><p class="eyebrow">Your timeline</p><h2>Make plans you can actually see.</h2></div><div class="calendar-actions"><select id="calendarFilter" aria-label="Filter calendar events"><option value="all">All categories</option><option value="school">School</option><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option><option value="relationship">Relationship</option></select><button class="small-link" id="addCalendarEvent">＋ Add event</button></div></div>
       <div class="calendar-layout"><article class="calendar-card"><div class="calendar-heading"><button id="previousMonth">‹</button><h3 id="calendarMonth">July 2026</h3><button id="nextMonth">›</button></div><div class="calendar-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="calendar-days" id="calendarDays"></div></article><article class="upcoming-card"><div class="advanced-heading"><div><p class="eyebrow">Upcoming</p><h3>What is coming up</h3></div><span class="date-pill">NEXT 30 DAYS</span></div><div id="upcomingEvents" class="upcoming-list"><div><span class="event-date coral-event">28<span>JUL</span></span><section><strong>Study block: Pharmacology XI</strong><small>School · 14:00</small></section></div><div><span class="event-date purple-event">02<span>AUG</span></span><section><strong>Exampoa launch planning</strong><small>Work · All day</small></section></div><div><span class="event-date green-event">18<span>AUG</span></span><section><strong>Pharmacovigilance project due</strong><small>School · Deadline</small></section></div></div></article></div>
     </section>
 

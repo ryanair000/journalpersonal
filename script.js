@@ -170,6 +170,10 @@ function addSimpleRow(target, label, meta, icon = '□') {
   const row = document.createElement('div');
   row.innerHTML = `<span>${icon}</span><strong>${value.trim().replaceAll('<','&lt;')}</strong><small>${meta}</small>`;
   document.querySelector(target).append(row);
+  const storageKey = target === '#researchList' ? 'schoolResearchItems' : 'schoolStudyItems';
+  const savedItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  savedItems.push({ value: value.trim(), meta, icon });
+  localStorage.setItem(storageKey, JSON.stringify(savedItems));
 }
 document.querySelector('#addUnit')?.addEventListener('click', () => {
   const code = prompt('Unit code, for example PHR 308:');
@@ -180,6 +184,9 @@ document.querySelector('#addUnit')?.addEventListener('click', () => {
   const row = document.createElement('div');
   row.innerHTML = `<span>${code.trim().replaceAll('<','&lt;')}</span><strong>${name.trim().replaceAll('<','&lt;')}</strong><small>${lecturer.trim().replaceAll('<','&lt;')} · ${year?.trim() || 'Current unit'}</small>`;
   document.querySelector('#unitList').append(row);
+  const savedUnits = JSON.parse(localStorage.getItem('customUnits') || '[]');
+  savedUnits.push({ code: code.trim(), name: name.trim(), lecturer: lecturer.trim(), year: year?.trim() || 'Current unit' });
+  localStorage.setItem('customUnits', JSON.stringify(savedUnits));
 });
 document.querySelector('#addStudy')?.addEventListener('click', () => addSimpleRow('#studyList', 'What do you need to study or read?', 'New session · schedule it', '◒'));
 document.querySelector('#addReading')?.addEventListener('click', () => addSimpleRow('#studyList', 'What reading session should you add?', 'New reading · add a duration', '◒'));
@@ -190,6 +197,7 @@ document.querySelector('#addProject')?.addEventListener('click', () => {
   if (!title) return;
   document.querySelector('#projectTitle').textContent = title.trim();
   document.querySelector('#projectNotes').textContent = next?.trim() || 'Add your next action when you know it.';
+  localStorage.setItem('schoolProjectDetails', JSON.stringify({ title: title.trim(), next: next?.trim() || 'Add your next action when you know it.' }));
 });
 document.querySelector('#addClass')?.addEventListener('click', () => {
   const day = prompt('Which day? (Monday-Friday)');
@@ -205,6 +213,9 @@ document.querySelector('#addClass')?.addEventListener('click', () => {
   const row = document.createElement('p');
   row.innerHTML = `<span>${escapeText(day.trim())}</span><strong>${escapeText(subject.trim())}</strong><small>${escapeText(time.trim())}</small>`;
   list.append(row);
+  const classEntries = JSON.parse(localStorage.getItem('classEntries') || '[]');
+  classEntries.push({ day: day.trim(), time: time.trim(), subject: subject.trim() });
+  localStorage.setItem('classEntries', JSON.stringify(classEntries));
 });
 document.querySelector('#addBusiness')?.addEventListener('click', () => {
   const name = prompt('Business or work name:');
@@ -214,6 +225,9 @@ document.querySelector('#addBusiness')?.addEventListener('click', () => {
   const row = document.createElement('div');
   row.innerHTML = `<span class="business-badge coral-badge">${name.slice(0,2).toUpperCase()}</span><section><strong>${name.trim().replaceAll('<','&lt;')}</strong><small>${type.trim().replaceAll('<','&lt;')} · ${duration?.trim() || 'New business'}</small></section><b>New</b>`;
   document.querySelector('#businessList').append(row);
+  const businesses = JSON.parse(localStorage.getItem('personalBusinesses') || '[]');
+  businesses.push({ name: name.trim(), type: type.trim(), duration: duration?.trim() || 'New business' });
+  localStorage.setItem('personalBusinesses', JSON.stringify(businesses));
 });
 document.querySelector('#addWorkGoal')?.addEventListener('click', () => {
   const goal = prompt('What work goal do you want to add?');
@@ -221,6 +235,9 @@ document.querySelector('#addWorkGoal')?.addEventListener('click', () => {
   const label = document.createElement('label');
   label.innerHTML = `<input type="checkbox"> ${goal.trim().replaceAll('<','&lt;')}`;
   document.querySelector('#workGoalList').append(label);
+  const workGoals = JSON.parse(localStorage.getItem('workGoals') || '[]');
+  workGoals.push({ title: goal.trim(), done: false });
+  localStorage.setItem('workGoals', JSON.stringify(workGoals));
 });
 document.querySelector('#addWorkLog')?.addEventListener('click', () => {
   const hours = prompt('How many hours did you work?');
@@ -266,6 +283,9 @@ document.querySelector('#addPerson')?.addEventListener('click', () => {
   if (birthday?.trim()) row.querySelector('small').textContent += ` · ${birthday.trim()}`;
   row.dataset.group = group.trim().toLowerCase();
   document.querySelector('#peopleList').append(row);
+  const people = JSON.parse(localStorage.getItem('peopleDirectory') || '[]');
+  people.push({ name: name.trim(), group: group.trim(), birthday: birthday?.trim() || '', note: note?.trim() || 'Keep in touch' });
+  localStorage.setItem('peopleDirectory', JSON.stringify(people));
 });
 document.querySelectorAll('.people-tab').forEach((tab) => tab.addEventListener('click', () => {
   document.querySelectorAll('.people-tab').forEach((item) => item.classList.remove('active'));
@@ -342,6 +362,46 @@ if (businessList) {
 const peopleList = document.querySelector('#peopleList');
 if (peopleList) peopleList.innerHTML = '<div><span class="person-avatar peach">F</span><section><strong>Family circle</strong><small>Birthdays · gifts · favours · check-ins</small></section><button>Organize →</button></div><div><span class="person-avatar lavender">F</span><section><strong>Friends circle</strong><small>Catch-ups · memories · plans · support</small></section><button>Organize →</button></div><div><span class="person-avatar sage">♡</span><section><strong>My relationship</strong><small>Couple goals · dates · gifts · shared projects</small></section><button>Open space →</button></div>';
 
+// Refinement pass: time, profile, reminders, exports, filtering, editing, goal math, and install feedback.
+window.addEventListener('load', () => {
+  const profileDateState = { settings: { ...savedSettings } };
+  const dateLabel = document.querySelector('.topbar .eyebrow');
+  const topHeading = document.querySelector('.topbar h1');
+  const profileAvatar = document.querySelector('.topbar .avatar');
+  const profileInitials = (name) => String(name || 'C').trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+  const updateProfileDisplay = () => { const name = profileDateState.settings.name || 'Charry'; if (topHeading) topHeading.innerHTML = `Hi, ${escapeText(name)} <span>â™¡</span>`; if (profileAvatar) { profileAvatar.textContent = localStorage.getItem('profileInitials') || profileInitials(name); profileAvatar.classList.add('profile-avatar-edit'); profileAvatar.title = 'Click to edit your profile'; } };
+  const updateDateTime = () => { if (dateLabel) dateLabel.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date()); };
+  updateProfileDisplay(); updateDateTime(); window.setInterval(updateDateTime, 30000);
+  profileAvatar?.addEventListener('click', () => { const name = prompt('What should your dashboard call you?', profileDateState.settings.name || 'Charry'); if (!name?.trim()) return; const initials = prompt('Profile initials (1–2 letters):', profileInitials(name)) || profileInitials(name); profileDateState.settings.name = name.trim(); localStorage.setItem('dashboardSettings', JSON.stringify(profileDateState.settings)); localStorage.setItem('profileInitials', initials.trim().slice(0, 2).toUpperCase()); const settingName = document.querySelector('#settingName'); if (settingName) settingName.value = name.trim(); updateProfileDisplay(); });
+
+  const importantDates = JSON.parse(localStorage.getItem('importantDates') || '[]');
+  const reminderCard = document.querySelector('.people-reminder-card');
+  if (reminderCard && !document.querySelector('#importantDatesCard')) { const datesCard = document.createElement('div'); datesCard.id = 'importantDatesCard'; datesCard.className = 'important-dates-card'; datesCard.innerHTML = '<div class="inline-actions"><div><p class="eyebrow">Important dates</p><strong>Birthdays, milestones, and reminders</strong></div><button class="refinement-button" id="addImportantDate">＋ Add</button></div><div id="importantDateList"></div>'; reminderCard.append(datesCard); }
+  const renderImportantDates = () => { const list = document.querySelector('#importantDateList'); if (!list) return; const sorted = [...importantDates].sort((a, b) => String(a.date).localeCompare(String(b.date))); list.innerHTML = sorted.map((item) => `<div class="important-date-row"><span>♡</span><div><strong>${escapeText(item.title)}</strong><small>${escapeText(item.person || 'Personal reminder')}</small></div><time>${escapeText(item.date)}</time><button class="row-delete" data-important-index="${importantDates.indexOf(item)}" aria-label="Delete important date">×</button></div>`).join('') || '<p class="important-empty">Add a birthday, anniversary, exam date, or personal milestone.</p>'; };
+  renderImportantDates();
+  document.querySelector('#addImportantDate')?.addEventListener('click', () => { const title = prompt('What is the important date?'); const date = prompt('Date (YYYY-MM-DD or a note like 28 Jan 2027):'); const person = prompt('Who or what is it connected to?'); if (!title?.trim() || !date?.trim()) return; importantDates.push({ title: title.trim(), date: date.trim(), person: person?.trim() || 'Personal reminder' }); localStorage.setItem('importantDates', JSON.stringify(importantDates)); renderImportantDates(); });
+  document.querySelector('#importantDateList')?.addEventListener('click', (event) => { const button = event.target.closest('[data-important-index]'); if (!button) return; const index = Number(button.dataset.importantIndex); if (confirm('Remove this important date?')) { importantDates.splice(index, 1); localStorage.setItem('importantDates', JSON.stringify(importantDates)); renderImportantDates(); } });
+
+  const unitSearchHost = document.querySelector('#unitList');
+  if (unitSearchHost && !document.querySelector('#unitSearch')) { const unitSearch = document.createElement('input'); unitSearch.id = 'unitSearch'; unitSearch.className = 'unit-search'; unitSearch.type = 'search'; unitSearch.placeholder = 'Search unit code, name, or lecturer'; unitSearch.setAttribute('aria-label', 'Search pharmacy units'); unitSearchHost.before(unitSearch); unitSearch.addEventListener('input', () => { const query = unitSearch.value.toLowerCase(); unitSearchHost.querySelectorAll(':scope > div').forEach((row) => { row.hidden = !row.textContent.toLowerCase().includes(query); }); }); }
+
+  const exportExpenses = document.createElement('button'); exportExpenses.type = 'button'; exportExpenses.className = 'small-link'; exportExpenses.textContent = '↓ Export CSV'; exportExpenses.id = 'exportExpenses'; document.querySelector('#financeBreakdown .section-title')?.querySelector('.small-link')?.after(exportExpenses);
+  exportExpenses.addEventListener('click', () => { const rows = [['Category', 'Amount (KSh)'], ...Object.entries(categoryExpenses).map(([category, amount]) => [category, amount]), ['Total', Object.values(categoryExpenses).reduce((sum, amount) => sum + Number(amount), 0)]]; const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `charry-expenses-${new Date().toISOString().slice(0, 10)}.csv`; link.click(); URL.revokeObjectURL(url); });
+
+  archiveList?.addEventListener('click', (event) => { const button = event.target.closest('button'); if (!button) return; const article = button.closest('article'); if (!article) return; const title = article.querySelector('strong')?.textContent || ''; const index = archiveEntries.findIndex((entry) => entry.title === title); if (index < 0) return; const action = prompt('Type edit or delete:', 'edit')?.trim().toLowerCase(); if (action === 'delete' && confirm('Delete this journal archive entry?')) { archiveEntries.splice(index, 1); localStorage.setItem('archiveEntries', JSON.stringify(archiveEntries)); renderArchiveEntries(document.querySelector('#journalSearch')?.value || ''); } if (action === 'edit') { const nextTitle = prompt('Entry title:', archiveEntries[index].title); const nextDetail = prompt('Entry detail:', archiveEntries[index].detail || ''); if (nextTitle?.trim()) { archiveEntries[index].title = nextTitle.trim(); archiveEntries[index].detail = nextDetail?.trim() || ''; localStorage.setItem('archiveEntries', JSON.stringify(archiveEntries)); renderArchiveEntries(document.querySelector('#journalSearch')?.value || ''); } } });
+
+  const updateGoalProgress = (containerId, noteClass) => { const container = document.querySelector(containerId); if (!container) return; const inputs = [...container.querySelectorAll('input[type="checkbox"]')]; const completed = inputs.filter((input) => input.checked).length; const percent = inputs.length ? Math.round(completed / inputs.length * 100) : 0; let note = container.parentElement.querySelector(`.${noteClass}`); if (!note) { note = document.createElement('small'); note.className = `goal-progress-note ${noteClass}`; container.parentElement.append(note); } note.textContent = `${completed} of ${inputs.length} complete · ${percent}%`; if (containerId === '#monthGoals' && monthlyGoals) monthlyGoals.textContent = `${percent}%`; };
+  const bindGoalProgress = (containerId, storagePrefix, noteClass) => { const container = document.querySelector(containerId); if (!container) return; const bind = () => { [...container.querySelectorAll('input[type="checkbox"]')].forEach((input, index) => { const key = `${storagePrefix}-${index}`; input.checked = localStorage.getItem(key) === 'true'; input.onchange = () => { localStorage.setItem(key, input.checked); updateGoalProgress(containerId, noteClass); }; }); updateGoalProgress(containerId, noteClass); }; bind(); new MutationObserver(bind).observe(container, { childList: true, subtree: true }); };
+  bindGoalProgress('#monthGoals', 'goal-month', 'month-goal-progress'); bindGoalProgress('#quarterGoals', 'goal-quarter', 'quarter-goal-progress');
+
+  document.querySelector('#contentPipeline')?.addEventListener('click', (event) => { const card = event.target.closest('.pipeline-post'); if (!card || event.detail > 1) return; const post = savedPipelinePosts.find((item) => item.id === card.dataset.pipelineId); if (!post) return; const views = prompt('Views / reach for this post:', post.views || ''); const likes = prompt('Likes:', post.likes || ''); const comments = prompt('Comments or saves:', post.comments || ''); if (views === null) return; post.views = views.trim(); post.likes = likes?.trim() || ''; post.comments = comments?.trim() || ''; localStorage.setItem('pipelinePosts', JSON.stringify(savedPipelinePosts)); const metric = card.querySelector('.content-metric-badge') || document.createElement('span'); metric.className = 'content-metric-badge'; metric.textContent = `${post.views || '0'} views · ${post.likes || '0'} likes`; if (!metric.parentElement) card.append(metric); if (post.status === 3 && creatorAccountData[selectedCreatorAccount]) { const numericViews = Number(String(post.views).replaceAll(',', '').replace(/[^0-9.]/g, '')); const numericLikes = Number(String(post.likes).replaceAll(',', '').replace(/[^0-9.]/g, '')); const account = creatorAccountData[selectedCreatorAccount]; if (numericViews) account.reach = post.views; if (numericViews && numericLikes) account.engagement = `${(numericLikes / numericViews * 100).toFixed(1)}%`; account.best = post.title; account.meta = `${post.platform || 'Post'} · ${post.views || '0'} views · ${post.likes || '0'} likes`; localStorage.setItem('creatorAccountInsights', JSON.stringify(creatorAccountData)); renderAccountInsights(); } });
+
+  const appStatus = document.createElement('div'); appStatus.id = 'appStatus'; appStatus.className = 'app-status'; document.body.append(appStatus); let installPromptEvent;
+  const showAppStatus = (message, offline = false, install = false) => { appStatus.className = `app-status visible${offline ? ' offline' : ''}`; appStatus.innerHTML = `<span>${escapeText(message)}</span>${install ? '<button class="install-button" id="installApp">Install</button>' : ''}`; if (install) document.querySelector('#installApp').addEventListener('click', async () => { installPromptEvent?.prompt(); await installPromptEvent?.userChoice; installPromptEvent = null; appStatus.classList.remove('visible'); }); window.setTimeout(() => appStatus.classList.remove('visible'), 4500); };
+  const updateConnectionStatus = () => showAppStatus(navigator.onLine ? 'Online · your entries are saved on this device.' : 'Offline · your dashboard still works locally.', !navigator.onLine);
+  window.addEventListener('online', updateConnectionStatus); window.addEventListener('offline', updateConnectionStatus); window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); installPromptEvent = event; showAppStatus('Install this dashboard for quicker access.', false, true); }); window.setTimeout(updateConnectionStatus, 700);
+});
+
 const connectionCard = document.querySelector('.connection-card');
 if (connectionCard) {
   const toolkit = document.createElement('div');
@@ -405,6 +465,7 @@ document.querySelector('#importFile')?.addEventListener('change', (event) => {
 });
 
 let calendarView = new Date(2026, 6, 24);
+let calendarFilterState = 'all';
 const defaultEvents = [
   { date: '2026-07-28', title: 'Study block: Pharmacology XI', meta: 'School · 14:00', color: 'coral-event' },
   { date: '2026-08-02', title: 'Exampoa launch planning', meta: 'Work · All day', color: 'purple-event' },
@@ -425,15 +486,15 @@ const renderCalendar = () => {
     const actualDate = new Date(year, month, dayNumber);
     const isCurrentMonth = dayNumber > 0 && dayNumber <= daysInMonth;
     const dateString = `${actualDate.getFullYear()}-${String(actualDate.getMonth() + 1).padStart(2, '0')}-${String(actualDate.getDate()).padStart(2, '0')}`;
-    const hasEvent = calendarEvents.some((event) => event.date === dateString);
-    const isToday = dateString === '2026-07-24';
+    const hasEvent = calendarEvents.some((event) => event.date === dateString && (calendarFilterState === 'all' || String(event.meta || '').toLowerCase().includes(calendarFilterState)));
+    const isToday = dateString === new Date().toISOString().slice(0, 10);
     cells.push(`<button class="${isCurrentMonth ? '' : 'muted-day '}${isToday ? 'today ' : ''}${hasEvent ? 'has-event' : ''}" data-date="${dateString}">${isCurrentMonth ? dayNumber : (dayNumber <= 0 ? previousDays + dayNumber : dayNumber - daysInMonth)}</button>`);
   }
   days.innerHTML = cells.join('');
 };
 const renderUpcoming = () => {
   const list = document.querySelector('#upcomingEvents');
-  const upcoming = [...calendarEvents].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 6);
+  const upcoming = [...calendarEvents].filter((event) => calendarFilterState === 'all' || String(event.meta || '').toLowerCase().includes(calendarFilterState)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 6);
   list.innerHTML = upcoming.map((event) => { const date = new Date(`${event.date}T00:00:00`); return `<div><span class="event-date ${event.color || 'coral-event'}">${date.getDate()}<span>${date.toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span></span><section><strong>${escapeText(event.title)}</strong><small>${escapeText(event.meta || 'Personal event')}</small></section></div>`; }).join('');
 };
 document.querySelector('#previousMonth')?.addEventListener('click', () => { calendarView.setMonth(calendarView.getMonth() - 1); renderCalendar(); });
@@ -448,6 +509,7 @@ document.querySelector('#addCalendarEvent')?.addEventListener('click', () => {
   renderCalendar(); renderUpcoming();
 });
 renderCalendar(); renderUpcoming();
+document.querySelector('#calendarFilter')?.addEventListener('change', (event) => { calendarFilterState = event.target.value; renderCalendar(); renderUpcoming(); });
 
 const reviewFields = ['reviewProud', 'reviewHeavy', 'reviewPriorities', 'reviewPromise'];
 const savedReview = JSON.parse(localStorage.getItem('weeklyReview') || '{}');
@@ -666,21 +728,21 @@ document.querySelector('#addStudyLog')?.addEventListener('click', () => { const 
 const renderStudySessions = () => { const list = document.querySelector('#studySessionLog'); if (!list) return; const sessions = JSON.parse(localStorage.getItem('studySessions') || '[]'); list.innerHTML = sessions.slice(0, 5).map((session) => `<p><strong>${escapeText(session.topic)}</strong><small>${escapeText(session.duration)}</small></p>`).join('') || '<p class="capture-hint">Your completed study sessions will appear here.</p>'; };
 renderStudySessions();
 
-document.querySelector('#addExamPrep')?.addEventListener('click', () => { const unit = prompt('Unit or exam name:'); const code = prompt('Unit code and lecturer:'); const progress = Number(prompt('Preparation progress, 0–100:')); if (!unit?.trim() || Number.isNaN(progress)) return; const item = document.createElement('article'); item.innerHTML = `<div><strong>${escapeText(unit)}</strong><small>${escapeText(code || 'Unit details to add')}</small></div><div class="prep-bar"><i style="width:${Math.max(0, Math.min(100, progress))}%"></i></div><b>${Math.max(0, Math.min(100, progress))}%</b>`; document.querySelector('#examPrepList')?.append(item); });
+document.querySelector('#addExamPrep')?.addEventListener('click', () => { const unit = prompt('Unit or exam name:'); const code = prompt('Unit code and lecturer:'); const progress = Number(prompt('Preparation progress, 0–100:')); if (!unit?.trim() || Number.isNaN(progress)) return; const safeProgress = Math.max(0, Math.min(100, progress)); const item = document.createElement('article'); item.innerHTML = `<div><strong>${escapeText(unit)}</strong><small>${escapeText(code || 'Unit details to add')}</small></div><div class="prep-bar"><i style="width:${safeProgress}%"></i></div><b>${safeProgress}%</b>`; document.querySelector('#examPrepList')?.append(item); const examPrepItems = JSON.parse(localStorage.getItem('examPrepItems') || '[]'); examPrepItems.push({ unit: unit.trim(), code: code?.trim() || 'Unit details to add', progress: safeProgress }); localStorage.setItem('examPrepItems', JSON.stringify(examPrepItems)); });
 
-document.querySelector('#addBusinessKpi')?.addEventListener('click', () => { const business = prompt('Business:'); const metric = prompt('What are you measuring?'); const value = prompt('Current value:'); const note = prompt('Target or note:'); if (!business?.trim() || !metric?.trim() || !value?.trim()) return; const card = document.createElement('article'); card.innerHTML = `<p class="eyebrow">${escapeText(business)}</p><strong>${escapeText(value)}</strong><small>${escapeText(metric)}</small><span>${escapeText(note || 'Add a target')}</span>`; document.querySelector('#businessKpiList')?.append(card); });
+document.querySelector('#addBusinessKpi')?.addEventListener('click', () => { const business = prompt('Business:'); const metric = prompt('What are you measuring?'); const value = prompt('Current value:'); const note = prompt('Target or note:'); if (!business?.trim() || !metric?.trim() || !value?.trim()) return; const card = document.createElement('article'); card.innerHTML = `<p class="eyebrow">${escapeText(business)}</p><strong>${escapeText(value)}</strong><small>${escapeText(metric)}</small><span>${escapeText(note || 'Add a target')}</span>`; document.querySelector('#businessKpiList')?.append(card); const businessKpis = JSON.parse(localStorage.getItem('businessKpis') || '[]'); businessKpis.push({ business: business.trim(), metric: metric.trim(), value: value.trim(), note: note?.trim() || 'Add a target' }); localStorage.setItem('businessKpis', JSON.stringify(businessKpis)); });
 
 document.querySelectorAll('[data-people-filter]').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('[data-people-filter]').forEach((item) => item.classList.remove('active')); button.classList.add('active'); const filter = button.dataset.peopleFilter; document.querySelectorAll('#peopleCheckinList > div').forEach((item) => { item.style.display = filter === 'all' || item.dataset.personGroup === filter ? 'flex' : 'none'; }); }));
-document.querySelector('#addPeopleCheckin')?.addEventListener('click', () => { const group = prompt('Family, friends, or relationship?'); const title = prompt('What should you remember or do?'); const detail = prompt('When or why?'); if (!group?.trim() || !title?.trim()) return; const row = document.createElement('div'); row.dataset.personGroup = group.trim().toLowerCase(); row.innerHTML = `<strong>${escapeText(title)}</strong><small>${escapeText(detail || 'Check in soon')}</small><span>${escapeText(group)}</span>`; document.querySelector('#peopleCheckinList')?.append(row); });
+document.querySelector('#addPeopleCheckin')?.addEventListener('click', () => { const group = prompt('Family, friends, or relationship?'); const title = prompt('What should you remember or do?'); const detail = prompt('When or why?'); if (!group?.trim() || !title?.trim()) return; const row = document.createElement('div'); row.dataset.personGroup = group.trim().toLowerCase(); row.innerHTML = `<strong>${escapeText(title)}</strong><small>${escapeText(detail || 'Check in soon')}</small><span>${escapeText(group)}</span>`; document.querySelector('#peopleCheckinList')?.append(row); const checkins = JSON.parse(localStorage.getItem('peopleCheckins') || '[]'); checkins.push({ group: group.trim().toLowerCase(), title: title.trim(), detail: detail?.trim() || 'Check in soon' }); localStorage.setItem('peopleCheckins', JSON.stringify(checkins)); });
 const peopleReminder = document.querySelector('#peopleReminderInput'); if (peopleReminder) peopleReminder.value = localStorage.getItem('peopleReminder') || '';
 document.querySelector('#savePeopleReminder')?.addEventListener('click', () => { localStorage.setItem('peopleReminder', peopleReminder.value); document.querySelector('#connectionReminder').textContent = peopleReminder.value || 'Who needs a little love from you?'; });
 if (localStorage.getItem('peopleReminder')) document.querySelector('#connectionReminder').textContent = localStorage.getItem('peopleReminder');
 
-document.querySelector('#addPipelinePost')?.addEventListener('click', () => { const title = prompt('Post or content title:'); const platform = prompt('Platform:'); const status = prompt('Status: planned, creating, scheduled, or published?', 'planned'); if (!title?.trim()) return; const columnIndex = { planned: 0, creating: 1, scheduled: 2, published: 3 }[status?.trim().toLowerCase()] ?? 0; const card = document.createElement('div'); card.className = 'pipeline-post'; card.innerHTML = `<strong>${escapeText(title)}</strong><small>${escapeText(platform || 'Platform to add')}</small>`; document.querySelectorAll('.pipeline-grid > article')[columnIndex].append(card); });
+document.querySelector('#addPipelinePost')?.addEventListener('click', () => { const title = prompt('Post or content title:'); const platform = prompt('Platform:'); const status = prompt('Status: planned, creating, scheduled, or published?', 'planned'); if (!title?.trim()) return; const columnIndex = { planned: 0, creating: 1, scheduled: 2, published: 3 }[status?.trim().toLowerCase()] ?? 0; const post = { id: `pipeline-${Date.now()}`, title: title.trim(), platform: platform?.trim() || 'Platform to add', status: columnIndex, views: '', likes: '', comments: '' }; if (typeof appendPipelinePost === 'function') appendPipelinePost(post, true); });
 
 const clearData = (keys, label) => { if (!confirm(`Clear ${label}? This cannot be undone unless you have an exported backup.`)) return; keys.forEach((key) => localStorage.removeItem(key)); document.querySelector('#dataManagementStatus').textContent = `${label} cleared.`; setTimeout(() => window.location.reload(), 700); };
 document.querySelector('#clearJournalData')?.addEventListener('click', () => clearData(['quickNote', 'journalEntries', 'archiveEntries'], 'journal data'));
-document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'mealLogs', 'nutritionNote', 'studySessions', 'weeklyExpenses', 'categoryExpenses'], 'tracking data'));
+document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'mealLogs', 'nutritionNote', 'studySessions', 'weeklyExpenses', 'categoryExpenses', 'customUnits', 'schoolStudyItems', 'schoolResearchItems', 'schoolProjectDetails', 'classEntries', 'personalBusinesses', 'workGoals', 'peopleDirectory', 'peopleCheckins', 'examPrepItems', 'businessKpis', 'careerTasks'], 'tracking and added items'));
 document.querySelector('#clearAllData')?.addEventListener('click', () => { if (!confirm('Clear every locally saved dashboard item? Export a backup first if you may want it later.')) return; localStorage.clear(); window.location.reload(); });
 
 const defaultAccountInsights = { Instagram: { followers: '2.4k', growth: '+8.2% this month', reach: '4,820', engagement: '7.4%', posts: '12', best: 'A realistic student morning', meta: 'Reel · 4,280 views · 312 likes' }, TikTok: { followers: '1.8k', growth: '+14.1% this month', reach: '6,100', engagement: '8.6%', posts: '9', best: 'Study with me setup', meta: 'Video · 8,920 views · 540 likes' }, YouTube: { followers: '824', growth: '+5.3% this month', reach: '1,900', engagement: '5.1%', posts: '3', best: 'July reset routine', meta: 'Short · 2,100 views · 98 likes' }, Other: { followers: '0', growth: 'Add your growth', reach: '0', engagement: '0%', posts: '0', best: 'Add your best content', meta: 'No performance logged yet' } };
@@ -694,7 +756,7 @@ renderAccountInsights();
 
 const savedPipelinePosts = JSON.parse(localStorage.getItem('pipelinePosts') || '[]');
 const pipelineColumns = [...document.querySelectorAll('.pipeline-grid > article')];
-const appendPipelinePost = (post, persist = false) => { const column = pipelineColumns[post.status] || pipelineColumns[0]; if (!column) return; const card = document.createElement('div'); card.className = 'pipeline-post'; card.dataset.pipelineId = post.id; card.innerHTML = `<strong>${escapeText(post.title)}</strong><small>${escapeText(post.platform || 'Platform to add')}</small>`; column.append(card); if (persist) { savedPipelinePosts.push(post); localStorage.setItem('pipelinePosts', JSON.stringify(savedPipelinePosts)); } };
+const appendPipelinePost = (post, persist = false) => { const column = pipelineColumns[post.status] || pipelineColumns[0]; if (!column) return; const card = document.createElement('div'); card.className = 'pipeline-post'; card.dataset.pipelineId = post.id; const metric = post.views ? `<span class="content-metric-badge">${escapeText(post.views)} views · ${escapeText(post.likes || '0')} likes</span>` : ''; card.innerHTML = `<strong>${escapeText(post.title)}</strong><small>${escapeText(post.platform || 'Platform to add')}</small>${metric}<span class="post-edit-hint">Click to add metrics · double-click to edit</span>`; column.append(card); if (persist) { savedPipelinePosts.push(post); localStorage.setItem('pipelinePosts', JSON.stringify(savedPipelinePosts)); } };
 savedPipelinePosts.forEach((post) => appendPipelinePost(post));
 document.querySelector('#contentPipeline')?.addEventListener('dblclick', (event) => { const card = event.target.closest('.pipeline-post'); if (!card) return; const post = savedPipelinePosts.find((item) => item.id === card.dataset.pipelineId); if (!post) return; const title = prompt('Edit post title:', post.title); const status = prompt('Move to: planned, creating, scheduled, or published:', ['planned', 'creating', 'scheduled', 'published'][post.status]); if (!title?.trim()) return; post.title = title.trim(); const newStatus = { planned: 0, creating: 1, scheduled: 2, published: 3 }[status?.trim().toLowerCase()] ?? post.status; post.status = newStatus; localStorage.setItem('pipelinePosts', JSON.stringify(savedPipelinePosts)); card.remove(); appendPipelinePost(post); });
 
@@ -708,7 +770,7 @@ document.querySelector('#addResource')?.addEventListener('click', () => { const 
 const careerNoteField = document.querySelector('#careerNote'); if (careerNoteField) careerNoteField.value = localStorage.getItem('careerNote') || '';
 document.querySelector('#saveCareerNote')?.addEventListener('click', () => { localStorage.setItem('careerNote', careerNoteField.value); document.querySelector('#saveCareerNote').textContent = 'Saved reflection ✓'; });
 document.querySelectorAll('#careerTaskList input').forEach((input, index) => { const key = `career-task-${index}`; input.checked = localStorage.getItem(key) === 'true'; input.addEventListener('change', () => localStorage.setItem(key, input.checked)); });
-document.querySelector('#addCareerTask')?.addEventListener('click', () => { const task = prompt('What career or attachment task should you add?'); if (!task?.trim()) return; const label = document.createElement('label'); label.innerHTML = `<input type="checkbox"> ${escapeText(task)}`; document.querySelector('#careerTaskList')?.append(label); });
+document.querySelector('#addCareerTask')?.addEventListener('click', () => { const task = prompt('What career or attachment task should you add?'); if (!task?.trim()) return; const label = document.createElement('label'); label.innerHTML = `<input type="checkbox"> ${escapeText(task)}`; document.querySelector('#careerTaskList')?.append(label); const careerTasks = JSON.parse(localStorage.getItem('careerTasks') || '[]'); careerTasks.push({ title: task.trim(), done: false }); localStorage.setItem('careerTasks', JSON.stringify(careerTasks)); });
 
 let savingsGoals = JSON.parse(localStorage.getItem('savingsGoals') || '[]');
 const renderSavings = () => { const list = document.querySelector('#savingsList'); if (!list) return; list.innerHTML = savingsGoals.map((goal) => `<article><div><p class="eyebrow">${escapeText(goal.name)}</p><strong>KSh ${Number(goal.saved).toLocaleString()} <small>/ KSh ${Number(goal.target).toLocaleString()}</small></strong><div class="savings-bar"><i style="width:${Math.min(100, Number(goal.saved) / Number(goal.target) * 100)}%"></i></div><span>${escapeText(goal.note || 'Keep going')}</span></div></article>`).join('') || '<p class="capture-hint">Add a savings goal to give your money direction.</p>'; };
@@ -753,4 +815,32 @@ document.querySelector('#entryForm').addEventListener('submit', (event) => {
   event.target.reset(); closeModal();
   const saved = document.querySelector('#saveNote'); saved.textContent = 'Entry saved ✓';
   setTimeout(() => { saved.textContent = 'Save note ↗'; }, 1600);
+});
+// Second persistence pass: hydrate the areas that can be expanded from the dashboard.
+window.addEventListener('load', () => {
+  const readList = (key) => JSON.parse(localStorage.getItem(key) || '[]');
+  const appendHtml = (selector, html) => document.querySelector(selector)?.insertAdjacentHTML('beforeend', html);
+  const customUnits = readList('customUnits');
+  customUnits.forEach((unit) => appendHtml('#unitList', `<div class="saved-custom-row"><span>${escapeText(unit.code)}</span><strong>${escapeText(unit.name)}</strong><small>${escapeText(unit.lecturer)} · ${escapeText(unit.year)}</small></div>`));
+  readList('schoolStudyItems').forEach((item) => appendHtml('#studyList', `<div class="saved-custom-row"><span>${escapeText(item.icon || '◒')}</span><strong>${escapeText(item.value)}</strong><small>${escapeText(item.meta)}</small></div>`));
+  readList('schoolResearchItems').forEach((item) => appendHtml('#researchList', `<p class="saved-custom-row"><span>NOTE</span> ${escapeText(item.value)} <small>${escapeText(item.meta)}</small></p>`));
+  const savedProject = JSON.parse(localStorage.getItem('schoolProjectDetails') || 'null');
+  if (savedProject) { const title = document.querySelector('#projectTitle'); const notes = document.querySelector('#projectNotes'); if (title) title.textContent = savedProject.title; if (notes) notes.textContent = savedProject.next; }
+  const classEntries = readList('classEntries');
+  if (classEntries.length) { let list = document.querySelector('.schedule-entry-list'); if (!list) { list = document.createElement('div'); list.className = 'schedule-entry-list'; document.querySelector('.timetable-card')?.append(list); } classEntries.forEach((entry) => { list.insertAdjacentHTML('beforeend', `<p><span>${escapeText(entry.day)}</span><strong>${escapeText(entry.subject)}</strong><small>${escapeText(entry.time)}</small></p>`); }); }
+  readList('personalBusinesses').forEach((business) => appendHtml('#businessList', `<div class="saved-custom-row"><span class="business-badge coral-badge">${escapeText(business.name.slice(0, 2).toUpperCase())}</span><section><strong>${escapeText(business.name)}</strong><small>${escapeText(business.type)} · ${escapeText(business.duration)}</small></section><b>New</b></div>`));
+  readList('workGoals').forEach((goal, index) => appendHtml('#workGoalList', `<label class="saved-work-goal"><input type="checkbox" data-saved-work-goal="${index}" ${goal.done ? 'checked' : ''}> ${escapeText(goal.title)}</label>`));
+  document.querySelector('#workGoalList')?.addEventListener('change', (event) => { const input = event.target.closest('[data-saved-work-goal]'); if (!input) return; const goals = readList('workGoals'); goals[Number(input.dataset.savedWorkGoal)].done = input.checked; localStorage.setItem('workGoals', JSON.stringify(goals)); });
+  readList('peopleDirectory').forEach((person) => appendHtml('#peopleList', `<div class="saved-custom-row"><span class="person-avatar peach">${escapeText(person.name.charAt(0).toUpperCase())}</span><section><strong>${escapeText(person.name)}</strong><small>${escapeText(person.group)} · ${escapeText(person.note)}${person.birthday ? ` · ${escapeText(person.birthday)}` : ''}</small></section><button>Check in →</button></div>`));
+  readList('peopleCheckins').forEach((item) => appendHtml('#peopleCheckinList', `<div data-person-group="${escapeText(item.group)}"><strong>${escapeText(item.title)}</strong><small>${escapeText(item.detail)}</small><span>${escapeText(item.group)}</span></div>`));
+  readList('examPrepItems').forEach((item) => appendHtml('#examPrepList', `<article><div><strong>${escapeText(item.unit)}</strong><small>${escapeText(item.code)}</small></div><div class="prep-bar"><i style="width:${item.progress}%"></i></div><b>${item.progress}%</b></article>`));
+  readList('businessKpis').forEach((item) => appendHtml('#businessKpiList', `<article><p class="eyebrow">${escapeText(item.business)}</p><strong>${escapeText(item.value)}</strong><small>${escapeText(item.metric)}</small><span>${escapeText(item.note)}</span></article>`));
+  readList('careerTasks').forEach((task, index) => appendHtml('#careerTaskList', `<label><input type="checkbox" data-saved-career-task="${index}" ${task.done ? 'checked' : ''}> ${escapeText(task.title)}</label>`));
+  document.querySelector('#careerTaskList')?.addEventListener('change', (event) => { const input = event.target.closest('[data-saved-career-task]'); if (!input) return; const tasks = readList('careerTasks'); tasks[Number(input.dataset.savedCareerTask)].done = input.checked; localStorage.setItem('careerTasks', JSON.stringify(tasks)); });
+
+  const examActions = document.querySelector('#examPrep .section-title');
+  if (examActions && !document.querySelector('#addExamDateRefinement')) { const examDateButton = document.createElement('button'); examDateButton.id = 'addExamDateRefinement'; examDateButton.className = 'small-link'; examDateButton.type = 'button'; examDateButton.textContent = '＋ Add exam date'; examActions.append(examDateButton); examDateButton.addEventListener('click', () => { const title = prompt('Exam or unit name:'); const date = prompt('Exam date (YYYY-MM-DD):'); if (!title?.trim() || !date?.match(/^\d{4}-\d{2}-\d{2}$/)) return; calendarEvents.push({ date, title: `Exam · ${title.trim()}`, meta: 'School · Exam', color: 'coral-event' }); localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); renderCalendar(); renderUpcoming(); }); }
+
+  const settingsCard = document.querySelector('.settings-card');
+  if (settingsCard && !document.querySelector('#customizationPanel')) { const panel = document.createElement('div'); panel.id = 'customizationPanel'; panel.className = 'customization-panel'; panel.innerHTML = '<p class="eyebrow">Personalize your layout</p><strong>Show the spaces you use most.</strong><div class="customization-options"></div>'; const options = [['home', 'Today'], ['trackers', 'Trackers'], ['schoolHub', 'School center'], ['workHub', 'Work'], ['people', 'People'], ['calendar', 'Calendar'], ['goalsHub', 'Goals'], ['visionBoard', 'Vision board'], ['contentPipeline', 'Content pipeline'], ['monthlySummary', 'Monthly summary']]; const hiddenSections = new Set(readList('hiddenSections')); options.forEach(([id, label]) => { const item = document.createElement('label'); const input = document.createElement('input'); input.type = 'checkbox'; input.checked = !hiddenSections.has(id); input.dataset.customSection = id; item.append(input, document.createTextNode(label)); panel.querySelector('.customization-options').append(item); const section = document.querySelector(`#${id}`); if (section) section.hidden = hiddenSections.has(id); }); settingsCard.querySelector('.backup-tools')?.before(panel); panel.addEventListener('change', (event) => { const input = event.target.closest('[data-custom-section]'); if (!input) return; const section = document.querySelector(`#${input.dataset.customSection}`); if (section) section.hidden = !input.checked; const current = [...panel.querySelectorAll('[data-custom-section]:not(:checked)')].map((checkbox) => checkbox.dataset.customSection); localStorage.setItem('hiddenSections', JSON.stringify(current)); }); }
 });

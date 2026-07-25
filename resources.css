@@ -1,0 +1,261 @@
+/* Search, backup import, and resources hub. */
+.journal-search,
+.resource-search {
+  display: block;
+  min-width: 180px;
+}
+
+.journal-search input,
+.resource-search input,
+#resourceModal select {
+  width: 100%;
+  border: 1px solid rgba(112, 78, 96, .14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--ink);
+  font: 500 11px "DM Sans", sans-serif;
+  outline: 0;
+}
+
+.journal-search input,
+.resource-search input {
+  height: 38px;
+  padding: 0 14px;
+}
+
+.journal-search input:focus,
+.resource-search input:focus,
+#resourceModal select:focus {
+  border-color: rgba(179, 105, 137, .52);
+  box-shadow: 0 0 0 3px rgba(179, 105, 137, .1);
+}
+
+.resources-hub {
+  scroll-margin-top: 24px;
+}
+
+.resources-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.resource-search {
+  flex: 1 1 270px;
+  max-width: 340px;
+}
+
+.resource-filters {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 2px;
+  scrollbar-width: thin;
+}
+
+.resource-filters button {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border: 1px solid rgba(112, 78, 96, .12);
+  border-radius: 999px;
+  background: rgba(255, 253, 251, .64);
+  color: #87747e;
+  font-size: 10px;
+}
+
+.resource-filters button.active {
+  border-color: transparent;
+  background: var(--ink);
+  color: #fff;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.resource-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(112, 78, 96, .1);
+  border-radius: 22px;
+  background: rgba(255, 253, 251, .88);
+  box-shadow: 0 14px 40px rgba(91, 62, 77, .055);
+}
+
+.resource-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.resource-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resource-pin-button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(119, 79, 101, .14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .58);
+  color: #b296a4;
+  font-size: 15px;
+}
+
+.resource-pin-button.selected {
+  background: #fff1d8;
+  color: #b98735;
+}
+
+.resource-category {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font: 500 8px "DM Mono", monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.category-study { background: #eee9f7; color: #786597; }
+.category-wellbeing { background: #e8f1ea; color: #66816d; }
+.category-money { background: #f8ece5; color: #9b6a55; }
+.category-career { background: #f7e7ed; color: #95647b; }
+.category-personal { background: #f5efdf; color: #89734f; }
+
+.resource-card h3 {
+  margin: 17px 0 8px;
+  color: var(--ink);
+  font: 500 20px "Playfair Display", serif;
+}
+
+.resource-card > p {
+  min-height: 42px;
+  margin: 0;
+  color: #7d7178;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.resource-link,
+.resource-note-only {
+  display: inline-flex;
+  margin-top: 17px;
+  font-size: 10px;
+}
+
+.resource-link {
+  color: var(--ink);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 3px;
+}
+
+.resource-note-only {
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 8px;
+}
+
+.resource-empty {
+  grid-column: 1 / -1;
+  display: grid;
+  place-items: center;
+  min-height: 190px;
+  padding: 28px;
+  border: 1px dashed rgba(151, 105, 128, .24);
+  border-radius: 22px;
+  background: rgba(252, 246, 248, .65);
+  text-align: center;
+}
+
+.resource-empty > span {
+  color: var(--coral);
+  font-size: 22px;
+}
+
+.resource-empty h3 {
+  margin: 12px 0 5px;
+  font: 500 19px "Playfair Display", serif;
+}
+
+.resource-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+#resourceModal select {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+}
+
+.resource-pin {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 6px 0 18px;
+  color: #756871;
+  font-size: 11px;
+}
+
+.resource-pin input {
+  width: auto !important;
+  margin: 0 !important;
+  accent-color: var(--coral);
+}
+
+@media (max-width: 980px) {
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resources-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .resource-search {
+    max-width: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .journal-toolbar {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .journal-search {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-filters {
+    width: 100%;
+  }
+
+  .resource-card {
+    padding: 19px;
+    border-radius: 18px;
+  }
+}

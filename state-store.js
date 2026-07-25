@@ -14,6 +14,7 @@ const metrics = {
   writes: 0,
   removals: 0,
   errors: 0,
+  rollbacks: 0,
   lastError: ""
 };
 
@@ -88,6 +89,40 @@ export function writeJson(key, value, options = {}) {
   return writeRaw(key, JSON.stringify(value), options);
 }
 
+export function writeJsonBatch(entries, options = {}) {
+  const storage = options.storage || globalThis.localStorage;
+  const pairs = Array.isArray(entries) ? entries : Object.entries(entries || {});
+  if (!pairs.length) return true;
+
+  const prepared = pairs.map(([key, value]) => [String(key), JSON.stringify(value)]);
+  const previous = new Map();
+
+  try {
+    for (const [key] of prepared) previous.set(key, storage.getItem(key));
+    for (const [key, value] of prepared) storage.setItem(key, value);
+    metrics.writes += prepared.length;
+    if (options.notify !== false) {
+      for (const [key] of prepared) reportChange("write", key, storage);
+    }
+    return true;
+  } catch (error) {
+    let rollbackFailed = false;
+    for (const [key, value] of previous) {
+      try {
+        if (value === null) storage.removeItem(key);
+        else storage.setItem(key, value);
+      } catch (rollbackError) {
+        rollbackFailed = true;
+        reportError("rollback", key, storage, rollbackError);
+      }
+    }
+    metrics.rollbacks += 1;
+    reportError(rollbackFailed ? "batch-write-partial-rollback" : "batch-write", prepared.map(([key]) => key).join(","), storage, error);
+    if (options.suppressErrors) return false;
+    throw error;
+  }
+}
+
 export function removeKey(key, options = {}) {
   const storage = options.storage || globalThis.localStorage;
   try {
@@ -145,6 +180,7 @@ export function storageDiagnostics(storage = globalThis.localStorage) {
     reads: metrics.reads,
     writes: metrics.writes,
     removals: metrics.removals,
+    rollbacks: metrics.rollbacks,
     errors: metrics.errors,
     lastError: metrics.lastError
   });
@@ -161,6 +197,7 @@ const stateStore = Object.freeze({
   storageDiagnostics,
   writeAppState,
   writeJson,
+  writeJsonBatch,
   writeRaw
 });
 

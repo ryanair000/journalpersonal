@@ -1,20 +1,8 @@
 "use strict";
 
+import { element, qs } from "./app-core.js";
+
 (() => {
-  const qs = (selector, root = document) => root.querySelector(selector);
-
-  function element(tag, options = {}) {
-    const node = document.createElement(tag);
-    if (options.className) node.className = options.className;
-    if (options.text !== undefined) node.textContent = String(options.text);
-    if (options.attrs) {
-      Object.entries(options.attrs).forEach(([name, value]) => {
-        if (value !== undefined && value !== null) node.setAttribute(name, String(value));
-      });
-    }
-    return node;
-  }
-
   function appendField(form, labelText, field) {
     form.append(element("label", {
       className: "form-label",
@@ -115,7 +103,7 @@
       attrs: { role: "group", "aria-label": "Filter resources by category" }
     });
     ["All", "Study", "Wellbeing", "Money", "Career", "Personal"].forEach((category, index) => {
-      const button = element("button", {
+      filters.append(element("button", {
         className: index === 0 ? "active" : "",
         text: category,
         attrs: {
@@ -123,8 +111,7 @@
           "data-resource-filter": category,
           "aria-pressed": String(index === 0)
         }
-      });
-      filters.append(button);
+      }));
     });
 
     toolbar.append(search, filters);
@@ -225,8 +212,4 @@
     if (toast) toast.before(modal);
     else document.body.append(modal);
   }
-
-  import("./resources.js").catch((error) => {
-    console.error("Unable to load the resources hub.", error);
-  });
 })();

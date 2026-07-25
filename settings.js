@@ -1,15 +1,49 @@
 "use strict";
 
+import { element, localDateKey, pad, qs, qsa } from "./app-core.js";
+import {
+  STORAGE_KEYS,
+  isRecord,
+  readAppState,
+  readRaw,
+  removeKey,
+  removeKeys,
+  writeAppState,
+  writeRaw
+} from "./state-store.js";
+
 (() => {
-  const STORAGE_KEY = "myLittleLife.app.v2";
-  const RESOURCE_KEY = "myLittleLife.resources.v1";
-  const MIGRATION_KEY = "myLittleLife.migrated.v2";
-  const NOTICE_KEY = "myLittleLife.settingsNotice";
   const today = new Date();
-  const pad = (value) => String(value).padStart(2, "0");
-  const dateKey = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
-  const qs = (selector, root = document) => root.querySelector(selector);
-  const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const dateKey = localDateKey(today);
+  const NOTICE_KEY = STORAGE_KEYS.settingsNotice;
+  const RESET_KEYS = [
+    STORAGE_KEYS.appState,
+    STORAGE_KEYS.resources,
+    STORAGE_KEYS.migration,
+    "dailyMood",
+    "mentalCheckIn",
+    "gratitudeNote",
+    "savedMemory",
+    "quickNote",
+    "weeklyExpenses",
+    "contentAnalytics",
+    "peopleNote",
+    "journalEntries",
+    "meal-Breakfast",
+    "meal-Lunch",
+    "meal-Dinner",
+    "wellbeing-Prayer",
+    "wellbeing-Workout",
+    "wellbeing-Meal",
+    "habit-0",
+    "habit-1",
+    "habit-2",
+    "habit-3",
+    "leridia-rebrand-0",
+    "leridia-rebrand-1",
+    "leridia-rebrand-2",
+    "leridia-rebrand-3"
+  ];
 
   const DEFAULT_HABITS = [
     "Drink some water",
@@ -32,25 +66,6 @@
     { key: "resources", label: "Resources hub", description: "Saved links, contacts, notes, and useful references.", selectors: ["#resources"], navHrefs: ["#resources"] }
   ];
 
-  function element(tag, options = {}) {
-    const node = document.createElement(tag);
-    if (options.className) node.className = options.className;
-    if (options.text !== undefined) node.textContent = String(options.text);
-    Object.entries(options.attrs || {}).forEach(([name, value]) => {
-      if (value !== undefined && value !== null) node.setAttribute(name, String(value));
-    });
-    return node;
-  }
-
-  function safeParse(value, fallback) {
-    try {
-      const parsed = JSON.parse(value);
-      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
   function defaultSettings() {
     return {
       weeklyBudget: 2500,
@@ -61,16 +76,16 @@
   }
 
   function normalizeState(rawState) {
-    const state = rawState && typeof rawState === "object" ? rawState : {};
+    const state = isRecord(rawState) ? rawState : {};
     state.version = Number(state.version) || 2;
-    state.profile = state.profile && typeof state.profile === "object" ? state.profile : { name: "Charry" };
+    state.profile = isRecord(state.profile) ? state.profile : { name: "Charry" };
     state.profile.name = String(state.profile.name || "Charry").trim().slice(0, 60) || "Charry";
-    state.daily = state.daily && typeof state.daily === "object" ? state.daily : {};
-    state.weekly = state.weekly && typeof state.weekly === "object" ? state.weekly : {};
-    state.notes = state.notes && typeof state.notes === "object" ? state.notes : { people: "", connection: "" };
+    state.daily = isRecord(state.daily) ? state.daily : {};
+    state.weekly = isRecord(state.weekly) ? state.weekly : {};
+    state.notes = isRecord(state.notes) ? state.notes : { people: "", connection: "" };
 
     const defaults = defaultSettings();
-    const source = state.settings && typeof state.settings === "object" ? state.settings : {};
+    const source = isRecord(state.settings) ? state.settings : {};
     const budget = Number(source.weeklyBudget);
     const allowedKeys = new Set(SECTION_OPTIONS.map((option) => option.key));
     const hiddenSections = Array.isArray(source.hiddenSections)
@@ -94,11 +109,11 @@
   }
 
   function loadState() {
-    return normalizeState(safeParse(localStorage.getItem(STORAGE_KEY), {}));
+    return normalizeState(readAppState({}));
   }
 
   function captureUnsavedFields(state) {
-    const existingDay = state.daily[dateKey] && typeof state.daily[dateKey] === "object" ? state.daily[dateKey] : {};
+    const existingDay = isRecord(state.daily[dateKey]) ? state.daily[dateKey] : {};
     state.daily[dateKey] = {
       mood: "",
       habits: [false, false, false, false],
@@ -121,7 +136,22 @@
   function saveState(state, options = {}) {
     const normalized = normalizeState(state);
     if (options.preserveUnsaved !== false) captureUnsavedFields(normalized);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    writeAppState(normalized);
+  }
+
+  function saveNotice(message) {
+    writeRaw(NOTICE_KEY, message, { storage: globalThis.sessionStorage });
+  }
+
+  function consumeNotice() {
+    const notice = readRaw(NOTICE_KEY, { storage: globalThis.sessionStorage, fallback: "" });
+    if (notice) removeKey(NOTICE_KEY, { storage: globalThis.sessionStorage });
+    return notice;
+  }
+
+  function reloadSettings() {
+    globalThis.location.hash = "settings";
+    globalThis.location.reload();
   }
 
   function isoWeekKey(date) {
@@ -170,7 +200,7 @@
   function applyBudget(state) {
     const weeklyBudget = state.settings.weeklyBudget;
     const key = isoWeekKey(today);
-    const week = state.weekly[key] && typeof state.weekly[key] === "object" ? state.weekly[key] : {};
+    const week = isRecord(state.weekly[key]) ? state.weekly[key] : {};
     const expenses = Array.isArray(week.expenses) ? week.expenses : [];
     const total = expenses.reduce((sum, expense) => sum + Number(expense?.amount || 0), 0);
     const budgetNode = qs(".money-detail .balance-line > div:nth-child(2) strong");
@@ -389,9 +419,8 @@
       });
       nextState.settings.hiddenSections = SECTION_OPTIONS.filter((option) => values.get(`visible-${option.key}`) !== option.key).map((option) => option.key);
       saveState(nextState);
-      sessionStorage.setItem(NOTICE_KEY, "Settings saved.");
-      globalThis.location.hash = "settings";
-      globalThis.location.reload();
+      saveNotice("Settings saved.");
+      reloadSettings();
     });
 
     exportButton.addEventListener("click", () => {
@@ -419,9 +448,8 @@
         const nextState = loadState();
         delete nextState.daily[dateKey];
         saveState(nextState, { preserveUnsaved: false });
-        sessionStorage.setItem(NOTICE_KEY, "Today's check-in was cleared.");
-        globalThis.location.hash = "settings";
-        globalThis.location.reload();
+        saveNotice("Today's check-in was cleared.");
+        reloadSettings();
       });
     });
 
@@ -429,23 +457,19 @@
       const nextState = loadState();
       nextState.settings = defaultSettings();
       saveState(nextState);
-      sessionStorage.setItem(NOTICE_KEY, "Default settings restored.");
-      globalThis.location.hash = "settings";
-      globalThis.location.reload();
+      saveNotice("Default settings restored.");
+      reloadSettings();
     });
 
     resetAllButton.addEventListener("click", () => {
       armButton(resetAllButton, "Click again to reset everything", () => {
-        [
-          STORAGE_KEY, RESOURCE_KEY, MIGRATION_KEY, "dailyMood", "mentalCheckIn", "gratitudeNote",
-          "savedMemory", "quickNote", "weeklyExpenses", "contentAnalytics", "peopleNote",
-          "journalEntries", "meal-Breakfast", "meal-Lunch", "meal-Dinner", "wellbeing-Prayer",
-          "wellbeing-Workout", "wellbeing-Meal", "habit-0", "habit-1", "habit-2", "habit-3",
-          "leridia-rebrand-0", "leridia-rebrand-1", "leridia-rebrand-2", "leridia-rebrand-3"
-        ].forEach((key) => localStorage.removeItem(key));
-        sessionStorage.setItem(NOTICE_KEY, "All local dashboard data was reset.");
-        globalThis.location.hash = "settings";
-        globalThis.location.reload();
+        const removed = removeKeys(RESET_KEYS, { suppressErrors: true });
+        if (!removed) {
+          showDataStatus("Some local data could not be reset in this browser.");
+          return;
+        }
+        saveNotice("All local dashboard data was reset.");
+        reloadSettings();
       });
     });
 
@@ -470,9 +494,8 @@
     if (settingsLink) setNavigationActive(settingsLink);
   });
 
-  const notice = sessionStorage.getItem(NOTICE_KEY);
+  const notice = consumeNotice();
   if (notice) {
-    sessionStorage.removeItem(NOTICE_KEY);
     const status = qs("#settingsStatus");
     if (status) status.textContent = notice;
     const toast = qs("#appToast");

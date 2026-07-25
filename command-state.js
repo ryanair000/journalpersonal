@@ -126,6 +126,70 @@ export function consumeNotice() {
   return notice;
 }
 
+export function currentBackupPayload() {
+  const dashboardData = readRaw(STORAGE_KEYS.appState, { fallback: "{}" });
+  const resourceData = readRaw(STORAGE_KEYS.resources, { fallback: "[]" });
+  const dashboard = safeJsonParse(dashboardData, {});
+  const resources = safeJsonParse(resourceData, []);
+
+  return Object.freeze({
+    dashboard: isRecord(dashboard) ? dashboard : {},
+    resources: Array.isArray(resources) ? resources : [],
+    exportedAt: new Date().toISOString()
+  });
+}
+
+export function snapshotPayload(snapshot) {
+  const normalized = normalizeBackup(snapshot);
+  if (!normalized) return null;
+
+  const dashboard = safeJsonParse(normalized.dashboardData, null);
+  const resources = safeJsonParse(normalized.resourceData, null);
+  if (!isRecord(dashboard) || !Array.isArray(resources)) return null;
+
+  return Object.freeze({
+    dashboard,
+    resources,
+    snapshotAt: normalized.at
+  });
+}
+
+export function restoreHistoryEntry(entry, options = {}) {
+  if (!isHistoryEntry(entry)) return false;
+
+  try {
+    if (typeof globalThis.__littleLifeHistoryRestore === "function") {
+      globalThis.__littleLifeHistoryRestore(entry);
+    } else if (entry.previousValue === null) {
+      removeKey(entry.key, { suppressErrors: true, notify: false });
+    } else {
+      writeRaw(entry.key, entry.previousValue, { suppressErrors: true, notify: false });
+    }
+  } catch {
+    return false;
+  }
+
+  if (options.notice !== false) {
+    setNotice(options.notice || "Last local change undone.", { suppressErrors: true });
+  }
+  return true;
+}
+
+export function undoLatestHistory(options = {}) {
+  const history = readHistory();
+  const entry = history[0];
+  if (!entry) return false;
+  if (!restoreHistoryEntry(entry, { notice: false })) return false;
+
+  const updated = writeHistory(history.slice(1), { suppressErrors: true });
+  if (!updated) return false;
+
+  if (options.notice !== false) {
+    setNotice(options.notice || "Last local change undone.", { suppressErrors: true });
+  }
+  return true;
+}
+
 export function createAutomaticSnapshot(options = {}) {
   const dashboardData = readRaw(STORAGE_KEYS.appState, { fallback: "{}" });
   const resourceData = readRaw(STORAGE_KEYS.resources, { fallback: "[]" });
@@ -202,11 +266,15 @@ const commandState = Object.freeze({
   commandStateDiagnostics,
   consumeNotice,
   createAutomaticSnapshot,
+  currentBackupPayload,
   peekNotice,
   readBackups,
   readHistory,
+  restoreHistoryEntry,
   restoreSnapshot,
   setNotice,
+  snapshotPayload,
+  undoLatestHistory,
   writeBackups,
   writeHistory
 });

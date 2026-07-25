@@ -1,6 +1,7 @@
 "use strict";
 
 import { element, qs } from "./app-core.js";
+import { commandStateDiagnostics } from "./command-state.js";
 import { storageDiagnostics } from "./state-store.js";
 
 (() => {
@@ -25,6 +26,7 @@ import { storageDiagnostics } from "./state-store.js";
 
   function diagnosticText() {
     const storage = storageDiagnostics();
+    const commandState = commandStateDiagnostics();
     const lines = [
       "My Little Life — module diagnostics",
       `Checked: ${new Date().toISOString()}`,
@@ -33,6 +35,7 @@ import { storageDiagnostics } from "./state-store.js";
       `Local storage: ${storage.available ? "available" : "unavailable"}`,
       `Local storage estimate: ${storage.sizeLabel}`,
       `Storage operations: ${storage.reads} reads | ${storage.writes} writes | ${storage.removals} removals | ${storage.errors} errors`,
+      `Command state: ${commandState.historyCount} undo entries | ${commandState.backupCount} snapshots | notice ${commandState.hasNotice ? "pending" : "clear"}`,
       ""
     ];
     Object.entries(registry.modules).forEach(([, state]) => {
@@ -65,6 +68,7 @@ import { storageDiagnostics } from "./state-store.js";
     qs("#moduleHealthCard")?.remove();
 
     const storage = storageDiagnostics();
+    const commandState = commandStateDiagnostics();
     const card = element("article", { className: "module-health-card", attrs: { id: "moduleHealthCard", "aria-labelledby": "moduleHealthTitle" } });
     const heading = element("div", { className: "module-health-heading" });
     const copy = element("div");
@@ -78,7 +82,7 @@ import { storageDiagnostics } from "./state-store.js";
     const summaryCopy = element("div");
     summaryCopy.append(
       element("strong", { text: failed ? `${failed} module${failed === 1 ? "" : "s"} need attention` : "All modules loaded" }),
-      element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${storage.sizeLabel} local data · storage ${storage.available ? "ready" : "unavailable"}` })
+      element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${storage.sizeLabel} local data · ${commandState.backupCount} snapshot${commandState.backupCount === 1 ? "" : "s"}` })
     );
     summary.append(summaryCopy);
 

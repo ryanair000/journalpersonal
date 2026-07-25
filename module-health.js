@@ -2,6 +2,7 @@
 
 import { element, qs } from "./app-core.js";
 import { commandStateDiagnostics } from "./command-state.js";
+import { featureNoticeDiagnostics } from "./feature-notices.js";
 import { storageDiagnostics } from "./state-store.js";
 
 (() => {
@@ -27,6 +28,8 @@ import { storageDiagnostics } from "./state-store.js";
   function diagnosticText() {
     const storage = storageDiagnostics();
     const commandState = commandStateDiagnostics();
+    const featureNotices = featureNoticeDiagnostics();
+    const pendingNotices = Object.values(featureNotices.pending).filter(Boolean).length;
     const lines = [
       "My Little Life — module diagnostics",
       `Checked: ${new Date().toISOString()}`,
@@ -36,6 +39,7 @@ import { storageDiagnostics } from "./state-store.js";
       `Local storage estimate: ${storage.sizeLabel}`,
       `Storage operations: ${storage.reads} reads | ${storage.writes} writes | ${storage.removals} removals | ${storage.errors} errors`,
       `Command state: ${commandState.historyCount} undo entries | ${commandState.backupCount} snapshots | notice ${commandState.hasNotice ? "pending" : "clear"}`,
+      `Feature notices: ${featureNotices.registered.length} registered | ${pendingNotices} pending | ${featureNotices.reads} reads | ${featureNotices.writes} writes | ${featureNotices.removals} removals | ${featureNotices.errors} errors`,
       ""
     ];
     Object.entries(registry.modules).forEach(([, state]) => {
@@ -69,6 +73,8 @@ import { storageDiagnostics } from "./state-store.js";
 
     const storage = storageDiagnostics();
     const commandState = commandStateDiagnostics();
+    const featureNotices = featureNoticeDiagnostics();
+    const pendingNotices = Object.values(featureNotices.pending).filter(Boolean).length;
     const card = element("article", { className: "module-health-card", attrs: { id: "moduleHealthCard", "aria-labelledby": "moduleHealthTitle" } });
     const heading = element("div", { className: "module-health-heading" });
     const copy = element("div");
@@ -82,7 +88,7 @@ import { storageDiagnostics } from "./state-store.js";
     const summaryCopy = element("div");
     summaryCopy.append(
       element("strong", { text: failed ? `${failed} module${failed === 1 ? "" : "s"} need attention` : "All modules loaded" }),
-      element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${storage.sizeLabel} local data · ${commandState.backupCount} snapshot${commandState.backupCount === 1 ? "" : "s"}` })
+      element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${storage.sizeLabel} local data · ${commandState.backupCount} snapshot${commandState.backupCount === 1 ? "" : "s"} · ${pendingNotices} feature notice${pendingNotices === 1 ? "" : "s"} pending` })
     );
     summary.append(summaryCopy);
 
@@ -124,4 +130,6 @@ import { storageDiagnostics } from "./state-store.js";
   globalThis.addEventListener("mll:module-status", () => requestAnimationFrame(render));
   globalThis.addEventListener("mll:modules-complete", () => requestAnimationFrame(render));
   globalThis.addEventListener("mll:storage-error", () => requestAnimationFrame(render));
+  globalThis.addEventListener("mll:feature-notice", () => requestAnimationFrame(render));
+  globalThis.addEventListener("mll:feature-notice-error", () => requestAnimationFrame(render));
 })();

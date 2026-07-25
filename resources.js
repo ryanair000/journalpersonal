@@ -1,13 +1,18 @@
 "use strict";
 
-(() => {
-  const DASHBOARD_KEY = "myLittleLife.app.v2";
-  const RESOURCE_KEY = "myLittleLife.resources.v1";
-  const MAX_BACKUP_SIZE = 5 * 1024 * 1024;
+import { createId, element, qs, qsa, safeJsonParse } from "./app-core.js";
+import {
+  STORAGE_KEYS,
+  isRecord,
+  readAppState,
+  readJson,
+  writeJson,
+  writeJsonBatch
+} from "./state-store.js";
 
-  const qs = (selector, root = document) => root.querySelector(selector);
-  const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const createId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+(() => {
+  const MAX_BACKUP_SIZE = 5 * 1024 * 1024;
+  const RESOURCE_CATEGORIES = ["Study", "Wellbeing", "Money", "Career", "Personal"];
 
   const starterResources = [
     {
@@ -68,27 +73,6 @@
     }
   ];
 
-  function safeJsonParse(value, fallback) {
-    try {
-      const parsed = JSON.parse(value);
-      return parsed ?? fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
-  function element(tag, options = {}) {
-    const node = document.createElement(tag);
-    if (options.className) node.className = options.className;
-    if (options.text !== undefined) node.textContent = String(options.text);
-    if (options.attrs) {
-      Object.entries(options.attrs).forEach(([name, value]) => {
-        if (value !== undefined && value !== null) node.setAttribute(name, String(value));
-      });
-    }
-    return node;
-  }
-
   function showToast(message) {
     const toast = qs("#appToast");
     if (!toast) return;
@@ -113,16 +97,14 @@
   }
 
   function normalizeResource(resource) {
-    if (!resource || typeof resource !== "object") return null;
+    if (!isRecord(resource)) return null;
     const title = String(resource.title || "").trim();
-    const categories = ["Study", "Wellbeing", "Money", "Career", "Personal"];
-    const category = categories.includes(resource.category) ? resource.category : "Personal";
     if (!title) return null;
 
     return {
-      id: String(resource.id || createId()),
+      id: String(resource.id || createId("resource")),
       title: title.slice(0, 120),
-      category,
+      category: RESOURCE_CATEGORIES.includes(resource.category) ? resource.category : "Personal",
       url: normalizeResourceUrl(resource.url),
       note: String(resource.note || "").trim().slice(0, 500),
       pinned: Boolean(resource.pinned)
@@ -130,22 +112,20 @@
   }
 
   function loadResources() {
-    const stored = safeJsonParse(localStorage.getItem(RESOURCE_KEY), null);
-    if (!Array.isArray(stored)) return starterResources.map((item) => ({ ...item }));
+    const stored = readJson(STORAGE_KEYS.resources, null, { validate: Array.isArray });
+    if (!stored) return starterResources.map((item) => ({ ...item }));
     return stored.map(normalizeResource).filter(Boolean);
   }
 
   let resources = loadResources();
 
   function saveResources() {
-    try {
-      localStorage.setItem(RESOURCE_KEY, JSON.stringify(resources));
-      return true;
-    } catch (error) {
-      console.error("Unable to save resources.", error);
+    const saved = writeJson(STORAGE_KEYS.resources, resources, { suppressErrors: true });
+    if (!saved) {
       showToast("Resources could not be saved in this browser.");
       return false;
     }
+    return true;
   }
 
   function removeButton(label, onClick) {
@@ -336,9 +316,9 @@
     }
 
     resources.push({
-      id: createId(),
+      id: createId("resource"),
       title: title.slice(0, 120),
-      category,
+      category: RESOURCE_CATEGORIES.includes(category) ? category : "Personal",
       url,
       note: note.slice(0, 500),
       pinned
@@ -382,12 +362,11 @@
   }
 
   function downloadBackup() {
-    const dashboard = safeJsonParse(localStorage.getItem(DASHBOARD_KEY), null);
     const backup = {
       format: "my-little-life-backup",
       version: 3,
       exportedAt: new Date().toISOString(),
-      dashboard,
+      dashboard: readAppState(null),
       resources
     };
 
@@ -427,31 +406,27 @@
 
     try {
       const parsed = safeJsonParse(await file.text(), null);
-      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-        throw new Error("Invalid backup");
-      }
+      if (!isRecord(parsed)) throw new Error("Invalid backup");
 
-      const dashboard = parsed.format === "my-little-life-backup"
-        ? parsed.dashboard
-        : parsed;
-      const importedResources = parsed.format === "my-little-life-backup"
-        ? parsed.resources
-        : null;
-
-      if (!dashboard || typeof dashboard !== "object" || Array.isArray(dashboard)) {
-        throw new Error("Missing dashboard data");
-      }
+      const dashboard = parsed.format === "my-little-life-backup" ? parsed.dashboard : parsed;
+      const importedResources = parsed.format === "my-little-life-backup" ? parsed.resources : null;
+      if (!isRecord(dashboard)) throw new Error("Missing dashboard data");
 
       if (!globalThis.confirm("Replace the current dashboard data with this backup?")) {
         event.currentTarget.value = "";
         return;
       }
 
-      localStorage.setItem(DASHBOARD_KEY, JSON.stringify(dashboard));
-      if (Array.isArray(importedResources)) {
-        resources = importedResources.map(normalizeResource).filter(Boolean);
-        localStorage.setItem(RESOURCE_KEY, JSON.stringify(resources));
+      const nextResources = Array.isArray(importedResources)
+        ? importedResources.map(normalizeResource).filter(Boolean)
+        : null;
+      const entries = [[STORAGE_KEYS.appState, dashboard]];
+      if (nextResources) entries.push([STORAGE_KEYS.resources, nextResources]);
+
+      if (!writeJsonBatch(entries, { suppressErrors: true })) {
+        throw new Error("Backup could not be stored");
       }
+      if (nextResources) resources = nextResources;
 
       showToast("Backup imported. Reloading...");
       setTimeout(() => globalThis.location.reload(), 500);

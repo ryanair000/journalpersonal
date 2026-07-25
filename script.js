@@ -12,6 +12,7 @@
 
   const startedAt = performance.now();
   const modulePlan = [
+    { path: "./state-store.js", label: "State access", critical: true },
     { path: "./dashboard.js", label: "Dashboard", critical: true },
     { path: "./state-write-guard.js", label: "State protection" },
     { path: "./resource-bootstrap.js", label: "Resource layout" },
@@ -114,7 +115,7 @@
   }
 
   function preloadModules() {
-    modulePlan.slice(0, 6).forEach((module) => {
+    modulePlan.slice(0, 7).forEach((module) => {
       document.head.append(element("link", {
         attrs: { rel: "modulepreload", href: module.path }
       }));

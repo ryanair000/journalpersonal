@@ -1,6 +1,7 @@
 "use strict";
 
-import { element, localStorageSizeLabel, qs } from "./app-core.js";
+import { element, qs } from "./app-core.js";
+import { storageDiagnostics } from "./state-store.js";
 
 (() => {
   const registry = globalThis.MyLittleLifeModules;
@@ -23,12 +24,15 @@ import { element, localStorageSizeLabel, qs } from "./app-core.js";
   }
 
   function diagnosticText() {
+    const storage = storageDiagnostics();
     const lines = [
       "My Little Life — module diagnostics",
       `Checked: ${new Date().toISOString()}`,
       `Online: ${navigator.onLine}`,
       `Startup duration: ${registry.durationMs || 0} ms`,
-      `Local storage estimate: ${localStorageSizeLabel()}`,
+      `Local storage: ${storage.available ? "available" : "unavailable"}`,
+      `Local storage estimate: ${storage.sizeLabel}`,
+      `Storage operations: ${storage.reads} reads | ${storage.writes} writes | ${storage.removals} removals | ${storage.errors} errors`,
       ""
     ];
     Object.entries(registry.modules).forEach(([, state]) => {
@@ -60,6 +64,7 @@ import { element, localStorageSizeLabel, qs } from "./app-core.js";
     if (!host) return false;
     qs("#moduleHealthCard")?.remove();
 
+    const storage = storageDiagnostics();
     const card = element("article", { className: "module-health-card", attrs: { id: "moduleHealthCard", "aria-labelledby": "moduleHealthTitle" } });
     const heading = element("div", { className: "module-health-heading" });
     const copy = element("div");
@@ -71,7 +76,10 @@ import { element, localStorageSizeLabel, qs } from "./app-core.js";
     const failed = states.filter((state) => state.status === "failed").length;
     const summary = element("div", { className: "module-health-summary" });
     const summaryCopy = element("div");
-    summaryCopy.append(element("strong", { text: failed ? `${failed} module${failed === 1 ? "" : "s"} need attention` : "All modules loaded" }), element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${localStorageSizeLabel()} local data` }));
+    summaryCopy.append(
+      element("strong", { text: failed ? `${failed} module${failed === 1 ? "" : "s"} need attention` : "All modules loaded" }),
+      element("p", { text: `${ready} of ${states.length} ready · ${registry.durationMs || 0} ms startup · ${storage.sizeLabel} local data · storage ${storage.available ? "ready" : "unavailable"}` })
+    );
     summary.append(summaryCopy);
 
     const list = element("div", { className: "module-health-list" });
@@ -111,4 +119,5 @@ import { element, localStorageSizeLabel, qs } from "./app-core.js";
   globalThis.addEventListener("offline", render);
   globalThis.addEventListener("mll:module-status", () => requestAnimationFrame(render));
   globalThis.addEventListener("mll:modules-complete", () => requestAnimationFrame(render));
+  globalThis.addEventListener("mll:storage-error", () => requestAnimationFrame(render));
 })();

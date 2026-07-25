@@ -245,9 +245,14 @@ document.querySelector('#addWorkGoal')?.addEventListener('click', () => {
   workGoals.push({ title: goal.trim(), done: false });
   localStorage.setItem('workGoals', JSON.stringify(workGoals));
 });
+const workLogEntries = JSON.parse(localStorage.getItem('workLogEntries') || '[]');
 document.querySelector('#addWorkLog')?.addEventListener('click', () => {
-  const hours = prompt('How many hours did you work?');
-  if (hours) alert(`Logged ${hours} hour(s). Your work history can be expanded with income, clients, and project tracking next.`);
+  const hours = Number(prompt('How many hours did you work?'));
+  const note = prompt('What did you work on?');
+  if (Number.isNaN(hours) || hours <= 0) return;
+  workLogEntries.unshift({ hours, note: note?.trim() || 'Work session', date: new Date().toISOString().slice(0, 10) });
+  localStorage.setItem('workLogEntries', JSON.stringify(workLogEntries));
+  alert(`Logged ${hours} hour(s).`);
 });
 const rhythmDefaults = { sleep: '7h 12m', water: '3 / 7', movement: '12 min' };
 const rhythmData = { ...rhythmDefaults, ...JSON.parse(localStorage.getItem('rhythmData') || '{}') };
@@ -759,7 +764,7 @@ document.querySelector('#addPipelinePost')?.addEventListener('click', () => { co
 
 const clearData = (keys, label) => { if (!confirm(`Clear ${label}? This cannot be undone unless you have an exported backup.`)) return; keys.forEach((key) => localStorage.removeItem(key)); document.querySelector('#dataManagementStatus').textContent = `${label} cleared.`; setTimeout(() => window.location.reload(), 700); };
 document.querySelector('#clearJournalData')?.addEventListener('click', () => clearData(['quickNote', 'journalEntries', 'archiveEntries'], 'journal data'));
-document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'customHabitHistory', 'routineHistory', 'routines', 'mealLogs', 'nutritionNote', 'studySessions', 'studyTimerSeconds', 'weeklyExpenses', 'categoryExpenses', 'expenseLedger', 'prayerHistory', 'moodHistory', 'contentAccounts', 'customUnits', 'schoolStudyItems', 'schoolResearchItems', 'schoolProjectDetails', 'classEntries', 'personalBusinesses', 'workGoals', 'peopleDirectory', 'peopleCheckins', 'examPrepItems', 'businessKpis', 'careerTasks', 'analyticsHistory', 'monthlyBudget'], 'tracking and added items'));
+document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'customHabitHistory', 'routineHistory', 'routines', 'mealLogs', 'nutritionNote', 'studySessions', 'studyTimerSeconds', 'weeklyExpenses', 'categoryExpenses', 'expenseLedger', 'prayerHistory', 'moodHistory', 'contentAccounts', 'customUnits', 'schoolStudyItems', 'schoolResearchItems', 'schoolProjectDetails', 'classEntries', 'personalBusinesses', 'workGoals', 'workLogEntries', 'peopleDirectory', 'peopleCheckins', 'examPrepItems', 'businessKpis', 'careerTasks', 'analyticsHistory', 'monthlyBudget'], 'tracking and added items'));
 document.querySelector('#clearAllData')?.addEventListener('click', () => { if (!confirm('Clear every locally saved dashboard item? Export a backup first if you may want it later.')) return; localStorage.clear(); window.location.reload(); });
 
 const defaultAccountInsights = { Instagram: { followers: '2.4k', growth: '+8.2% this month', reach: '4,820', engagement: '7.4%', posts: '12', best: 'A realistic student morning', meta: 'Reel · 4,280 views · 312 likes' }, TikTok: { followers: '1.8k', growth: '+14.1% this month', reach: '6,100', engagement: '8.6%', posts: '9', best: 'Study with me setup', meta: 'Video · 8,920 views · 540 likes' }, YouTube: { followers: '824', growth: '+5.3% this month', reach: '1,900', engagement: '5.1%', posts: '3', best: 'July reset routine', meta: 'Short · 2,100 views · 98 likes' }, Other: { followers: '0', growth: 'Add your growth', reach: '0', engagement: '0%', posts: '0', best: 'Add your best content', meta: 'No performance logged yet' } };
@@ -989,4 +994,146 @@ window.addEventListener('load', () => {
   const studyLogPass = document.querySelector('#studySessionLog'); const enhanceStudyRows = () => { if (!studyLogPass) return; const sessions = readNextPass('studySessions'); [...studyLogPass.querySelectorAll('p')].forEach((row, index) => { if (!sessions[index] || row.querySelector('.study-edit-controls')) return; const controls = document.createElement('span'); controls.className = 'edit-controls study-edit-controls'; controls.innerHTML = '<button data-study-edit aria-label="Edit study log">✎</button><button data-study-delete aria-label="Delete study log">×</button>'; row.append(controls); controls.addEventListener('click', (event) => { event.stopPropagation(); const edit = event.target.closest('[data-study-edit]'); const remove = event.target.closest('[data-study-delete]'); if (remove) { if (!confirm('Delete this study session?')) return; sessions.splice(index, 1); } else { const topic = prompt('What did you study?', sessions[index].topic); const duration = prompt('How long?', sessions[index].duration); if (!topic?.trim()) return; Object.assign(sessions[index], { topic: topic.trim(), duration: duration?.trim() || 'Focused session' }); } localStorage.setItem('studySessions', JSON.stringify(sessions)); renderStudySessions(); }); }); }; enhanceStudyRows(); if (studyLogPass) new MutationObserver(enhanceStudyRows).observe(studyLogPass, { childList: true });
 
   const customInsightButtons = document.querySelectorAll('#accountSelector [data-account^="custom-"]'); customInsightButtons.forEach((button) => { button.title = 'Select this account, then use Update account below'; });
+});
+// Next fifteen-task pass: work history, savings actions, resources, dates, exports, and polish.
+window.addEventListener('load', () => {
+  const readFifteen = (key, fallback = []) => JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+
+  const workMetrics = document.querySelector('#workHub .work-metrics');
+  const workSessionSummary = document.createElement('div');
+  workSessionSummary.className = 'history-mini-card work-session-summary';
+  workMetrics?.append(workSessionSummary);
+  const renderWorkSessionSummary = () => {
+    if (!workSessionSummary) return;
+    const entries = readFifteen('workLogEntries');
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const monthEntries = entries.filter((entry) => String(entry.date || '').startsWith(monthKey));
+    const hours = monthEntries.reduce((sum, entry) => sum + Number(entry.hours || 0), 0);
+    const notes = monthEntries.slice(0, 3).map((entry) => `${entry.date}: ${entry.note || 'Work session'}`);
+    const metric = [...(workMetrics?.querySelectorAll('.work-metric-row') || [])].find((row) => row.textContent.toLowerCase().includes('hours'))?.querySelector('strong');
+    if (metric) metric.textContent = `${hours}h`;
+    workSessionSummary.innerHTML = `<p class="eyebrow">Logged work sessions</p><strong>${hours}h this month · ${monthEntries.length} sessions</strong>${notes.length ? `<small>${notes.map((note) => escapeText(note)).join(' · ')}</small>` : '<small>Log your first session to see the rhythm of your work.</small>'}`;
+  };
+  renderWorkSessionSummary();
+  document.querySelector('#addWorkLog')?.addEventListener('click', () => window.setTimeout(renderWorkSessionSummary, 80));
+
+  const savingsListFifteen = document.querySelector('#savingsList');
+  const parseGoalDate = (note) => {
+    const value = String(note || '');
+    const iso = value.match(/\b\d{4}-\d{2}-\d{2}\b/)?.[0];
+    if (iso) return new Date(`${iso}T00:00:00`);
+    const parsed = Date.parse(value.replace(/^target\s*:\s*/i, ''));
+    return Number.isNaN(parsed) ? null : new Date(parsed);
+  };
+  const renderSavingsCountdowns = () => {
+    if (!savingsListFifteen) return;
+    const goals = readFifteen('savingsGoals');
+    [...savingsListFifteen.querySelectorAll('article')].forEach((row, index) => {
+      const goal = goals[index];
+      if (!goal) return;
+      row.classList.add('editable-item');
+      const date = parseGoalDate(goal.note);
+      const countdown = date ? Math.ceil((date - new Date()) / 86400000) : null;
+      let extra = row.querySelector('.savings-goal-actions');
+      if (!extra) { extra = document.createElement('div'); extra.className = 'savings-goal-actions'; row.append(extra); }
+      extra.innerHTML = `<button type="button" class="refinement-button" data-saving-contribute="${index}">＋ Add contribution</button>${countdown !== null ? `<small class="savings-countdown">${countdown >= 0 ? `${countdown} days to target` : 'Target date passed · update your plan'}</small>` : '<small class="savings-countdown">Add a target date in Edit goal.</small>'}`;
+    });
+  };
+  renderSavingsCountdowns();
+  if (savingsListFifteen) {
+    new MutationObserver(renderSavingsCountdowns).observe(savingsListFifteen, { childList: true });
+    savingsListFifteen.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-saving-contribute]');
+      if (!button) return;
+      event.stopPropagation();
+      const goals = readFifteen('savingsGoals');
+      const goal = goals[Number(button.dataset.savingContribute)];
+      if (!goal) return;
+      const amount = Number(prompt(`Add to ${goal.name} (KSh):`, '0'));
+      if (Number.isNaN(amount) || amount <= 0) return;
+      goal.saved = Number(goal.saved || 0) + amount;
+      localStorage.setItem('savingsGoals', JSON.stringify(goals));
+      savingsGoals.splice(0, savingsGoals.length, ...goals);
+      renderSavings();
+    });
+  }
+
+  const kpiListFifteen = document.querySelector('#businessKpiList');
+  const kpiSummaryFifteen = document.createElement('div');
+  kpiSummaryFifteen.className = 'summary-strip';
+  kpiListFifteen?.after(kpiSummaryFifteen);
+  const renderKpiSummaryFifteen = () => {
+    const kpis = readFifteen('businessKpis');
+    const numericTotal = kpis.reduce((sum, item) => sum + (Number(String(item.value).replaceAll(',', '').replace(/[^0-9.-]/g, '')) || 0), 0);
+    kpiSummaryFifteen.innerHTML = `<span class="summary-chip"><strong>${kpis.length}</strong> saved KPI${kpis.length === 1 ? '' : 's'}</span><span class="summary-chip"><strong>${numericTotal.toLocaleString()}</strong> total numeric value</span>`;
+  };
+  renderKpiSummaryFifteen();
+  const decorateKpisFifteen = () => {
+    if (!kpiListFifteen) return;
+    const kpis = readFifteen('businessKpis');
+    [...kpiListFifteen.querySelectorAll('article')].slice(-kpis.length).forEach((row, index) => {
+      if (row.querySelector('[data-kpi-edit]')) return;
+      const controls = document.createElement('span'); controls.className = 'edit-controls'; controls.innerHTML = '<button type="button" data-kpi-edit aria-label="Edit KPI">✎</button><button type="button" data-kpi-delete aria-label="Delete KPI">×</button>'; row.append(controls);
+      controls.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const current = readFifteen('businessKpis');
+        const item = current[index];
+        if (!item) return;
+        if (event.target.closest('[data-kpi-delete]')) { if (!confirm('Delete this KPI?')) return; current.splice(index, 1); }
+        else { const business = prompt('Business:', item.business); const metric = prompt('Metric:', item.metric); const value = prompt('Current value:', item.value); const note = prompt('Target or note:', item.note); if (!business?.trim() || !metric?.trim() || !value?.trim()) return; Object.assign(item, { business: business.trim(), metric: metric.trim(), value: value.trim(), note: note?.trim() || 'Add a target' }); }
+        localStorage.setItem('businessKpis', JSON.stringify(current)); window.location.reload();
+      });
+    });
+  };
+  decorateKpisFifteen();
+  if (kpiListFifteen) new MutationObserver(() => { decorateKpisFifteen(); renderKpiSummaryFifteen(); }).observe(kpiListFifteen, { childList: true });
+
+  const resourceListFifteen = document.querySelector('#resourceList');
+  const decorateResourcesFifteen = () => {
+    const resources = readFifteen('pharmacyResources');
+    [...(resourceListFifteen?.querySelectorAll('article') || [])].slice(-resources.length).forEach((row, index) => {
+      const resource = resources[index];
+      const openButton = row.querySelector('button:not([data-resource-edit]):not([data-resource-delete])');
+      if (openButton && resource?.link) { openButton.dataset.resourceLink = resource.link; openButton.title = 'Open saved link'; }
+    });
+  };
+  decorateResourcesFifteen();
+  if (resourceListFifteen) new MutationObserver(decorateResourcesFifteen).observe(resourceListFifteen, { childList: true });
+  resourceListFifteen?.addEventListener('click', (event) => { const button = event.target.closest('[data-resource-link]'); if (button) window.open(button.dataset.resourceLink, '_blank', 'noopener'); });
+
+  const importantListFifteen = document.querySelector('#importantDateList');
+  const decorateImportantDatesFifteen = () => {
+    [...(importantListFifteen?.querySelectorAll('.important-date-row') || [])].forEach((row) => {
+      if (row.querySelector('[data-important-edit]')) return;
+      const deleteButton = row.querySelector('[data-important-index]'); if (!deleteButton) return;
+      const editButton = document.createElement('button'); editButton.type = 'button'; editButton.dataset.importantEdit = deleteButton.dataset.importantIndex; editButton.className = 'row-edit'; editButton.setAttribute('aria-label', 'Edit important date'); editButton.textContent = '✎'; deleteButton.before(editButton);
+    });
+  };
+  decorateImportantDatesFifteen();
+  importantListFifteen?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-important-edit]'); if (!button) return;
+    event.stopPropagation(); const dates = readFifteen('importantDates'); const item = dates[Number(button.dataset.importantEdit)]; if (!item) return;
+    const title = prompt('What is the important date?', item.title); const date = prompt('Date:', item.date); const person = prompt('Who or what is it connected to?', item.person); if (!title?.trim() || !date?.trim()) return;
+    Object.assign(item, { title: title.trim(), date: date.trim(), person: person?.trim() || 'Personal reminder' }); localStorage.setItem('importantDates', JSON.stringify(dates)); window.location.reload();
+  });
+
+  document.querySelectorAll('.sidebar a').forEach((link) => link.addEventListener('click', () => { document.body.classList.remove('sidebar-open'); const toggle = document.querySelector('.sidebar-toggle'); if (toggle) { toggle.textContent = '☰ Menu'; toggle.setAttribute('aria-label', 'Open navigation'); } }));
+
+  const settingsTriggerFifteen = document.querySelector('#openSettings');
+  const restoreSettingsFocus = () => { if (settingsModal?.getAttribute('aria-hidden') === 'true') window.setTimeout(() => settingsTriggerFifteen?.focus(), 0); };
+  settingsTriggerFifteen?.addEventListener('click', () => { window.setTimeout(() => document.querySelector('#settingName')?.focus(), 0); });
+  document.querySelector('#closeSettings')?.addEventListener('click', restoreSettingsFocus);
+  document.querySelector('#settingsBackdrop')?.addEventListener('click', restoreSettingsFocus);
+  document.querySelector('#settingsForm')?.addEventListener('submit', () => window.setTimeout(restoreSettingsFocus, 30));
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && settingsModal?.classList.contains('open')) { hideSettings(); restoreSettingsFocus(); } });
+
+  const journalActionsFifteen = document.querySelector('#journalArchive .archive-actions');
+  if (journalActionsFifteen && !document.querySelector('#exportJournalMarkdown')) {
+    const button = document.createElement('button'); button.id = 'exportJournalMarkdown'; button.type = 'button'; button.className = 'small-link'; button.textContent = '↓ Markdown'; journalActionsFifteen.append(button);
+    button.addEventListener('click', () => { const entries = [...archiveEntries].sort((a, b) => String(b.date).localeCompare(String(a.date))); const markdown = `# My little life journal\n\n${entries.map((entry) => `## ${entry.title}\n\n_${entry.date}${entry.tag ? ` · ${entry.tag}` : ''}_\n\n${entry.detail || ''}`).join('\n\n') || 'No journal entries yet.'}\n`; const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `charry-journal-${new Date().toISOString().slice(0, 10)}.md`; link.click(); URL.revokeObjectURL(url); });
+  }
+
+  const dataCardFifteen = document.querySelector('#dataManagement .data-management-card');
+  if (dataCardFifteen && !document.querySelector('#printDashboard')) { const print = document.createElement('button'); print.id = 'printDashboard'; print.type = 'button'; print.textContent = 'Print dashboard'; dataCardFifteen.append(print); print.addEventListener('click', () => window.print()); }
+  if (dataCardFifteen && !document.querySelector('#dataFreshness')) { const freshness = document.createElement('span'); freshness.id = 'dataFreshness'; freshness.className = 'data-freshness'; localStorage.setItem('dashboardLastOpenedAt', new Date().toISOString()); freshness.textContent = `Last opened ${new Date().toLocaleString()}`; dataCardFifteen.append(freshness); }
 });

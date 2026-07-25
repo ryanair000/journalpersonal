@@ -10,7 +10,14 @@ export const FEATURE_NOTICE_KEYS = Object.freeze({
 
 const KEY_TO_FEATURE = new Map(Object.entries(FEATURE_NOTICE_KEYS).map(([feature, key]) => [key, feature]));
 const registeredFeatures = new Set();
-const metrics = { reads: 0, writes: 0, removals: 0, errors: 0, lastError: "" };
+const metrics = {
+  reads: 0,
+  writes: 0,
+  removals: 0,
+  errors: 0,
+  lastError: ""
+};
+
 let installed = false;
 let capturedGetItem = null;
 let capturedSetItem = null;
@@ -27,18 +34,34 @@ function featureForKey(key) {
 }
 
 function report(operation, feature, key) {
-  dispatch("mll:feature-notice", { operation, feature, key, storage: "sessionStorage" });
+  dispatch("mll:feature-notice", {
+    operation,
+    feature,
+    key,
+    storage: "sessionStorage"
+  });
 }
 
 function reportError(operation, feature, key, error) {
   const message = errorMessage(error);
   metrics.errors += 1;
   metrics.lastError = message;
-  dispatch("mll:feature-notice-error", { operation, feature, key, storage: "sessionStorage", error: message });
+  dispatch("mll:feature-notice-error", {
+    operation,
+    feature,
+    key,
+    storage: "sessionStorage",
+    error: message
+  });
 }
 
 function storageReady() {
-  return Boolean(globalThis.sessionStorage && typeof capturedGetItem === "function" && typeof capturedSetItem === "function" && typeof capturedRemoveItem === "function");
+  return Boolean(
+    globalThis.sessionStorage &&
+    typeof capturedGetItem === "function" &&
+    typeof capturedSetItem === "function" &&
+    typeof capturedRemoveItem === "function"
+  );
 }
 
 function readCaptured(key, options = {}) {
@@ -89,26 +112,35 @@ export function installFeatureNoticeBridge() {
   if (installed) return true;
   const storagePrototype = globalThis.Storage?.prototype;
   if (!storagePrototype) return false;
+
   capturedGetItem = storagePrototype.getItem;
   capturedSetItem = storagePrototype.setItem;
   capturedRemoveItem = storagePrototype.removeItem;
-  if (![capturedGetItem, capturedSetItem, capturedRemoveItem].every((method) => typeof method === "function")) return false;
+  if (![capturedGetItem, capturedSetItem, capturedRemoveItem].every((method) => typeof method === "function")) {
+    return false;
+  }
 
   storagePrototype.getItem = function getItem(key) {
     const normalizedKey = String(key);
     const feature = this === globalThis.sessionStorage ? featureForKey(normalizedKey) : "";
-    return feature ? readCaptured(normalizedKey) : capturedGetItem.call(this, normalizedKey);
+    if (feature) return readCaptured(normalizedKey);
+    return capturedGetItem.call(this, normalizedKey);
   };
+
   storagePrototype.setItem = function setItem(key, value) {
     const normalizedKey = String(key);
     const feature = this === globalThis.sessionStorage ? featureForKey(normalizedKey) : "";
-    return feature ? writeCaptured(normalizedKey, value) : capturedSetItem.call(this, normalizedKey, value);
+    if (feature) return writeCaptured(normalizedKey, value);
+    return capturedSetItem.call(this, normalizedKey, value);
   };
+
   storagePrototype.removeItem = function removeItem(key) {
     const normalizedKey = String(key);
     const feature = this === globalThis.sessionStorage ? featureForKey(normalizedKey) : "";
-    return feature ? removeCaptured(normalizedKey) : capturedRemoveItem.call(this, normalizedKey);
+    if (feature) return removeCaptured(normalizedKey);
+    return capturedRemoveItem.call(this, normalizedKey);
   };
+
   installed = true;
   globalThis.__littleLifeFeatureNoticeBridgeInstalled = true;
   return true;
@@ -128,7 +160,8 @@ export function setFeatureNotice(feature, message, options = {}) {
   registerFeatureNotice(normalized);
   const key = FEATURE_NOTICE_KEYS[normalized];
   const text = String(message || "").trim().slice(0, 240);
-  return text ? writeCaptured(key, text, options) : removeCaptured(key, options);
+  if (!text) return removeCaptured(key, options);
+  return writeCaptured(key, text, options);
 }
 
 export function peekFeatureNotice(feature) {
@@ -168,8 +201,23 @@ export function featureNoticeDiagnostics() {
 registerFeatureNotice("finance");
 registerFeatureNotice("journal");
 
-const featureNotices = Object.freeze({ FEATURE_NOTICE_KEYS, consumeFeatureNotice, featureNoticeDiagnostics, installFeatureNoticeBridge, peekFeatureNotice, registerFeatureNotice, setFeatureNotice });
+const featureNotices = Object.freeze({
+  FEATURE_NOTICE_KEYS,
+  consumeFeatureNotice,
+  featureNoticeDiagnostics,
+  installFeatureNoticeBridge,
+  peekFeatureNotice,
+  registerFeatureNotice,
+  setFeatureNotice
+});
+
 if (!globalThis.MyLittleLifeFeatureNotices) {
-  Object.defineProperty(globalThis, "MyLittleLifeFeatureNotices", { configurable: false, enumerable: false, writable: false, value: featureNotices });
+  Object.defineProperty(globalThis, "MyLittleLifeFeatureNotices", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: featureNotices
+  });
 }
+
 export default featureNotices;

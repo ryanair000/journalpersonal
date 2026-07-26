@@ -320,6 +320,39 @@ document.querySelectorAll('.connection-scale button').forEach((button) => button
 // Charry's personalized pharmacy, work, and relationship data.
 const escapeText = (value) => String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
+// Launch cleanup: help Charry turn the starter dashboard into her real space.
+window.addEventListener('load', () => {
+  const setupItems = [
+    ['profile', 'Set your name, course, year, and unit totals', '#settingsModal'],
+    ['school', 'Add your timetable, study plan, and exam dates', '#schoolHub'],
+    ['content', 'Add your real creator accounts and analytics', '#accounts'],
+    ['work', 'Add Leridia, PlayMechi, Exampoa, and work goals', '#workHub'],
+    ['people', 'Add family, friends, Charry, birthdays, and dates', '#peopleHub'],
+    ['vision', 'Upload a vision-board image or add a future goal', '#visionBoard']
+  ];
+  const savedSetup = (() => { try { return JSON.parse(localStorage.getItem('launchChecklist') || '{}'); } catch { return {}; } })();
+  const setupCard = document.createElement('article'); setupCard.className = 'launch-setup-card';
+  const renderSetup = () => {
+    const completed = setupItems.filter(([key]) => savedSetup[key]).length;
+    setupCard.innerHTML = `<div class="launch-setup-heading"><div><p class="eyebrow">First-day setup</p><h3>Make this dashboard completely yours.</h3><small>${completed} of ${setupItems.length} launch steps complete</small></div><button type="button" class="launch-dismiss">${completed === setupItems.length ? 'Done' : 'Hide for now'}</button></div><div class="launch-progress"><i style="width:${completed / setupItems.length * 100}%"></i></div><div class="launch-checklist">${setupItems.map(([key, label, target]) => `<label><input type="checkbox" data-launch-key="${key}" ${savedSetup[key] ? 'checked' : ''}><span>${escapeText(label)}</span><button type="button" data-launch-open="${target}">Open</button></label>`).join('')}</div><button type="button" class="clear-starters30c">Clear starter examples</button><small class="launch-note">This removes only the built-in examples; saved personal entries stay safe.</small>`;
+    setupCard.querySelectorAll('[data-launch-key]').forEach((input) => input.addEventListener('change', () => { savedSetup[input.dataset.launchKey] = input.checked; localStorage.setItem('launchChecklist', JSON.stringify(savedSetup)); renderSetup(); }));
+    setupCard.querySelectorAll('[data-launch-open]').forEach((button) => button.addEventListener('click', () => { const target = document.querySelector(button.dataset.launchOpen); if (target?.classList.contains('settings-modal')) { target.classList.add('open'); target.setAttribute('aria-hidden', 'false'); target.querySelector('#settingName')?.focus(); } else target?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+    setupCard.querySelector('.launch-dismiss')?.addEventListener('click', () => { localStorage.setItem('launchSetupDismissed', 'true'); setupCard.remove(); });
+    setupCard.querySelector('.clear-starters30c')?.addEventListener('click', () => {
+      if (!confirm('Clear the built-in starter examples? Your saved personal entries will stay safe.')) return;
+      localStorage.setItem('starterExamplesHidden', 'true'); document.body.classList.add('starter-examples-hidden');
+      document.querySelectorAll('#content .content-board .idea-item:not([data-content-idea])').forEach((item) => item.remove());
+      document.querySelectorAll('#accountList .account-row:not(.saved-account-row)').forEach((item) => item.remove());
+      if (!localStorage.getItem('archiveEntries')) { archiveEntries.splice(0, archiveEntries.length); renderArchiveEntries(); }
+      if (!localStorage.getItem('calendarEvents')) { calendarEvents.splice(0, calendarEvents.length); localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); renderCalendar(); renderUpcoming(); }
+      setupCard.querySelector('.clear-starters30c').textContent = 'Starter examples cleared';
+    });
+  };
+  renderSetup();
+  if (localStorage.getItem('starterExamplesHidden') === 'true') document.body.classList.add('starter-examples-hidden');
+  if (localStorage.getItem('launchSetupDismissed') !== 'true') document.querySelector('#home .welcome-card')?.after(setupCard);
+});
+
 // Next thirty-task pass: daily focus, academic rhythm, money clarity, content momentum, and connection care.
 window.addEventListener('load', () => {
   const readNext30c = (key, fallback = []) => { try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
@@ -602,7 +635,7 @@ const defaultEvents = [
   { date: '2026-08-02', title: 'Exampoa launch planning', meta: 'Work · All day', color: 'purple-event' },
   { date: '2026-08-18', title: 'Pharmacovigilance project due', meta: 'School · Deadline', color: 'green-event' }
 ];
-let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || 'null') || defaultEvents;
+let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || 'null') || (localStorage.getItem('starterExamplesHidden') === 'true' ? [] : defaultEvents);
 const renderCalendar = () => {
   const year = calendarView.getFullYear();
   const month = calendarView.getMonth();
@@ -827,7 +860,7 @@ if (monthlyHabits) monthlyHabits.textContent = document.querySelectorAll('.check
 const monthlyMoney = document.querySelector('#monthlyMoney');
 if (monthlyMoney) monthlyMoney.textContent = `KSh ${Number(localStorage.getItem('weeklyExpenses') || 0).toLocaleString()}`;
 
-const archiveEntries = JSON.parse(localStorage.getItem('archiveEntries') || 'null') || [{ title: 'Learning to leave some things unrushed', detail: 'Saturday notes · A quiet morning', date: 'JUL 18' }, { title: 'On finding a rhythm that feels like mine', detail: 'Sunday thoughts · Personal', date: 'JUL 12' }];
+const archiveEntries = JSON.parse(localStorage.getItem('archiveEntries') || 'null') || (localStorage.getItem('starterExamplesHidden') === 'true' ? [] : [{ title: 'Learning to leave some things unrushed', detail: 'Saturday notes · A quiet morning', date: 'JUL 18' }, { title: 'On finding a rhythm that feels like mine', detail: 'Sunday thoughts · Personal', date: 'JUL 12' }]);
 const archiveList = document.querySelector('#archiveEntryList');
 const renderArchiveEntries = (query = '') => { if (!archiveList) return; const entries = archiveEntries.filter((entry) => `${entry.title} ${entry.detail} ${entry.tag || ''}`.toLowerCase().includes(query.toLowerCase())); archiveList.innerHTML = entries.map((entry) => `<article><span class="archive-entry-date">${escapeText(entry.date)}</span><div><strong>${escapeText(entry.title)}</strong><small>${escapeText(entry.detail || 'Personal entry')}${entry.tag ? ` · ${escapeText(entry.tag)}` : ''}</small></div><button>···</button></article>`).join('') || '<p class="capture-hint">No matching entries yet.</p>'; };
 document.querySelector('#journalSearch')?.addEventListener('input', (event) => renderArchiveEntries(event.target.value));

@@ -1490,6 +1490,8 @@ window.addEventListener('load', () => {
   const readThirty = (key, fallback = []) => JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
   const currentDateThirty = new Date(); const currentKeyThirty = currentDateThirty.toISOString().slice(0, 10); const monthKeyThirty = currentKeyThirty.slice(0, 7);
   const schoolOverview = document.querySelector('#schoolOverview');
+  const timetableThirty = document.querySelector('.timetable-card .timetable');
+  if (timetableThirty && !timetableThirty.parentElement.classList.contains('timetable-scroll')) { const timetableScrollThirty = document.createElement('div'); timetableScrollThirty.className = 'timetable-scroll'; timetableThirty.parentElement.insertBefore(timetableScrollThirty, timetableThirty); timetableScrollThirty.append(timetableThirty); }
   if (schoolOverview) {
     const readOverviewList = (key) => { try { const value = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } };
     const settingsOverview = JSON.parse(localStorage.getItem('dashboardSettings') || '{}');

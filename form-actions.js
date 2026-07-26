@@ -110,7 +110,46 @@
   function storeState(state) {
     captureUnsavedFields(state);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncLegacyStorage(state);
     pendingState = state;
+  }
+
+  function readLegacyList(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || "[]");
+      return Array.isArray(value) ? value : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function mergeLegacyList(key, items, mapItem, identity) {
+    if (!Array.isArray(items) || !items.length) return;
+    const current = readLegacyList(key);
+    items.map(mapItem).forEach((item) => {
+      if (!current.some((existing) => identity(existing) === identity(item))) current.push(item);
+    });
+    localStorage.setItem(key, JSON.stringify(current));
+  }
+
+  function syncLegacyStorage(state) {
+    mergeLegacyList("contentIdeas", state.lists.ideas, (item) => ({ title: item.text, detail: item.meta || "New idea", status: "idea", createdAt: dateKey }), (item) => `${item.title}|${item.createdAt}`);
+    mergeLegacyList("contentIdeas", state.lists.drafts, (item) => ({ title: item.text, detail: item.meta || "New draft", status: "draft", createdAt: dateKey }), (item) => `${item.title}|${item.createdAt}`);
+    mergeLegacyList("contentAccounts", state.lists.accounts, (item) => ({ platform: item.platform, username: item.username, followers: item.followers }), (item) => `${item.platform}|${item.username}`);
+    mergeLegacyList("customUnits", state.lists.units, (item) => ({ code: item.code, name: item.name, lecturer: item.lecturer, year: item.year }), (item) => `${item.code}|${item.name}`);
+    mergeLegacyList("schoolStudyItems", state.lists.study, (item) => ({ value: item.title, meta: item.meta || "New session", icon: "◒" }), (item) => `${item.value}|${item.meta}`);
+    mergeLegacyList("schoolResearchItems", state.lists.research, (item) => ({ value: item.title, meta: item.meta || "New reference", icon: "NOTE" }), (item) => `${item.value}|${item.meta}`);
+    mergeLegacyList("classEntries", state.lists.classes, (item) => ({ day: item.day, time: item.time, subject: item.subject }), (item) => `${item.day}|${item.time}|${item.subject}`);
+    mergeLegacyList("personalBusinesses", state.lists.businesses, (item) => ({ name: item.name, type: item.detail, duration: "" }), (item) => item.name);
+    mergeLegacyList("workGoals", state.lists.workGoals, (item) => ({ title: item.text, done: Boolean(item.done) }), (item) => item.title);
+    mergeLegacyList("workLogEntries", state.lists.workLogs, (item) => ({ hours: item.hours, note: item.note || "Work session", date: item.createdAt?.slice(0, 10) || dateKey }), (item) => `${item.date}|${item.hours}|${item.note}`);
+    mergeLegacyList("peopleDirectory", state.lists.people, (item) => ({ name: item.name, group: item.meta?.split(" · ")[0] || "Other", birthday: "", note: item.meta || "Keep in touch" }), (item) => item.name);
+    mergeLegacyList("relationshipItems", state.lists.relationshipItems, (item) => ({ type: item.type, text: item.text }), (item) => `${item.type}|${item.text}`);
+    const day = getDay(state);
+    Object.entries(day.meals || {}).forEach(([meal, description]) => { if (description) localStorage.setItem(`meal-${meal}`, description); });
+    if (day.memory) localStorage.setItem("savedMemory", day.memory);
+    if (state.project.title || state.project.next) localStorage.setItem("schoolProjectDetails", JSON.stringify({ title: state.project.title, next: state.project.next }));
+    if (state.weekly.expenses?.length) localStorage.setItem("weeklyExpenses", String(state.weekly.expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0)));
   }
 
   globalThis.addEventListener("beforeunload", () => {
@@ -388,8 +427,14 @@
           { name: "engagement", label: "Engagement rate", maxlength: 40, required: true, placeholder: "e.g. 6.8%" },
           { name: "views", label: "Total views", maxlength: 40, required: true }
         ],
-        values: (state) => ({ ...state.analytics }),
-        save: (values, state) => { state.analytics = { reach: values.reach.slice(0, 40), engagement: values.engagement.slice(0, 40), views: values.views.slice(0, 40) }; }
+        values: () => ({ ...safeParse(localStorage.getItem("contentAnalytics"), { reach: "", engagement: "", views: "" }) }),
+        save: (values, state) => {
+          state.analytics = { reach: values.reach.slice(0, 40), engagement: values.engagement.slice(0, 40), views: values.views.slice(0, 40) };
+          localStorage.setItem("contentAnalytics", JSON.stringify(state.analytics));
+          const history = readLegacyList("analyticsHistory");
+          history.push({ ...state.analytics, date: dateKey });
+          localStorage.setItem("analyticsHistory", JSON.stringify(history.slice(-8)));
+        }
       })
     },
     {
@@ -581,6 +626,323 @@
       })
     },
     {
+      selector: "#addResource",
+      create: () => ({
+        title: "Add pharmacy resource",
+        description: "Save a note, PDF, book, or useful link in your resource vault.",
+        submitLabel: "Add resource",
+        success: "Pharmacy resource added.",
+        fields: [
+          { name: "title", label: "Resource title", maxlength: 240, required: true },
+          { name: "type", label: "Type", type: "select", options: ["PDF", "LINK", "NOTE", "BOOK"], value: "NOTE", required: true },
+          { name: "note", label: "Course or note", maxlength: 240, placeholder: "e.g. Pharmacology XI" },
+          { name: "link", label: "Link", type: "url", maxlength: 500, placeholder: "Optional" }
+        ],
+        save: (values) => {
+          const resources = readLegacyList("pharmacyResources");
+          resources.push({ title: values.title.slice(0, 240), type: values.type, note: values.note.slice(0, 240) || "Pharmacy reference", link: values.link.slice(0, 500) });
+          localStorage.setItem("pharmacyResources", JSON.stringify(resources));
+        }
+      })
+    },
+    {
+      selector: "#addExam",
+      create: () => ({
+        title: "Add exam date",
+        description: "Keep an exam here even when the official timetable is still changing.",
+        submitLabel: "Add exam",
+        success: "Exam added.",
+        fields: [
+          { name: "code", label: "Unit code", maxlength: 30, required: true },
+          { name: "name", label: "Unit or exam name", maxlength: 180, required: true },
+          { name: "date", label: "Exam date", type: "date", required: true },
+          { name: "time", label: "Time", type: "text", maxlength: 80, placeholder: "Optional" }
+        ],
+        save: (values) => {
+          const exams = readLegacyList("examEntries");
+          exams.push({ code: values.code, name: values.name, date: values.date, time: values.time });
+          localStorage.setItem("examEntries", JSON.stringify(exams));
+        }
+      })
+    },
+    {
+      selector: "#addExamPrep",
+      create: () => ({
+        title: "Add exam preparation plan",
+        description: "Track how ready you feel for a unit or exam.",
+        submitLabel: "Add prep plan",
+        success: "Exam preparation plan added.",
+        fields: [
+          { name: "unit", label: "Unit or exam", maxlength: 180, required: true },
+          { name: "code", label: "Unit code and lecturer", maxlength: 240 },
+          { name: "progress", label: "Preparation progress", type: "number", min: 0, max: 100, value: 0, required: true }
+        ],
+        validate: (values) => Number.isFinite(Number(values.progress)) && Number(values.progress) >= 0 && Number(values.progress) <= 100 ? "" : "Use a progress value from 0 to 100.",
+        save: (values) => {
+          const items = readLegacyList("examPrepItems");
+          items.push({ unit: values.unit, code: values.code || "Unit details to add", progress: Number(values.progress) });
+          localStorage.setItem("examPrepItems", JSON.stringify(items));
+        }
+      })
+    },
+    {
+      selector: "#addBusinessKpi",
+      create: () => ({
+        title: "Add business KPI",
+        description: "Track a number that tells you whether a business is moving forward.",
+        submitLabel: "Add KPI",
+        success: "Business KPI added.",
+        fields: [
+          { name: "business", label: "Business", maxlength: 160, required: true },
+          { name: "metric", label: "What are you measuring?", maxlength: 160, required: true },
+          { name: "value", label: "Current value", maxlength: 80, required: true },
+          { name: "note", label: "Target or note", maxlength: 240 }
+        ],
+        save: (values) => {
+          const items = readLegacyList("businessKpis");
+          items.push({ business: values.business, metric: values.metric, value: values.value, note: values.note || "Add a target" });
+          localStorage.setItem("businessKpis", JSON.stringify(items));
+        }
+      })
+    },
+    {
+      selector: "#addCareerTask",
+      create: () => ({
+        title: "Add attachment task",
+        description: "Keep one practical next step for finding and preparing for attachment.",
+        submitLabel: "Add task",
+        success: "Attachment task added.",
+        fields: [{ name: "title", label: "Task", type: "textarea", rows: 3, maxlength: 300, required: true }],
+        save: (values) => {
+          const items = readLegacyList("careerTasks");
+          items.push({ title: values.title, done: false });
+          localStorage.setItem("careerTasks", JSON.stringify(items));
+        }
+      })
+    },
+    {
+      selector: "#addCustomHabit",
+      create: () => ({
+        title: "Create a habit",
+        description: "Choose a routine that fits your real life rather than an ideal one.",
+        submitLabel: "Add habit",
+        success: "Habit added.",
+        fields: [
+          { name: "name", label: "Habit", maxlength: 160, required: true },
+          { name: "frequency", label: "How often?", maxlength: 100, value: "Daily", required: true }
+        ],
+        save: (values) => {
+          const items = readLegacyList("customHabits");
+          items.push({ name: values.name, frequency: values.frequency, done: false });
+          localStorage.setItem("customHabits", JSON.stringify(items));
+        }
+      })
+    },
+    {
+      selector: "#addVisionCard",
+      create: () => ({
+        title: "Add to your vision board",
+        description: "Add a dream, feeling, place, or goal you want to keep close.",
+        submitLabel: "Add vision",
+        success: "Vision added to your board.",
+        fields: [
+          { name: "title", label: "Vision", maxlength: 180, required: true },
+          { name: "category", label: "Category", maxlength: 80, value: "My vision" },
+          { name: "text", label: "Affirmation or detail", type: "textarea", rows: 3, maxlength: 300 }
+        ],
+        save: (values) => {
+          const items = readLegacyList("visionItems");
+          items.push({ title: values.title, category: values.category || "My vision", text: values.text || "" });
+          localStorage.setItem("visionItems", JSON.stringify(items));
+        }
+      })
+    },
+    {
+      selector: "#addArchiveEntry",
+      create: () => ({
+        title: "Add journal archive entry",
+        description: "Keep a searchable record of something meaningful from your day.",
+        submitLabel: "Save entry",
+        success: "Journal entry archived.",
+        fields: [
+          { name: "title", label: "Entry title", maxlength: 180, required: true },
+          { name: "detail", label: "What do you want to remember?", type: "textarea", rows: 5, maxlength: 3000 },
+          { name: "tag", label: "Tag", type: "select", options: ["personal", "school", "work", "gratitude"], value: "personal" }
+        ],
+        save: (values) => {
+          const entries = readLegacyList("archiveEntries");
+          entries.unshift({ title: values.title, detail: values.detail || "", tag: values.tag, date: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit" }).toUpperCase() });
+          localStorage.setItem("archiveEntries", JSON.stringify(entries));
+        }
+      })
+    },
+    {
+      selector: "#addMealLog",
+      create: () => ({
+        title: "Log a meal",
+        description: "Record nourishment without needing to make it perfect.",
+        submitLabel: "Save meal",
+        success: "Meal logged.",
+        fields: [
+          { name: "type", label: "Meal", type: "select", options: ["Breakfast", "Lunch", "Dinner", "Snack"], value: "Lunch", required: true },
+          { name: "detail", label: "What did you eat?", type: "textarea", rows: 3, maxlength: 300, required: true }
+        ],
+        save: (values) => {
+          const meals = readLegacyList("mealLogs");
+          meals.push({ type: values.type, detail: values.detail, date: dateKey });
+          localStorage.setItem("mealLogs", JSON.stringify(meals));
+        }
+      })
+    },
+    {
+      selector: "#addCategorizedExpense",
+      create: () => ({
+        title: "Log a categorized expense",
+        description: "Notice where your money is going, without judgment.",
+        submitLabel: "Save expense",
+        success: "Expense logged.",
+        fields: [
+          { name: "category", label: "Category", type: "select", options: ["food", "transport", "school", "personal"], value: "personal", required: true },
+          { name: "amount", label: "Amount (KSh)", type: "number", min: 0.01, max: 100000000, step: 0.01, required: true },
+          { name: "note", label: "What was it for?", maxlength: 240 }
+        ],
+        validate: (values) => Number.isFinite(Number(values.amount)) && Number(values.amount) > 0 ? "Enter a positive amount." : "",
+        save: (values) => {
+          const amount = Number(values.amount);
+          const categories = { food: 0, transport: 0, school: 0, personal: 0, other: 0 };
+          Object.assign(categories, JSON.parse(localStorage.getItem("categoryExpenses") || "{}"));
+          categories[values.category] = Number(categories[values.category] || 0) + amount;
+          localStorage.setItem("categoryExpenses", JSON.stringify(categories));
+          localStorage.setItem("weeklyExpenses", String(Number(localStorage.getItem("weeklyExpenses") || 0) + amount));
+          const ledger = readLegacyList("expenseLedger");
+          ledger.unshift({ id: `expense-${Date.now()}`, category: values.category, amount, note: values.note || "", date: dateKey });
+          localStorage.setItem("expenseLedger", JSON.stringify(ledger));
+        }
+      })
+    },
+    {
+      selector: "#addScheduleEntry",
+      create: () => ({
+        title: "Add timetable item",
+        description: "Add a class, study block, or exam to your personal timetable.",
+        submitLabel: "Add to timetable",
+        success: "Timetable item added.",
+        fields: [
+          { name: "day", label: "Day", type: "select", options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], value: "Monday", required: true },
+          { name: "time", label: "Time", type: "text", maxlength: 80, required: true, placeholder: "e.g. 2:00–4:00 PM" },
+          { name: "title", label: "Class, study block, or exam", maxlength: 200, required: true }
+        ],
+        save: (values) => { const items = readLegacyList("scheduleEntries"); items.push({ day: values.day, time: values.time, title: values.title }); localStorage.setItem("scheduleEntries", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addStudyLog",
+      create: () => ({
+        title: "Log a study session",
+        description: "Capture what you covered so your effort becomes visible.",
+        submitLabel: "Save study log",
+        success: "Study session logged.",
+        fields: [
+          { name: "topic", label: "What did you study?", maxlength: 240, required: true },
+          { name: "duration", label: "How long?", maxlength: 80, placeholder: "e.g. 45 minutes" }
+        ],
+        save: (values) => { const items = readLegacyList("studySessions"); items.unshift({ topic: values.topic, duration: values.duration || "Focused session", date: dateKey }); localStorage.setItem("studySessions", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addPipelinePost",
+      create: () => ({
+        title: "Add content pipeline post",
+        description: "Move a content idea into a clear stage of creation.",
+        submitLabel: "Add post",
+        success: "Content post added.",
+        fields: [
+          { name: "title", label: "Post or content title", maxlength: 240, required: true },
+          { name: "platform", label: "Platform", maxlength: 80, placeholder: "Instagram, Facebook..." },
+          { name: "status", label: "Stage", type: "select", options: [{ value: "0", label: "Planned" }, { value: "1", label: "Creating" }, { value: "2", label: "Scheduled" }, { value: "3", label: "Published" }], value: "0" }
+        ],
+        save: (values) => { const items = readLegacyList("pipelinePosts"); items.push({ id: `pipeline-${Date.now()}`, title: values.title, platform: values.platform || "Platform to add", status: Number(values.status), views: "", likes: "", comments: "" }); localStorage.setItem("pipelinePosts", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addSavingsGoal",
+      create: () => ({
+        title: "Add a savings goal",
+        description: "Give your money a direction that feels meaningful.",
+        submitLabel: "Add savings goal",
+        success: "Savings goal added.",
+        fields: [
+          { name: "name", label: "Goal name", maxlength: 180, required: true },
+          { name: "target", label: "Target amount (KSh)", type: "number", min: 1, step: 1, required: true },
+          { name: "saved", label: "Already saved (KSh)", type: "number", min: 0, step: 1, value: 0 },
+          { name: "note", label: "Target date or note", maxlength: 240 }
+        ],
+        validate: (values) => Number(values.target) > 0 ? "" : "Enter a target amount.",
+        save: (values) => { const items = readLegacyList("savingsGoals"); items.push({ name: values.name, target: Number(values.target), saved: Number(values.saved || 0), note: values.note || "" }); localStorage.setItem("savingsGoals", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addDueItem",
+      create: () => ({
+        title: "Add a reminder",
+        description: "Put an important task or deadline somewhere you will see it.",
+        submitLabel: "Add reminder",
+        success: "Reminder added.",
+        fields: [
+          { name: "date", label: "Date or label", type: "date", required: true },
+          { name: "title", label: "What is due?", maxlength: 240, required: true },
+          { name: "meta", label: "Category or detail", maxlength: 200 },
+          { name: "when", label: "How soon?", maxlength: 80, value: "Soon" }
+        ],
+        save: (values) => { const items = readLegacyList("dueItems"); items.push({ date: values.date, title: values.title, meta: values.meta || "Reminder", when: values.when || "Soon" }); localStorage.setItem("dueItems", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addCalendarEvent",
+      create: () => ({
+        title: "Add calendar event",
+        description: "Add school, work, personal, health, or relationship plans to your timeline.",
+        submitLabel: "Add event",
+        success: "Calendar event added.",
+        fields: [
+          { name: "date", label: "Date", type: "date", required: true },
+          { name: "title", label: "What is happening?", maxlength: 240, required: true },
+          { name: "meta", label: "Category or time", maxlength: 160 }
+        ],
+        save: (values) => { const items = readLegacyList("calendarEvents"); items.push({ date: values.date, title: values.title, meta: values.meta || "Personal event", color: "coral-event" }); localStorage.setItem("calendarEvents", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addRoutine",
+      create: () => ({
+        title: "Add a recurring routine",
+        description: "Give your days a shape that supports the life you actually live.",
+        submitLabel: "Add routine",
+        success: "Routine added.",
+        fields: [
+          { name: "name", label: "Routine", maxlength: 180, required: true },
+          { name: "time", label: "Time", maxlength: 80, value: "Anytime" },
+          { name: "detail", label: "What does it include?", maxlength: 240 }
+        ],
+        save: (values) => { const items = readLegacyList("routines"); items.push({ name: values.name, time: values.time || "Anytime", detail: values.detail || "Your recurring routine" }); localStorage.setItem("routines", JSON.stringify(items)); }
+      })
+    },
+    {
+      selector: "#addBoardProject",
+      create: () => ({
+        title: "Add a project",
+        description: "Give a project a place, a next action, and a stage.",
+        submitLabel: "Add project",
+        success: "Project added to the board.",
+        fields: [
+          { name: "title", label: "Project name", maxlength: 200, required: true },
+          { name: "meta", label: "Category and next action", maxlength: 300 },
+          { name: "status", label: "Stage", type: "select", options: ["explore", "active", "done"], value: "explore" }
+        ],
+        save: (values) => { const items = readLegacyList("boardProjects"); items.push({ title: values.title, meta: values.meta || "New project", status: values.status }); localStorage.setItem("boardProjects", JSON.stringify(items)); }
+      })
+    },
+    {
       selector: "#addPerson",
       create: () => ({
         title: "Add person",
@@ -593,6 +955,21 @@
           { name: "note", label: "Connection note", type: "textarea", rows: 3, maxlength: 200, placeholder: "How do you want to stay connected?" }
         ],
         save: (values, state) => state.lists.people.push({ id: createId(), initial: values.name.charAt(0).toUpperCase(), tone: "peach", name: values.name.slice(0, 160), meta: `${values.group.slice(0, 100)} · ${(values.note || "Keep in touch").slice(0, 200)}`, action: "Check in →" })
+      })
+    },
+    {
+      selector: "#addMentalNoteThirty",
+      create: () => ({
+        title: "Add a private check-in note",
+        description: "Add context to how you are feeling. This stays on this device.",
+        submitLabel: "Save private note",
+        success: "Private check-in note saved.",
+        fields: [{ name: "text", label: "What do you want to remember?", type: "textarea", rows: 5, maxlength: 2000, required: true, placeholder: "Write what is underneath the feeling..." }],
+        save: (values) => {
+          const notes = readLegacyList("mentalHealthNotes");
+          notes.push({ date: dateKey, text: values.text.slice(0, 2000) });
+          localStorage.setItem("mentalHealthNotes", JSON.stringify(notes.slice(-60)));
+        }
       })
     },
     {
@@ -624,5 +1001,4 @@
     openForm(definition.create(trigger), trigger);
   }, true);
 
-  globalThis.prompt = () => null;
 })();

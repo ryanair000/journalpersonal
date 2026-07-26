@@ -1,7 +1,7 @@
-const CACHE_NAME = 'my-little-life-v7';
+const CACHE_NAME = 'my-little-life-v8';
 const ASSETS = [
   './', './index.html', './style.css', './mobile.css', './content.css', './analytics.css',
-  './details.css', './advanced.css', './settings.css', './backup.css', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css', './script.js', './manifest.json'
+  './details.css', './advanced.css', './settings.css', './backup.css', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css', './form-actions.css', './script.js', './form-actions.js', './manifest.json'
 ];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));

@@ -427,6 +427,13 @@
       document.body.classList.add("mll-auth-locked");
       if (gate) gate.hidden = false;
     }
+    window.dispatchEvent(new CustomEvent("mll:auth", {
+      detail: {
+        authenticated: Boolean(session?.user),
+        userId: session?.user?.id || null,
+        email: session?.user?.email || null
+      }
+    }));
   };
 
   const start = async () => {
@@ -478,5 +485,10 @@
     if (document.visibilityState === "visible") syncNow({ quiet: true });
   });
   window.addEventListener("load", start);
-  window.mllCloudSync = { syncNow: () => syncNow(), snapshotLocal };
+  window.mllCloudSync = {
+    syncNow: () => syncNow(),
+    snapshotLocal,
+    getClient: () => client,
+    getSession: () => session
+  };
 })();

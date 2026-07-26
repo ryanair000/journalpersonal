@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="school-overview.css" />
   <link rel="stylesheet" href="productivity-pass.css" />
   <link rel="stylesheet" href="auth-sync.css" />
+  <link rel="stylesheet" href="school-cloud.css" />
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="vision.css" />
   <link rel="stylesheet" href="goals.css" />
@@ -203,11 +204,49 @@
     <section class="resource-vault-section section" id="resourceVault">
       <div class="section-title"><div><p class="eyebrow">Pharmacy resource vault</p><h2>Keep useful knowledge close.</h2></div><button class="small-link" id="addResource">＋ Add resource</button></div>
       <div class="resource-grid" id="resourceList"><article><span class="resource-type">PDF</span><div><strong>WHO pharmacovigilance guide</strong><small>Reference · add a link or file note</small></div><button>Open →</button></article><article><span class="resource-type">NOTE</span><div><strong>Questions for Dr. Wanjiku</strong><small>Research · follow up</small></div><button>Review →</button></article><article><span class="resource-type">LINK</span><div><strong>Drug interactions reading list</strong><small>Pharmacology · useful links</small></div><button>Open →</button></article></div>
+      <section class="school-cloud-card" id="schoolDocuments" aria-labelledby="schoolDocumentsTitle">
+        <div class="school-cloud-heading"><div><p class="eyebrow">Private document library</p><h3 id="schoolDocumentsTitle">Notes, papers and course files</h3><p>Upload once, open from your phone or laptop, and track what you have reviewed.</p></div><span class="school-cloud-lock">Private cloud</span></div>
+        <form class="school-upload-form" id="schoolDocumentForm">
+          <label class="school-file-picker"><input id="schoolDocumentFiles" type="file" multiple required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,image/jpeg,image/png,image/webp"><span>↑ Choose files</span><small id="schoolFileSummary">PDF, Word, PowerPoint, images or text · up to 20 MB each</small></label>
+          <label>Unit code<input id="schoolDocumentUnit" list="schoolUnitCodes" placeholder="e.g. BPL4203" maxlength="30" required></label>
+          <datalist id="schoolUnitCodes"></datalist>
+          <label>Type<select id="schoolDocumentType"><option>Notes</option><option>Past paper</option><option>Research</option><option>Assignment</option><option>Reference</option><option>Attachment document</option></select></label>
+          <label>Total pages <span>(optional)</span><input id="schoolDocumentPages" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 42"></label>
+          <button class="school-upload-button" type="submit">Upload securely</button>
+        </form>
+        <div class="school-document-toolbar">
+          <input id="schoolDocumentSearch" type="search" placeholder="Search files or unit codes" aria-label="Search uploaded documents">
+          <select id="schoolDocumentTypeFilter" aria-label="Filter documents by type"><option value="all">All file types</option><option>Notes</option><option>Past paper</option><option>Research</option><option>Assignment</option><option>Reference</option><option>Attachment document</option></select>
+          <select id="schoolDocumentProgressFilter" aria-label="Filter documents by progress"><option value="all">All progress</option><option value="0">Not started</option><option value="25">Started</option><option value="50">Halfway</option><option value="75">Reviewing</option><option value="100">Complete</option></select>
+        </div>
+        <p class="school-cloud-status" id="schoolDocumentStatus" aria-live="polite">Sign in to upload and open private files.</p>
+        <div class="school-document-summary" id="schoolDocumentSummary"></div>
+        <div class="school-document-list" id="schoolDocumentList"></div>
+      </section>
     </section>
 
     <section class="career-section section" id="careerTracker">
       <div class="section-title"><div><p class="eyebrow">Attachment & career prep</p><h2>Prepare for the next chapter.</h2></div><button class="small-link" id="addCareerTask">＋ Add task</button></div>
       <div class="career-grid"><article class="career-progress-card"><p class="eyebrow">Attachment readiness</p><strong>0%</strong><div class="career-bar"><i></i></div><small>Placement, documents, wardrobe, confidence</small></article><article class="career-task-card"><div id="careerTaskList" class="career-task-list"><label><input type="checkbox"> Update my CV</label><label><input type="checkbox"> Research possible placement sites</label><label><input type="checkbox"> Prepare health-influencing content ideas</label><label><input type="checkbox"> Organize professional documents</label></div></article><article class="career-note-card"><p class="eyebrow">Future professional self</p><textarea id="careerNote" placeholder="How do I want to show up in healthcare?"></textarea><button class="detail-link" id="saveCareerNote">Save reflection →</button></article></div>
+      <section class="attachment-application-card" id="attachmentApplications" aria-labelledby="attachmentApplicationsTitle">
+        <div class="attachment-application-heading"><div><p class="eyebrow">Application pipeline</p><h3 id="attachmentApplicationsTitle">Every facility and follow-up</h3><p id="attachmentSearchRhythm">Tuesday and Thursday are your protected search days.</p></div><button type="button" class="small-link" id="toggleAttachmentForm">＋ Add facility</button></div>
+        <div class="attachment-stats" id="attachmentStats"></div>
+        <form class="attachment-form" id="attachmentApplicationForm" hidden>
+          <input id="attachmentEditingId" type="hidden">
+          <label>Facility<input id="attachmentFacility" required maxlength="160" placeholder="Hospital, pharmacy or organization"></label>
+          <label>Location<input id="attachmentLocation" maxlength="120" placeholder="Town or area"></label>
+          <label>Contact person<input id="attachmentContact" maxlength="120" placeholder="Name or department"></label>
+          <label>Phone or email<input id="attachmentContactDetail" maxlength="160" placeholder="Optional contact detail"></label>
+          <label>Application method<select id="attachmentMethod"><option>In person</option><option>Email</option><option>Phone call</option><option>Online portal</option><option>Referral</option><option>Not decided</option></select></label>
+          <label>Status<select id="attachmentStatus"><option>Researching</option><option>Ready to apply</option><option>Applied</option><option>Follow-up</option><option>Interview</option><option>Accepted</option><option>Declined</option></select></label>
+          <label>Application date<input id="attachmentAppliedDate" type="date"></label>
+          <label>Follow-up date<input id="attachmentFollowUpDate" type="date"></label>
+          <label class="attachment-notes-field">Notes<textarea id="attachmentNotes" rows="3" maxlength="600" placeholder="Requirements, response, documents needed or next action"></textarea></label>
+          <div class="attachment-form-actions"><button type="button" id="cancelAttachmentForm">Cancel</button><button type="submit">Save application</button></div>
+        </form>
+        <div class="attachment-toolbar"><input id="attachmentSearch" type="search" placeholder="Search facilities or contacts" aria-label="Search attachment applications"><select id="attachmentStatusFilter" aria-label="Filter attachment applications"><option value="all">All statuses</option><option>Researching</option><option>Ready to apply</option><option>Applied</option><option>Follow-up</option><option>Interview</option><option>Accepted</option><option>Declined</option></select></div>
+        <div class="attachment-application-list" id="attachmentApplicationList"></div>
+      </section>
     </section>
 
     <section class="savings-section section" id="savingsGoals">
@@ -324,5 +363,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="auth-sync.js"></script>
+  <script src="school-cloud.js"></script>
 </body>
 </html>

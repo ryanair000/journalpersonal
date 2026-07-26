@@ -1,0 +1,42 @@
+.school-cloud-card,.attachment-application-card{margin-top:22px;border:1px solid rgba(91,63,78,.1);border-radius:24px;background:linear-gradient(145deg,#fffdfd,#fff8fb);padding:24px;box-shadow:0 18px 45px rgba(72,48,61,.07)}
+.school-cloud-heading,.attachment-application-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
+.school-cloud-heading h3,.attachment-application-heading h3{margin:4px 0 5px;color:#4e3d46;font:500 24px/1.2 'Playfair Display',serif}
+.school-cloud-heading p,.attachment-application-heading p{margin:0;color:#947e88;font-size:11px;line-height:1.55}
+.school-cloud-lock{flex:0 0 auto;border-radius:999px;background:#efe9f7;color:#78648c;padding:7px 10px;font:600 9px 'DM Mono',monospace;text-transform:uppercase}
+.school-upload-form{display:grid;grid-template-columns:minmax(220px,1.8fr) repeat(3,minmax(130px,1fr)) auto;gap:10px;align-items:end;padding:15px;border-radius:18px;background:#f9eef2}
+.school-upload-form>label,.attachment-form>label{display:grid;gap:6px;color:#69545e;font-size:10px;font-weight:700}
+.school-upload-form label span,.attachment-form label span{color:#a28c96;font-size:9px;font-weight:500}
+.school-upload-form input,.school-upload-form select,.attachment-form input,.attachment-form select,.attachment-form textarea,.school-document-toolbar input,.school-document-toolbar select,.attachment-toolbar input,.attachment-toolbar select{width:100%;box-sizing:border-box;border:1px solid #e8dce1;border-radius:12px;background:#fff;padding:10px 11px;color:#514047;font:500 11px 'DM Sans',sans-serif;outline:none}
+.school-upload-form input:focus,.school-upload-form select:focus,.attachment-form input:focus,.attachment-form select:focus,.attachment-form textarea:focus,.school-document-toolbar input:focus,.school-document-toolbar select:focus,.attachment-toolbar input:focus,.attachment-toolbar select:focus{border-color:#ca819b;box-shadow:0 0 0 3px rgba(202,129,155,.12)}
+.school-file-picker{position:relative;min-height:63px;align-content:center;border:1px dashed #d9b8c4;border-radius:14px;background:#fff;padding:10px 13px;cursor:pointer}
+.school-file-picker input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.school-file-picker>span{color:#a95e79!important;font-size:11px!important;font-weight:700!important}
+.school-file-picker small{color:#a18c95;font-size:9px;font-weight:500;line-height:1.35}
+.school-upload-button,.attachment-form-actions button:last-child{min-height:39px;border:0;border-radius:12px;background:#c86f88;color:#fff;padding:0 15px;font:700 10px 'DM Sans',sans-serif;cursor:pointer}
+.school-upload-button:disabled{cursor:wait;opacity:.55}
+.school-document-toolbar,.attachment-toolbar{display:grid;grid-template-columns:minmax(180px,1fr) 180px 160px;gap:8px;margin:15px 0 10px}
+.school-cloud-status{min-height:16px;margin:8px 0;color:#8f7480;font-size:10px}
+.school-cloud-status.error{color:#a84560}.school-cloud-status.success{color:#557a61}
+.school-document-summary,.attachment-stats{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 13px}
+.school-document-summary span,.attachment-stats span{border-radius:999px;background:#f4edf7;color:#79678a;padding:7px 10px;font-size:9px}
+.school-document-summary strong,.attachment-stats strong{margin-right:3px;color:#594760}
+.school-document-list,.attachment-application-list{display:grid;gap:9px}
+.school-document-row{display:grid;grid-template-columns:38px minmax(180px,1fr) minmax(130px,220px) auto;gap:12px;align-items:center;border:1px solid rgba(91,63,78,.08);border-radius:16px;background:#fff;padding:12px}
+.school-document-icon{display:grid;width:36px;height:36px;place-items:center;border-radius:11px;background:#f8e8ef;color:#a75673;font:700 9px 'DM Mono',monospace}
+.school-document-copy{min-width:0}.school-document-copy strong{display:block;overflow:hidden;color:#58464f;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.school-document-copy small{display:block;margin-top:4px;color:#9c8790;font-size:9px}
+.school-document-progress{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}.school-document-progress select{grid-column:1/-1;width:100%;border:1px solid #eadfe3;border-radius:10px;background:#fff;padding:7px;color:#715d66;font-size:9px}.school-document-progress i{height:5px;border-radius:999px;background:linear-gradient(90deg,#d77e9c,#b493ce)}.school-document-progress b{color:#826d77;font-size:9px}
+.school-progress-track{grid-column:1/2;height:5px;overflow:hidden;border-radius:999px;background:#f0e7eb}.school-progress-track i{display:block}
+.school-document-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.school-document-actions button{border:1px solid #eadde2;border-radius:999px;background:#fff;color:#8d6273;padding:6px 8px;font-size:9px;cursor:pointer}.school-document-actions button.danger{border-color:transparent;color:#b04e69}.school-document-actions button.confirming{background:#a84560;color:#fff}
+.school-empty,.attachment-empty{border:1px dashed #ddcdd4;border-radius:16px;color:#9a858e;padding:22px;text-align:center;font-size:10px}
+.attachment-application-heading .small-link{flex:0 0 auto}
+.attachment-form{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:11px;margin:0 0 14px;padding:16px;border-radius:18px;background:#f7f0f8}
+.attachment-form[hidden]{display:none}
+.attachment-notes-field{grid-column:span 3}.attachment-form-actions{display:flex;align-items:end;justify-content:flex-end;gap:7px}.attachment-form-actions button:first-child{min-height:39px;border:0;background:transparent;color:#906d7b;font-size:10px;cursor:pointer}
+.attachment-toolbar{grid-template-columns:minmax(180px,1fr) 190px}
+.attachment-application-row{display:grid;grid-template-columns:minmax(180px,1.4fr) minmax(130px,.8fr) minmax(130px,.8fr) auto;gap:12px;align-items:center;border:1px solid rgba(91,63,78,.08);border-left:4px solid #d6a0b4;border-radius:16px;background:#fff;padding:13px}
+.attachment-application-row.overdue{border-left-color:#d0617c;background:#fffafb}.attachment-application-row.accepted{border-left-color:#7dab8b}
+.attachment-facility strong{display:block;color:#56434c;font-size:11px}.attachment-facility small,.attachment-detail small{display:block;margin-top:4px;color:#9a858e;font-size:9px;line-height:1.4}.attachment-detail b{color:#77616c;font-size:9px}
+.attachment-status-pill{display:inline-flex;border-radius:999px;background:#f4eaf0;color:#8c5c70;padding:6px 8px;font:650 8px 'DM Sans',sans-serif}.attachment-status-pill.accepted{background:#eaf4ed;color:#52715b}
+.attachment-row-actions{display:flex;gap:5px}.attachment-row-actions button{border:1px solid #eadde2;border-radius:999px;background:#fff;color:#866673;padding:6px 8px;font-size:9px;cursor:pointer}.attachment-row-actions button.confirming{background:#a84560;color:#fff}
+@media(max-width:1050px){.school-upload-form{grid-template-columns:repeat(2,minmax(0,1fr))}.school-file-picker{grid-column:1/-1}.school-upload-button{min-height:40px}.attachment-form{grid-template-columns:repeat(2,minmax(0,1fr))}.attachment-notes-field{grid-column:1/-1}.attachment-form-actions{grid-column:1/-1}}
+@media(max-width:720px){.school-cloud-card,.attachment-application-card{padding:17px;border-radius:20px}.school-cloud-heading,.attachment-application-heading{display:grid}.school-cloud-lock{justify-self:start}.school-upload-form,.attachment-form{grid-template-columns:1fr}.school-file-picker,.attachment-notes-field,.attachment-form-actions{grid-column:auto}.school-document-toolbar,.attachment-toolbar{grid-template-columns:1fr}.school-document-row,.attachment-application-row{grid-template-columns:1fr}.school-document-icon{display:none}.school-document-actions,.attachment-row-actions{justify-content:flex-start}.attachment-application-heading .small-link{justify-self:start}.attachment-form-actions{justify-content:flex-start}}

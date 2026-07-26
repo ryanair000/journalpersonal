@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="capture.css" />
   <link rel="stylesheet" href="progress.css" />
   <link rel="stylesheet" href="academic.css" />
+  <link rel="stylesheet" href="school-overview.css" />
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="vision.css" />
   <link rel="stylesheet" href="goals.css" />
@@ -244,6 +245,17 @@
 
     <section class="advanced-section section" id="schoolHub">
       <div class="section-title"><div><p class="eyebrow">Pharmacy school center</p><h2>Everything for your degree.</h2></div><button class="small-link" id="addUnit">＋ Add unit</button></div>
+      <div class="school-overview" id="schoolOverview">
+        <div class="school-overview-heading"><div><p class="eyebrow">School at a glance</p><h3>Your semester, in one view.</h3></div><span class="school-overview-status">YEAR 4.3 · PHARMACY</span></div>
+        <div class="school-overview-grid">
+          <article class="school-overview-stat overview-units"><span>Academic load</span><strong id="schoolOverviewUnits">76 / 134</strong><small id="schoolOverviewUnitsDetail">58 units remaining</small><i><b id="schoolOverviewUnitsBar"></b></i></article>
+          <article class="school-overview-stat overview-exam"><span>Next exam</span><strong id="schoolOverviewExam">BPL5101</strong><small id="schoolOverviewExamDetail">10 Aug · 11:00 AM–1:00 PM</small></article>
+          <article class="school-overview-stat overview-study"><span>Study rhythm</span><strong id="schoolOverviewStudy">0 min</strong><small id="schoolOverviewStudyDetail">logged this week</small></article>
+          <article class="school-overview-stat overview-attachment"><span>Attachment search</span><strong>Tue + Thu</strong><small>your planned search days</small></article>
+          <article class="school-overview-stat overview-prep"><span>Exam preparation</span><strong id="schoolOverviewPrep">0%</strong><small id="schoolOverviewPrepDetail">average across saved plans</small></article>
+        </div>
+        <nav class="school-overview-links" aria-label="School shortcuts"><a href="#studyTools">Study plan <span>→</span></a><a href="#examPrep">Exam prep <span>→</span></a><a href="#careerTracker">Attachment <span>→</span></a><a href="#projectBoard">Projects <span>→</span></a></nav>
+      </div>
       <div class="school-layout">
         <article class="advanced-card timetable-card"><div class="advanced-heading"><div><p class="eyebrow">Weekly timetable</p><h3>Where you need to be</h3></div><button class="mini-add" id="addClass">＋</button></div><div class="timetable"><div></div><b>MON</b><b>TUE</b><b>WED</b><b>THU</b><b>FRI</b><span>08:00</span><i></i><i></i><i class="class-cell">Pharmaceutics<small>LT 2</small></i><i></i><i></i><span>10:00</span><i class="class-cell">Pharmacology<small>Room 4</small></i><i></i><i></i><i></i><i class="class-cell">Pharmaceutical chem.<small>Lab</small></i><span>13:00</span><i></i><i class="class-cell">Pathology<small>LT 1</small></i><i></i><i></i><i></i><span>15:00</span><i></i><i></i><i class="class-cell">Community pharmacy<small>Room 8</small></i><i></i><i></i></div></article>
         <article class="advanced-card units-card"><div class="advanced-heading"><div><p class="eyebrow">Units & lecturers</p><h3>Your academic load</h3></div><span class="unit-count">8 / 12</span></div><div class="unit-progress"><i></i></div><div class="unit-summary"><div><strong>12</strong><small>Total units</small></div><div><strong>8</strong><small>Completed</small></div><div><strong>4</strong><small>Remaining</small></div></div><div id="unitList" class="unit-list"><div><span>PHR 302</span><strong>Pharmacology III</strong><small>Dr. Wanjiku · Year 3</small></div><div><span>PHR 304</span><strong>Pharmaceutics</strong><small>Dr. Kamau · Year 3</small></div><div><span>PHR 306</span><strong>Clinical pharmacy</strong><small>Dr. Otieno · Year 3</small></div></div></article>

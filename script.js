@@ -123,6 +123,78 @@ document.querySelector('#addAccount')?.addEventListener('click', () => {
   localStorage.setItem('contentAccounts', JSON.stringify(contentAccounts));
 });
 
+// Import the user's filtered August 2026 School of Pharmacy exam timetable once.
+window.addEventListener('load', () => {
+  const bpharmExamTimetable = [
+    ['BPL3103', '2026-08-06', '8:00–10:00 AM'],
+    ['BPC4102', '2026-08-07', '2:00–4:00 PM'],
+    ['BPL3102', '2026-08-07', '8:00–10:00 AM'],
+    ['BPC4101', '2026-08-08', '2:00–4:00 PM'],
+    ['BPL5101', '2026-08-10', '11:00 AM–1:00 PM'],
+    ['BPL4106', '2026-08-11', '2:00–4:00 PM'],
+    ['BPL4201', '2026-08-11', '11:00 AM–1:00 PM'],
+    ['BPL4105', '2026-08-12', '2:00–4:00 PM'],
+    ['BPC3103', '2026-08-12', '8:00–10:00 AM'],
+    ['BPL4104', '2026-08-13', '2:00–4:00 PM'],
+    ['BPC4204', '2026-08-13', '11:00 AM–1:00 PM'],
+    ['BPL4205', '2026-08-14', '11:00 AM–1:00 PM'],
+    ['BCH2206', '2026-08-14', '8:00–10:00 AM'],
+    ['BPT3102', '2026-08-15', '8:00–10:00 AM'],
+    ['BMM2102', '2026-08-16', '2:00–4:00 PM'],
+    ['BPA2204', '2026-08-16', '8:00–10:00 AM'],
+    ['BPT4103', '2026-08-17', '2:00–4:00 PM'],
+    ['BPT4204', '2026-08-17', '11:00 AM–1:00 PM'],
+    ['BPA2203', '2026-08-18', '2:00–4:00 PM'],
+    ['BPL4103', '2026-08-19', '2:00–4:00 PM'],
+    ['BPC3202', '2026-08-19', '8:00–10:00 AM'],
+    ['PBCU001', '2026-08-19', '11:00 AM–1:00 PM'],
+    ['BPC4202', '2026-08-20', '11:00 AM–1:00 PM'],
+    ['BPT4102', '2026-08-21', '2:00–4:00 PM'],
+    ['BPL4203', '2026-08-21', '8:00–10:00 AM'],
+  ].map(([code, date, time]) => {
+    const unit = units.find(([unitCode]) => unitCode === code);
+    return { code, name: unit?.[1] || code, date, time };
+  });
+
+  if (!localStorage.getItem('bpharmExamTimetableImportedV1')) {
+    const saved = JSON.parse(localStorage.getItem('examEntries') || '[]');
+    const merged = [...saved];
+    bpharmExamTimetable.forEach((entry) => {
+      if (!merged.some((item) => item.code === entry.code && item.date === entry.date)) merged.push(entry);
+    });
+    localStorage.setItem('examEntries', JSON.stringify(merged));
+    bpharmExamTimetable.forEach((entry) => {
+      const title = `Exam · ${entry.code} · ${entry.name}`;
+      if (!calendarEvents.some((event) => event.date === entry.date && event.title === title)) calendarEvents.push({ date: entry.date, title, meta: `School · ${entry.time}`, color: 'coral-event' });
+    });
+    localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+    localStorage.setItem('bpharmExamTimetableImportedV1', 'true');
+  }
+
+  if (!localStorage.getItem('bpharmExamTimetableReviewedV2')) {
+    const excludedCodes = new Set(['BMM2106', 'BPT3202', 'BPL4202']);
+    const saved = JSON.parse(localStorage.getItem('examEntries') || '[]').filter((entry) => !excludedCodes.has(entry.code));
+    localStorage.setItem('examEntries', JSON.stringify(saved));
+    const keptEvents = calendarEvents.filter((event) => ![...excludedCodes].some((code) => String(event.title || '').includes(`Exam · ${code} ·`)));
+    calendarEvents.splice(0, calendarEvents.length, ...keptEvents);
+    localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+    localStorage.setItem('bpharmExamTimetableReviewedV2', 'true');
+  }
+
+  const examList = document.querySelector('#examList');
+  const savedExams = JSON.parse(localStorage.getItem('examEntries') || '[]');
+  if (examList && savedExams.length) {
+    examList.replaceChildren();
+    savedExams.forEach((entry) => {
+      const row = document.createElement('div');
+      row.innerHTML = `<span class="exam-code">${escapeText(entry.code)}</span><section><strong>${escapeText(entry.name)}</strong><small>Exam: ${escapeText(entry.date)} · ${escapeText(entry.time || 'Time to confirm')}</small></section><b>${escapeText(entry.date)}</b>`;
+      examList.append(row);
+    });
+  }
+  if (typeof renderCalendar === 'function') renderCalendar();
+  if (typeof renderUpcoming === 'function') renderUpcoming();
+});
+
 document.querySelectorAll('.feel-row button').forEach((button) => button.addEventListener('click', () => {
   document.querySelectorAll('.feel-row button').forEach((item) => item.classList.remove('selected'));
   button.classList.add('selected');
@@ -463,30 +535,42 @@ const userHeading = document.querySelector('.topbar h1');
 if (userHeading) userHeading.innerHTML = 'Hi, Charry <span>♡</span>';
 
 const units = [
-  ['PBCU001', 'Research methods', 'Dr. Mungoma Michael'],
-  ['BPT4204', 'Pharmacy management 3', 'Dr. Solomon Karanja'],
-  ['BPC4202', 'Pharmaceutical Chemistry X', 'Dr. Epaphrodite Twahirwa'],
-  ['BPA2203', 'Human pathology 3', 'Lecturer to add'],
-  ['BPL4203', 'Pharmacology XI', 'Dr. Samuel Wainaina'],
-  ['BPC4204', 'Pharmaceutical Chemistry XII', 'Lecturer to add'],
-  ['BPL4105', 'Pharmacology VII', 'Dr. Dennis Opwoko'],
-  ['BPL4201', 'Pharmacology IX', 'Dr. Dennis Opwoko'],
-  ['BPL4205', 'Clinical pharmacy IV', 'Dr. Arwa Nath'],
-  ['BPL5101', 'Clinical pharmacy V', 'Dr. Arwa Nath'],
-  ['BPT3102', 'Pharmaceutics 2', 'Dr. Rose Obat']
+  ['BPC4102', 'Pharmaceutical Chemistry VII (Nuclear Magnetic Resonance)', 'Lecturer to add'],
+  ['BPC4101', 'Spectroscopy III', 'Lecturer to add'],
+  ['BPL4106', 'Pharmacology VIII (GIT Pharmacology)', 'Lecturer to add'],
+  ['BPL4105', 'Pharmacology VII (CVS Pharmacology)', 'Dr. Dennis Opwoko'],
+  ['BPL4104', 'Pharmacology VI (Respiratory and Renal Pharmacology)', 'Lecturer to add'],
+  ['BMM2102', 'Immunology', 'Lecturer to add'],
+  ['BPT4103', 'Pharmacy Management I', 'Lecturer to add'],
+  ['BPL4103', 'Clinical Pharmacy II (Respiratory & Infectious Diseases)', 'Lecturer to add'],
+  ['BPT4102', 'Pharmaceutics VI (Unit Operations)', 'Lecturer to add'],
+  ['BPL5101', 'Clinical Pharmacy V', 'Dr. Arwa Nath'],
+  ['BPL4201', 'Pharmacology IX (Chemotherapy I)', 'Dr. Dennis Opwoko'],
+  ['BPC4204', 'Pharmaceutical Chemistry XII (ANS)', 'Dr. Lucy Githaga'],
+  ['BPL4205', 'Clinical Pharmacy IV (CNS & Bone Joint Infections)', 'Dr. Arwa Nath'],
+  ['BPT3102', 'Pharmaceutics II (Drug Standards and GMP)', 'Dr. Rose Obat'],
+  ['BPT4204', 'Pharmacy Management III', 'Dr. Solomon Karanja'],
+  ['BPA2203', 'Human Pathology III', 'Dr. Jediel & Dr. Lucy Githaga'],
+  ['PBCU001', 'Research Methods', 'Dr. Mungoma Michael'],
+  ['BPC4202', 'Pharmaceutical Chemistry X (NSAIDs and Antihistamines)', 'Dr. Epaphrodite Twahirwa'],
+  ['BPL4203', 'Pharmacology XI (Vitamins & Endocrine Pharmacology)', 'Dr. Samuel Wainaina'],
+  ['BPC3103', 'Pharmaceutical Chemistry III (Analytical Methods I)', 'Lecturer to add'],
+  ['BPC3202', 'Pharmaceutical Chemistry V (Central Nervous System Drugs)', 'Lecturer to add'],
+  ['BCH2206', 'Spectroscopy II', 'Lecturer to add'],
+  ['BPL3103', 'Pharmacology II (Autonomic Pharmacology)', 'Lecturer to add'],
+  ['BPL3102', 'Pharmacology I (Introduction to Pharmacology)', 'Lecturer to add'],
+  ['BPA2204', 'Human Pathology IV', 'Lecturer to add']
 ];
 const unitList = document.querySelector('#unitList');
 if (unitList) {
   unitList.innerHTML = units.map(([code, name, lecturer]) => `<div><span>${escapeText(code)}</span><strong>${escapeText(name)}</strong><small>${escapeText(lecturer)} · Year 4.3</small></div>`).join('');
-  document.querySelector('#schoolHub .unit-count').textContent = '11 current';
-  units[3][2] = 'Dr. Jediel & Dr. Lucy Githaga';
-  units[5][2] = 'Dr. Lucy Githaga';
+  document.querySelector('#schoolHub .unit-count').textContent = '25 pending';
   unitList.innerHTML = units.map(([code, name, lecturer]) => `<div><span>${escapeText(code)}</span><strong>${escapeText(name)}</strong><small>${escapeText(lecturer)} · Year 4.3</small></div>`).join('');
   document.querySelector('.unit-summary').innerHTML = '<div><strong>134</strong><small>Total units</small></div><div><strong>76</strong><small>Completed</small></div><div><strong>58</strong><small>Remaining</small></div>';
   const timetableCard = document.querySelector('.timetable-card');
   const timetableNote = document.createElement('p');
   timetableNote.className = 'detail-hint';
-  timetableNote.textContent = 'Classes complete · final exam dates not released yet.';
+  timetableNote.textContent = 'Classes complete - August 2026 draft exam timetable imported.';
   timetableCard.append(timetableNote);
   const studyPreference = document.createElement('p');
   studyPreference.className = 'detail-hint study-preference';

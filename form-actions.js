@@ -656,11 +656,14 @@
           { name: "code", label: "Unit code", maxlength: 30, required: true },
           { name: "name", label: "Unit or exam name", maxlength: 180, required: true },
           { name: "date", label: "Exam date", type: "date", required: true },
-          { name: "time", label: "Time", type: "text", maxlength: 80, placeholder: "Optional" }
+          { name: "time", label: "Time", type: "text", maxlength: 80, placeholder: "e.g. 11:00 AM–1:00 PM", required: true },
+          { name: "venue", label: "Venue", maxlength: 160, placeholder: "e.g. LT 2" },
+          { name: "lecturer", label: "Lecturer", maxlength: 160, placeholder: "e.g. Dr. Arwa Nath" },
+          { name: "classYear", label: "Class / year", maxlength: 100, placeholder: "e.g. BPharm Year 4.3" }
         ],
         save: (values) => {
           const exams = readLegacyList("examEntries");
-          exams.push({ code: values.code, name: values.name, date: values.date, time: values.time });
+          exams.push({ code: values.code, name: values.name, date: values.date, time: values.time, venue: values.venue, lecturer: values.lecturer, classYear: values.classYear });
           localStorage.setItem("examEntries", JSON.stringify(exams));
         }
       })

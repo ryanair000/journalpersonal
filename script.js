@@ -710,33 +710,59 @@ document.querySelector('#settingsForm')?.addEventListener('submit', (event) => {
   hideSettings();
 });
 
-document.querySelector('#exportData')?.addEventListener('click', () => {
-  const selectedKeys = JSON.parse(localStorage.getItem('backupScope') || 'null');
-  const allData = { ...localStorage };
-  const data = Array.isArray(selectedKeys) && selectedKeys.length ? Object.fromEntries(selectedKeys.filter((key) => key in allData).map((key) => [key, allData[key]])) : allData;
-  const backup = { app: 'my little life', version: 2, exportedAt: new Date().toISOString(), data };
+const isSafeBackupKey = (key) => window.mllRecordsSafety?.isRecordKey?.(key) ?? (!String(key).startsWith('sb-') && !String(key).startsWith('supabase.') && !String(key).startsWith('mll.auth.') && !['mll.sync.meta.v1', 'mll.sync.keyTimes.v1', 'mll.authenticatedBefore', 'privacyPinHash'].includes(String(key)));
+const collectSafeBackupData = () => window.mllRecordsSafety?.collectRecordData?.() || Object.fromEntries(Object.entries({ ...localStorage }).filter(([key]) => isSafeBackupKey(key)));
+
+document.querySelector('#exportData')?.addEventListener('click', async () => {
+  let selectedKeys = null;
+  try { selectedKeys = JSON.parse(localStorage.getItem('backupScope') || 'null'); } catch { selectedKeys = null; }
+  const allData = collectSafeBackupData();
+  const data = Array.isArray(selectedKeys) && selectedKeys.length
+    ? Object.fromEntries(selectedKeys.filter((key) => isSafeBackupKey(key) && key in allData).map((key) => [key, allData[key]]))
+    : allData;
+  const backup = window.mllRecordsSafety?.createBackupEnvelope
+    ? await window.mllRecordsSafety.createBackupEnvelope(data)
+    : { app: 'my little life', version: 3, exportedAt: new Date().toISOString(), data };
   const file = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(file);
   link.download = `my-little-life-backup-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
-  URL.revokeObjectURL(link.href);
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  localStorage.setItem('lastBackupAt', new Date().toISOString());
 });
 document.querySelector('#importData')?.addEventListener('click', () => document.querySelector('#importFile').click());
 document.querySelector('#importFile')?.addEventListener('change', (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { alert('That backup is larger than 10 MB. Please choose a smaller dashboard backup.'); event.target.value = ''; return; }
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try {
       const backup = JSON.parse(reader.result);
-      if (!backup.data || typeof backup.data !== 'object') throw new Error('Invalid backup');
-      const keys = Object.keys(backup.data);
-      if (!confirm(`Import ${keys.length} saved items? This will replace matching local items.\n\n${keys.slice(0, 8).join(', ')}${keys.length > 8 ? '…' : ''}`)) return;
-      Object.entries(backup.data).forEach(([key, value]) => localStorage.setItem(key, value));
+      if (backup.app !== 'my little life' || !backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('Invalid backup');
+      const safeEntries = Object.entries(backup.data).filter(([key, value]) => isSafeBackupKey(key) && typeof value === 'string');
+      if (!safeEntries.length) throw new Error('No dashboard records');
+      if (backup.integrity?.checksum && window.mllRecordsSafety?.checksumData) {
+        const checksum = await window.mllRecordsSafety.checksumData(backup.data);
+        if (checksum !== backup.integrity.checksum) throw new Error('Checksum mismatch');
+      }
+      const skipped = Object.keys(backup.data).length - safeEntries.length;
+      const keys = safeEntries.map(([key]) => key);
+      if (!confirm(`Import ${keys.length} saved dashboard items? This will replace matching records.${skipped ? `\n\n${skipped} unsafe or invalid session item${skipped === 1 ? '' : 's'} will be skipped.` : ''}\n\n${keys.slice(0, 8).join(', ')}${keys.length > 8 ? '…' : ''}`)) return;
+      let importProtected = false;
+      try { if (window.mllRecordsSafety?.createSnapshot) { await window.mllRecordsSafety.createSnapshot('before import', true); importProtected = true; } } catch { importProtected = false; }
+      if (!importProtected && !confirm('A recovery point could not be created before import. Continue only if your current records are already backed up.')) return;
+      const applyImport = () => safeEntries.forEach(([key, value]) => localStorage.setItem(key, value));
+      if (window.mllRecordsSafety?.runWithoutSnapshots) await window.mllRecordsSafety.runWithoutSnapshots(applyImport);
+      else applyImport();
+      await window.mllCloudSync?.syncNow?.().catch(() => {});
       alert('Backup imported. Refreshing your dashboard now.');
       window.location.reload();
-    } catch { alert('That file does not look like a valid dashboard backup.'); }
+    } catch (error) {
+      const integrityProblem = error?.message === 'Checksum mismatch';
+      alert(integrityProblem ? 'This backup failed its integrity check and was not imported. The file may be damaged or changed.' : 'That file does not look like a valid dashboard backup.');
+    } finally { event.target.value = ''; }
   };
   reader.readAsText(file);
 });
@@ -1020,10 +1046,34 @@ if (localStorage.getItem('peopleReminder')) document.querySelector('#connectionR
 
 document.querySelector('#addPipelinePost')?.addEventListener('click', () => { const title = prompt('Post or content title:'); const platform = prompt('Platform:'); const status = prompt('Status: planned, creating, scheduled, or published?', 'planned'); if (!title?.trim()) return; const columnIndex = { planned: 0, creating: 1, scheduled: 2, published: 3 }[status?.trim().toLowerCase()] ?? 0; const post = { id: `pipeline-${Date.now()}`, title: title.trim(), platform: platform?.trim() || 'Platform to add', status: columnIndex, views: '', likes: '', comments: '' }; if (typeof appendPipelinePost === 'function') appendPipelinePost(post, true); });
 
-const clearData = (keys, label) => { if (!confirm(`Clear ${label}? This cannot be undone unless you have an exported backup.`)) return; keys.forEach((key) => localStorage.removeItem(key)); document.querySelector('#dataManagementStatus').textContent = `${label} cleared.`; setTimeout(() => window.location.reload(), 700); };
+const createDestructiveSafetyPoint = async (label) => {
+  if (!window.mllRecordsSafety?.createSnapshot) return false;
+  try { await window.mllRecordsSafety.createSnapshot(`before clearing ${label}`, true); return true; }
+  catch { return false; }
+};
+const clearData = async (keys, label) => {
+  if (!confirm(`Clear ${label}? A device recovery point will be saved first.`)) return;
+  const protectedFirst = await createDestructiveSafetyPoint(label);
+  if (!protectedFirst && !confirm('A recovery point could not be created in this browser. Continue only if you already exported a backup.')) return;
+  const removeSelected = () => keys.filter(isSafeBackupKey).forEach((key) => localStorage.removeItem(key));
+  if (window.mllRecordsSafety?.runWithoutSnapshots) await window.mllRecordsSafety.runWithoutSnapshots(removeSelected);
+  else removeSelected();
+  await window.mllCloudSync?.syncNow?.().catch(() => {});
+  document.querySelector('#dataManagementStatus').textContent = `${label} cleared. A recovery point was kept on this device.`;
+  setTimeout(() => window.location.reload(), 700);
+};
 document.querySelector('#clearJournalData')?.addEventListener('click', () => clearData(['quickNote', 'journalEntries', 'archiveEntries', 'memoryEntries', 'gratitudeHistory'], 'journal data'));
 document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'customHabitHistory', 'routineHistory', 'routines', 'mealLogs', 'nutritionNote', 'nutritionHistory', 'studySessions', 'studyTimerSeconds', 'studyTimerHistory', 'weeklyExpenses', 'categoryExpenses', 'expenseLedger', 'incomeEntries', 'prayerHistory', 'moodHistory', 'mentalHealthHistory', 'workoutHistory', 'rhythmHistory', 'unitProgress', 'contentAccounts', 'accountAnalyticsHistory', 'selectedCreatorAccount', 'contentIdeas', 'myLittleLife.creatorCenter.v1', 'myLittleLife.creatorAccount.active', 'myLittleLife.lifeCommand.v1', 'customUnits', 'schoolStudyItems', 'schoolResearchItems', 'schoolProjectDetails', 'projectMilestones', 'classEntries', 'examEntries', 'personalBusinesses', 'businessStatuses', 'workGoals', 'workDeadlines', 'workLogEntries', 'peopleDirectory', 'peopleCheckins', 'peopleContactHistory', 'peopleNoteHistory', 'relationshipFeelHistory', 'relationshipDates', 'examPrepItems', 'examNextActions', 'businessKpis', 'careerTasks', 'analyticsHistory', 'recurringExpenses', 'recurringEvents', 'savingsContributions', 'monthlyBudget'], 'tracking and added items'));
-document.querySelector('#clearAllData')?.addEventListener('click', () => { if (!confirm('Clear every locally saved dashboard item? Export a backup first if you may want it later.')) return; localStorage.clear(); window.location.reload(); });
+document.querySelector('#clearAllData')?.addEventListener('click', async () => {
+  if (!confirm('Clear every saved dashboard record? A device recovery point will be saved first, and your sign-in will stay connected.')) return;
+  const protectedFirst = await createDestructiveSafetyPoint('all dashboard records');
+  if (!protectedFirst && !confirm('A recovery point could not be created in this browser. Continue only if you already exported a backup.')) return;
+  const removeAllRecords = () => Object.keys(collectSafeBackupData()).forEach((key) => localStorage.removeItem(key));
+  if (window.mllRecordsSafety?.runWithoutSnapshots) await window.mllRecordsSafety.runWithoutSnapshots(removeAllRecords);
+  else removeAllRecords();
+  await window.mllCloudSync?.syncNow?.().catch(() => {});
+  window.location.reload();
+});
 
 const defaultAccountInsights = { Instagram: { followers: '2.4k', growth: '+8.2% this month', reach: '4,820', engagement: '7.4%', posts: '12', best: 'A realistic student morning', meta: 'Reel · 4,280 views · 312 likes' }, TikTok: { followers: '1.8k', growth: '+14.1% this month', reach: '6,100', engagement: '8.6%', posts: '9', best: 'Study with me setup', meta: 'Video · 8,920 views · 540 likes' }, YouTube: { followers: '824', growth: '+5.3% this month', reach: '1,900', engagement: '5.1%', posts: '3', best: 'July reset routine', meta: 'Short · 2,100 views · 98 likes' }, Other: { followers: '0', growth: 'Add your growth', reach: '0', engagement: '0%', posts: '0', best: 'Add your best content', meta: 'No performance logged yet' } };
 const creatorAccountData = { ...defaultAccountInsights, ...JSON.parse(localStorage.getItem('creatorAccountInsights') || '{}') };

@@ -288,10 +288,18 @@
       <p class="mll-sync-note" data-mll-sync-note>Your entries are currently stored on this device.</p>
       <div class="mll-account-actions">
         <button type="button" data-mll-sync-now>Sync now</button>
+        <button type="button" data-mll-password hidden>Change password</button>
         <button type="button" data-mll-signout>Sign out</button>
       </div>`;
     host.append(accountCard);
     accountCard.querySelector("[data-mll-sync-now]").addEventListener("click", () => syncNow());
+    accountCard.querySelector("[data-mll-password]").addEventListener("click", () => {
+      const gate = document.querySelector("#mllAuthGate");
+      if (!gate) return;
+      document.body.classList.add("mll-auth-locked");
+      gate.hidden = false;
+      gate.showRecovery?.();
+    });
     accountCard.querySelector("[data-mll-signout]").addEventListener("click", async () => {
       await client?.auth.signOut();
     });
@@ -406,6 +414,7 @@
     const email = accountCard?.querySelector("[data-mll-account-email]");
     const signOut = accountCard?.querySelector("[data-mll-signout]");
     const syncButton = accountCard?.querySelector("[data-mll-sync-now]");
+    const passwordButton = accountCard?.querySelector("[data-mll-password]");
 
     if (session?.user) {
       nativeSetItem.call(localStorage, AUTHENTICATED_KEY, "true");
@@ -414,6 +423,7 @@
       if (email) email.textContent = session.user.email || "Signed in";
       if (signOut) signOut.hidden = false;
       if (syncButton) syncButton.hidden = false;
+      if (passwordButton) passwordButton.hidden = false;
       window.clearInterval(pollTimer);
       pollTimer = window.setInterval(() => syncNow({ quiet: true }), POLL_MS);
       await syncNow({ quiet: true });
@@ -423,6 +433,7 @@
       if (email) email.textContent = "Not signed in";
       if (signOut) signOut.hidden = true;
       if (syncButton) syncButton.hidden = true;
+      if (passwordButton) passwordButton.hidden = true;
       updateAccountCard(navigator.onLine ? "local" : "offline", navigator.onLine ? "Sign in to synchronize your phone and laptop." : "Offline. Your entries remain on this device.");
       document.body.classList.add("mll-auth-locked");
       if (gate) gate.hidden = false;
@@ -458,8 +469,6 @@
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
 
-    const { data } = await client.auth.getSession();
-    await setSignedIn(data.session);
     client.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
       if (event === "PASSWORD_RECOVERY") {
@@ -474,6 +483,8 @@
       }
       window.setTimeout(() => setSignedIn(nextSession), 0);
     });
+    const { data } = await client.auth.getSession();
+    await setSignedIn(data.session);
   };
 
   window.addEventListener("online", () => {

@@ -397,18 +397,47 @@ window.addEventListener('load', () => {
   const setupItems = [
     ['profile', 'Set your name, course, year, and unit totals', '#settingsModal'],
     ['school', 'Add your timetable, study plan, and exam dates', '#schoolHub'],
-    ['content', 'Add your real creator accounts and analytics', '#accounts'],
+    ['content', 'Personalize your creator accounts and start analytics', '#content'],
     ['work', 'Add Leridia, PlayMechi, Exampoa, and work goals', '#workHub'],
     ['people', 'Add family, friends, Charry, birthdays, and dates', '#peopleHub'],
     ['vision', 'Upload a vision-board image or add a future goal', '#visionBoard']
   ];
   const savedSetup = (() => { try { return JSON.parse(localStorage.getItem('launchChecklist') || '{}'); } catch { return {}; } })();
   const setupCard = document.createElement('article'); setupCard.className = 'launch-setup-card';
+  const jumpToSetupSection = (element) => {
+    if (!element) return;
+    const rootBehavior = document.documentElement.style.scrollBehavior;
+    const bodyBehavior = document.body.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.scrollBehavior = 'auto';
+    element.scrollIntoView({ block: 'start' });
+    document.documentElement.style.scrollBehavior = rootBehavior;
+    document.body.style.scrollBehavior = bodyBehavior;
+  };
   const renderSetup = () => {
     const completed = setupItems.filter(([key]) => savedSetup[key]).length;
-    setupCard.innerHTML = `<div class="launch-setup-heading"><div><p class="eyebrow">First-day setup</p><h3>Make this dashboard completely yours.</h3><small>${completed} of ${setupItems.length} launch steps complete</small></div><button type="button" class="launch-dismiss">${completed === setupItems.length ? 'Done' : 'Hide for now'}</button></div><div class="launch-progress"><i style="width:${completed / setupItems.length * 100}%"></i></div><div class="launch-checklist">${setupItems.map(([key, label, target]) => `<label><input type="checkbox" data-launch-key="${key}" ${savedSetup[key] ? 'checked' : ''}><span>${escapeText(label)}</span><button type="button" data-launch-open="${target}">Open</button></label>`).join('')}</div><button type="button" class="clear-starters30c">Clear starter examples</button><small class="launch-note">This removes only the built-in examples; saved personal entries stay safe.</small>`;
+    setupCard.innerHTML = `<div class="launch-setup-heading"><div><p class="eyebrow">First-day setup</p><h3>Make this dashboard completely yours.</h3><small>${completed} of ${setupItems.length} launch steps complete</small></div><button type="button" class="launch-dismiss">${completed === setupItems.length ? 'Done' : 'Hide for now'}</button></div><div class="launch-progress"><i style="width:${completed / setupItems.length * 100}%"></i></div><div class="launch-checklist">${setupItems.map(([key, label, target]) => `<div class="launch-checklist-item"><label><input type="checkbox" data-launch-key="${key}" ${savedSetup[key] ? 'checked' : ''}><span>${escapeText(label)}</span></label><button type="button" data-launch-item="${key}" data-launch-open="${target}">Open</button></div>`).join('')}</div><button type="button" class="clear-starters30c">Clear starter examples</button><small class="launch-note">This removes only the built-in examples; saved personal entries stay safe.</small>`;
     setupCard.querySelectorAll('[data-launch-key]').forEach((input) => input.addEventListener('change', () => { savedSetup[input.dataset.launchKey] = input.checked; localStorage.setItem('launchChecklist', JSON.stringify(savedSetup)); renderSetup(); }));
-    setupCard.querySelectorAll('[data-launch-open]').forEach((button) => button.addEventListener('click', () => { const target = document.querySelector(button.dataset.launchOpen); if (target?.classList.contains('settings-modal')) { target.classList.add('open'); target.setAttribute('aria-hidden', 'false'); target.querySelector('#settingName')?.focus(); } else target?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+    setupCard.querySelectorAll('[data-launch-open]').forEach((button) => button.addEventListener('click', () => {
+      const key = button.dataset.launchItem;
+      const target = document.querySelector(button.dataset.launchOpen);
+      if (target?.classList.contains('settings-modal')) {
+        document.querySelector('#openSettings')?.click();
+        target.querySelector('#settingName')?.focus();
+        return;
+      }
+      if (key === 'content') document.querySelector('[data-creator-tab="plan"]')?.click();
+      if (target && target.getBoundingClientRect().height > 0) {
+        jumpToSetupSection(target);
+        window.setTimeout(() => {
+          const preferred = key === 'content' ? target.querySelector('[data-creator-action="edit-account"]') : target.querySelector('button, input, select, textarea');
+          preferred?.focus({ preventScroll: true });
+        }, 450);
+        return;
+      }
+      const fallback = key === 'content' ? document.querySelector('#content') : document.querySelector('#lifeOverview');
+      jumpToSetupSection(fallback);
+    }));
     setupCard.querySelector('.launch-dismiss')?.addEventListener('click', () => { localStorage.setItem('launchSetupDismissed', 'true'); setupCard.remove(); });
     setupCard.querySelector('.clear-starters30c')?.addEventListener('click', () => {
       if (!confirm('Clear the built-in starter examples? Your saved personal entries will stay safe.')) return;

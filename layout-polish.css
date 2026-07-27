@@ -1,0 +1,271 @@
+/* Clear, scan-friendly layouts for the business KPI and people detail sections. */
+.business-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.business-kpi-grid > article {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 168px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 19px;
+  overflow: hidden;
+  border: 1px solid rgba(84, 59, 71, 0.09);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff7f9, #fffdfd);
+  box-shadow: 0 10px 25px rgba(84, 59, 71, 0.055);
+}
+
+.business-kpi-grid > article:nth-child(4n + 2) {
+  background: linear-gradient(145deg, #f8f3ff, #fffdfd);
+}
+
+.business-kpi-grid > article:nth-child(4n + 3) {
+  background: linear-gradient(145deg, #fff8ec, #fffdfd);
+}
+
+.business-kpi-grid > article:nth-child(4n + 4) {
+  background: linear-gradient(145deg, #f2f9f4, #fffdfd);
+}
+
+.business-kpi-grid .eyebrow {
+  margin: 0 0 18px;
+  overflow-wrap: anywhere;
+}
+
+.business-kpi-grid > article > strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #513b47;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.7rem, 2.5vw, 2.15rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.business-kpi-grid > article > small {
+  display: block;
+  color: #8f7783;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.business-kpi-grid > article > span:not(.edit-controls) {
+  display: inline-flex;
+  margin-top: auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #765967;
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+.business-kpi-grid .edit-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  margin: 0;
+}
+
+.business-kpi-grid .edit-controls button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.people-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.75fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+.people-filter-card,
+.people-reminder-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(84, 59, 71, 0.09);
+  border-radius: 20px;
+  background: rgba(255, 251, 252, 0.88);
+  box-shadow: 0 10px 25px rgba(84, 59, 71, 0.05);
+}
+
+.people-reminder-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(145deg, #f8f2fb, #fffafc);
+}
+
+.people-filter-tabs {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 12px;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.people-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.people-filter-tabs button {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border: 1px solid rgba(84, 59, 71, 0.1);
+  border-radius: 999px;
+  background: #fff;
+  color: #806b76;
+  font: inherit;
+  font-size: 0.73rem;
+  cursor: pointer;
+}
+
+.people-filter-tabs button.active {
+  border-color: transparent;
+  background: #765967;
+  color: #fff;
+}
+
+.people-checkin-list {
+  display: grid;
+  gap: 8px;
+}
+
+.people-checkin-list > div,
+.people-checkin-list > div.editable-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 3px 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(84, 59, 71, 0.07);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.people-checkin-list > div > strong,
+.people-checkin-list > div > small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.people-checkin-list > div > strong {
+  grid-column: 1;
+  color: #513b47;
+  font-size: 0.84rem;
+}
+
+.people-checkin-list > div > small {
+  grid-column: 1;
+  color: #967f8b;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.people-checkin-list > div > span:not(.edit-controls) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff0f3;
+  color: #9c6076;
+  font-size: 0.67rem;
+  white-space: nowrap;
+}
+
+.people-checkin-list .contact-log-button {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.people-checkin-list .edit-controls {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+
+.people-reminder-card h3 {
+  margin: 8px 0 16px;
+  color: #513b47;
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.people-reminder-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(84, 59, 71, 0.13);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #513b47;
+  font: inherit;
+}
+
+.people-reminder-card .detail-link {
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  color: #a65d76;
+  cursor: pointer;
+}
+
+@media (max-width: 1050px) {
+  .business-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .people-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .business-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .business-kpi-grid > article {
+    min-height: 150px;
+    padding: 17px;
+  }
+
+  .people-filter-card,
+  .people-reminder-card {
+    padding: 15px;
+  }
+
+  .people-checkin-list > div,
+  .people-checkin-list > div.editable-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .people-checkin-list > div > span:not(.edit-controls) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .people-checkin-list .contact-log-button,
+  .people-checkin-list .edit-controls {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
+}

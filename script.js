@@ -1329,7 +1329,8 @@ window.addEventListener('load', () => {
   const decorateKpisFifteen = () => {
     if (!kpiListFifteen) return;
     const kpis = readFifteen('businessKpis');
-    [...kpiListFifteen.querySelectorAll('article')].slice(-kpis.length).forEach((row, index) => {
+    const customRows = kpis.length ? [...kpiListFifteen.querySelectorAll('article')].slice(-kpis.length) : [];
+    customRows.forEach((row, index) => {
       if (row.querySelector('[data-kpi-edit]')) return;
       const controls = document.createElement('span'); controls.className = 'edit-controls'; controls.innerHTML = '<button type="button" data-kpi-edit aria-label="Edit KPI">✎</button><button type="button" data-kpi-delete aria-label="Delete KPI">×</button>'; row.append(controls);
       controls.addEventListener('click', (event) => {

@@ -293,6 +293,22 @@
     });
   }
 
+  function quickAddIdea(input = {}) {
+    const title = String(input.title || "").trim();
+    if (!title) return false;
+    const account = accountById(input.accountId || (activeAccount === "all" ? state.accounts[0].id : activeAccount));
+    const now = new Date().toISOString();
+    state.posts.unshift({
+      id: uid(), title, accountId: account.id, platform: input.platform || account.platforms[0] || "Other",
+      status: "Idea", format: input.format || "Post", pillar: String(input.pillar || "").trim(), campaign: "",
+      publishDate: String(input.publishDate || ""), publishTime: "", goal: input.goal || "Awareness",
+      hook: "", cta: "", notes: String(input.notes || "").trim(), repurpose: [], metrics: {}, createdAt: now, updatedAt: now
+    });
+    save(true, "Content idea captured.");
+    render();
+    return true;
+  }
+
   function accountForm(account) {
     openModal({
       eyebrow: "Account settings", title: `Personalize ${account.name}`,
@@ -649,5 +665,5 @@
   if (!renderShell()) return;
   bindEvents();
   render();
-  globalThis.MyLittleLifeCreator = Object.freeze({ getState: () => structuredClone(state), render, openPostForm: () => postForm() });
+  globalThis.MyLittleLifeCreator = Object.freeze({ getState: () => structuredClone(state), render, openPostForm: () => postForm(), quickAddIdea });
 })();

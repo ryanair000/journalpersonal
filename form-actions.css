@@ -64,6 +64,28 @@
   gap: 17px;
 }
 
+.calendar-event-form {
+  width: min(680px, 100%);
+}
+
+.calendar-event-form .action-form-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.calendar-event-form [data-field-name="title"],
+.calendar-event-form [data-field-name="notes"] {
+  grid-column: 1 / -1;
+}
+
+.calendar-event-form [data-field-name="notes"] textarea {
+  min-height: 105px;
+}
+
+@media (max-width: 620px) {
+  .calendar-event-form .action-form-fields { grid-template-columns: 1fr; }
+  .calendar-event-form [data-field-name] { grid-column: auto; }
+}
+
 .action-form-field {
   display: grid;
   gap: 8px;

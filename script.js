@@ -799,20 +799,26 @@ const renderUpcoming = () => {
   const list = document.querySelector('#upcomingEvents');
   const todayKey = new Date().toISOString().slice(0, 10);
   const upcoming = [...calendarEvents].filter((event) => event.date >= todayKey && (calendarFilterState === 'all' || String(event.meta || '').toLowerCase().includes(calendarFilterState))).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 6);
-  list.innerHTML = upcoming.map((event) => { const date = new Date(`${event.date}T00:00:00`); return `<div><span class="event-date ${event.color || 'coral-event'}">${date.getDate()}<span>${date.toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span></span><section><strong>${escapeText(event.title)}</strong><small>${escapeText(event.meta || 'Personal event')}</small></section></div>`; }).join('');
+  list.innerHTML = upcoming.map((event) => { const date = new Date(`${event.date}T00:00:00`); const eventIndex = calendarEvents.indexOf(event); return `<div><span class="event-date ${event.color || 'coral-event'}">${date.getDate()}<span>${date.toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span></span><section><strong>${escapeText(event.title)}</strong><small>${escapeText(event.meta || 'Personal event')}</small></section><span class="edit-controls calendar-edit-controls"><button type="button" data-calendar-edit="${eventIndex}" aria-label="Edit calendar event">✎</button><button type="button" data-calendar-delete="${eventIndex}" aria-label="Delete calendar event">×</button></span></div>`; }).join('');
 };
 document.querySelector('#previousMonth')?.addEventListener('click', () => { calendarView.setMonth(calendarView.getMonth() - 1); renderCalendar(); });
 document.querySelector('#nextMonth')?.addEventListener('click', () => { calendarView.setMonth(calendarView.getMonth() + 1); renderCalendar(); });
-document.querySelector('#addCalendarEvent')?.addEventListener('click', () => {
-  const date = prompt('Date (YYYY-MM-DD):');
-  const title = prompt('What is happening?');
-  const meta = prompt('Category or time, for example “School · 14:00”:');
-  if (!date?.match(/^\d{4}-\d{2}-\d{2}$/) || !title?.trim()) return;
-  calendarEvents.push({ date, title: title.trim(), meta: meta?.trim() || 'Personal event', color: 'coral-event' });
-  localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
-  renderCalendar(); renderUpcoming();
-});
 renderCalendar(); renderUpcoming();
+document.querySelector('#upcomingEvents')?.addEventListener('click', (event) => {
+  const edit = event.target.closest('[data-calendar-edit]');
+  const remove = event.target.closest('[data-calendar-delete]');
+  if (!edit && !remove) return;
+  const eventIndex = Number((edit || remove).dataset.calendarEdit ?? (edit || remove).dataset.calendarDelete);
+  if (!Number.isInteger(eventIndex) || !calendarEvents[eventIndex]) return;
+  if (remove) {
+    if (!confirm(`Delete “${calendarEvents[eventIndex].title}” from your calendar?`)) return;
+    calendarEvents.splice(eventIndex, 1);
+    localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+    renderCalendar(); renderUpcoming();
+    return;
+  }
+  document.dispatchEvent(new CustomEvent('mll:open-calendar-form', { detail: { editIndex: eventIndex, opener: edit } }));
+});
 document.querySelector('#calendarFilter')?.addEventListener('change', (event) => { calendarFilterState = event.target.value; renderCalendar(); renderUpcoming(); });
 
 const reviewFields = ['reviewProud', 'reviewHeavy', 'reviewPriorities', 'reviewPromise'];
@@ -1692,7 +1698,7 @@ window.addEventListener('load', () => {
   const date30 = new Date().toISOString().slice(0, 10);
   const addCalendarEvent30 = (date, title, meta = 'Personal event') => { if (!date || !title || calendarEvents.some((event) => event.date === date && event.title === title)) return; calendarEvents.push({ date, title, meta, color: 'coral-event' }); localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents)); renderCalendar(); renderUpcoming(); };
 
-  document.querySelector('#calendarDays')?.addEventListener('dblclick', (event) => { const day = event.target.closest('[data-date]'); if (!day) return; const title = prompt(`Add an event on ${day.dataset.date}:`); const meta = prompt('Category or time:'); if (title?.trim()) addCalendarEvent30(day.dataset.date, title.trim(), meta?.trim() || 'Personal event'); });
+  document.querySelector('#calendarDays')?.addEventListener('dblclick', (event) => { const day = event.target.closest('[data-date]'); if (!day) return; document.dispatchEvent(new CustomEvent('mll:open-calendar-form', { detail: { date: day.dataset.date, opener: day } })); });
   const recurringEvents30 = readNext30('recurringEvents'); const calendarActions30 = document.querySelector('#calendar .calendar-actions'); if (calendarActions30 && !document.querySelector('#addRecurringEvent30')) { const button = document.createElement('button'); button.id = 'addRecurringEvent30'; button.type = 'button'; button.className = 'small-link'; button.textContent = '＋ Repeat'; calendarActions30.append(button); button.addEventListener('click', () => { const title = prompt('What should repeat?'); const start = prompt('First date (YYYY-MM-DD):'); const frequency = prompt('Frequency: weekly or monthly?', 'monthly')?.trim().toLowerCase(); const meta = prompt('Category or note:'); if (!title?.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(start)) return; recurringEvents30.push({ title: title.trim(), start, frequency: frequency === 'weekly' ? 'weekly' : 'monthly', meta: meta?.trim() || 'Recurring event' }); localStorage.setItem('recurringEvents', JSON.stringify(recurringEvents30)); syncRecurringEvents30(); }); }
   const syncRecurringEvents30 = () => { recurringEvents30.forEach((item, index) => { for (let step = 0; step < 8; step += 1) { const day = new Date(`${item.start}T00:00:00`); if (item.frequency === 'weekly') day.setDate(day.getDate() + step * 7); else day.setMonth(day.getMonth() + step); const date = day.toISOString().slice(0, 10); addCalendarEvent30(date, `${item.title} · repeat`, item.meta); } }); }; syncRecurringEvents30();
 

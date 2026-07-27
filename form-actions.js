@@ -32,8 +32,8 @@
   }
 
   function ensureStylesheet() {
-    if (qs('link[href="form-actions.css"]')) return;
-    document.head.append(element("link", { attrs: { rel: "stylesheet", href: "form-actions.css" } }));
+    if (qs('link[href^="form-actions.css"]')) return;
+    document.head.append(element("link", { attrs: { rel: "stylesheet", href: "form-actions.css?v=27" } }));
   }
 
   function safeParse(value, fallback) {
@@ -231,6 +231,7 @@
 
   function fieldControl(field, value) {
     const wrapper = element("label", { className: "action-form-field" });
+    wrapper.dataset.fieldName = field.name;
     const label = element("span", { text: field.label });
     const id = `action-${field.name}`;
     let control;
@@ -297,6 +298,8 @@
     formOpener = opener || document.activeElement;
     heading.textContent = action.title;
     description.textContent = action.description || "Add the details below.";
+    eyebrow.textContent = action.eyebrow || "Quick add";
+    form.classList.toggle("calendar-event-form", action.kind === "calendar-event");
     submitButton.textContent = action.submitLabel || "Save";
     errorMessage.textContent = "";
     fields.replaceChildren();
@@ -369,6 +372,69 @@
       first.focus();
     }
   });
+
+  const calendarCategories = [
+    { value: "school", label: "School" },
+    { value: "work", label: "Work" },
+    { value: "personal", label: "Personal" },
+    { value: "health", label: "Health & wellness" },
+    { value: "relationship", label: "Relationship" }
+  ];
+  const calendarColors = { school: "coral-event", work: "purple-event", personal: "green-event", health: "green-event", relationship: "purple-event" };
+  const parseCalendarEvent = (item = {}) => {
+    const meta = String(item.meta || "");
+    const categoryLabel = meta.split("·")[0]?.trim().toLowerCase();
+    const category = item.category || ({ "health & wellness": "health" }[categoryLabel] || calendarCategories.find((entry) => entry.value === categoryLabel)?.value || "personal");
+    const times = meta.match(/\b\d{1,2}:\d{2}\b/g) || [];
+    return { title: item.title || "", date: item.date || dateKey, category, startTime: item.startTime || times[0] || "", endTime: item.endTime || times[1] || "", location: item.location || "", notes: item.notes || "", repeat: item.repeat || "none" };
+  };
+  const calendarDateAtStep = (date, repeat, step) => {
+    const next = new Date(`${date}T00:00:00`);
+    if (repeat === "weekly") next.setDate(next.getDate() + step * 7);
+    if (repeat === "monthly") next.setMonth(next.getMonth() + step);
+    return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
+  };
+  const createCalendarAction = ({ date = dateKey, editIndex = null } = {}) => {
+    const items = readLegacyList("calendarEvents");
+    const editing = Number.isInteger(editIndex) && items[editIndex];
+    const initial = parseCalendarEvent(editing || { date });
+    return {
+      kind: "calendar-event",
+      eyebrow: "Calendar planner",
+      title: editing ? "Edit calendar event" : "Add calendar event",
+      description: editing ? "Update the complete event record below. Changes are saved to your private timeline." : "Create a complete event record for school, work, wellbeing, relationships, or personal plans.",
+      submitLabel: editing ? "Save changes" : "Add to calendar",
+      success: editing ? "Calendar event updated." : "Calendar event added.",
+      values: initial,
+      fields: [
+        { name: "title", label: "Event title", maxlength: 240, required: true, placeholder: "e.g. Pharmacology revision session" },
+        { name: "category", label: "Category", type: "select", required: true, options: calendarCategories },
+        { name: "date", label: "Date", type: "date", required: true },
+        { name: "startTime", label: "Start time", type: "time" },
+        { name: "endTime", label: "End time", type: "time", help: "Optional" },
+        { name: "location", label: "Venue or location", maxlength: 160, placeholder: "Room, campus, online, or address" },
+        { name: "repeat", label: "Repeat", type: "select", options: [{ value: "none", label: "Does not repeat" }, { value: "weekly", label: "Weekly" }, { value: "monthly", label: "Monthly" }] },
+        { name: "notes", label: "Notes", type: "textarea", rows: 3, maxlength: 600, placeholder: "Preparation, people involved, links, or anything to remember" }
+      ],
+      validate: (values) => values.endTime && values.startTime && values.endTime <= values.startTime ? "End time must be later than the start time." : "",
+      save: (values) => {
+        const currentItems = readLegacyList("calendarEvents");
+        const categoryLabel = calendarCategories.find((entry) => entry.value === values.category)?.label || "Personal";
+        const timeLabel = values.startTime ? `${values.startTime}${values.endTime ? `–${values.endTime}` : ""}` : "All day";
+        const meta = [categoryLabel, timeLabel, values.location].filter(Boolean).join(" · ");
+        const base = { id: editing?.id || createId(), date: values.date, title: values.title.slice(0, 240), category: values.category, startTime: values.startTime || "", endTime: values.endTime || "", location: values.location.slice(0, 160), notes: values.notes.slice(0, 600), repeat: values.repeat, meta, color: calendarColors[values.category] || "coral-event" };
+        if (editing) currentItems[editIndex] = base;
+        else if (values.repeat === "none") currentItems.push(base);
+        else {
+          const recurrenceId = createId();
+          for (let step = 0; step < 8; step += 1) currentItems.push({ ...base, id: createId(), recurrenceId, date: calendarDateAtStep(values.date, values.repeat, step) });
+        }
+        localStorage.setItem("calendarEvents", JSON.stringify(currentItems));
+      }
+    };
+  };
+
+  document.addEventListener("mll:open-calendar-form", (event) => openForm(createCalendarAction(event.detail || {}), event.detail?.opener || document.activeElement));
 
   const actionDefinitions = [
     {
@@ -902,18 +968,7 @@
     },
     {
       selector: "#addCalendarEvent",
-      create: () => ({
-        title: "Add calendar event",
-        description: "Add school, work, personal, health, or relationship plans to your timeline.",
-        submitLabel: "Add event",
-        success: "Calendar event added.",
-        fields: [
-          { name: "date", label: "Date", type: "date", required: true },
-          { name: "title", label: "What is happening?", maxlength: 240, required: true },
-          { name: "meta", label: "Category or time", maxlength: 160 }
-        ],
-        save: (values) => { const items = readLegacyList("calendarEvents"); items.push({ date: values.date, title: values.title, meta: values.meta || "Personal event", color: "coral-event" }); localStorage.setItem("calendarEvents", JSON.stringify(items)); }
-      })
+      create: () => createCalendarAction()
     },
     {
       selector: "#addRoutine",

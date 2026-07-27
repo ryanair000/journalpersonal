@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-little-life-v19';
+const CACHE_NAME = 'my-little-life-v20';
 const ASSETS = [
   './', './index.html', './style.css', './mobile.css', './content.css', './analytics.css',
   './details.css', './advanced.css', './settings.css', './backup.css', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './school-overview.css', './productivity-pass.css', './auth-sync.css', './school-cloud.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css', './form-actions.css', './script.js', './form-actions.js', './productivity-pass.js', './supabase-config.js', './auth-sync.js', './school-cloud.js', './manifest.json'

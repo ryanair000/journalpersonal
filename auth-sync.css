@@ -8,7 +8,7 @@
 .mll-auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:24px 0 18px;padding:4px;border-radius:14px;background:#f8edf1}
 .mll-auth-tab{min-height:38px;border:0;border-radius:11px;background:transparent;color:#8a6f7c;font:650 12px 'DM Sans',sans-serif;cursor:pointer}
 .mll-auth-tab.active{background:#fff;color:#8d5068;box-shadow:0 4px 14px rgba(91,63,78,.08)}
-.mll-auth-form{display:grid;gap:14px}
+.mll-auth-form{display:grid;gap:14px;margin-top:24px}
 .mll-auth-field{display:grid;gap:7px;color:#5f4c55;font-size:12px;font-weight:650}
 .mll-auth-field input{width:100%;box-sizing:border-box;border:1px solid #e7d9df;border-radius:14px;background:#fff;padding:13px 14px;color:#43363c;font:500 14px 'DM Sans',sans-serif;outline:0}
 .mll-auth-field input:focus{border-color:#c8819d;box-shadow:0 0 0 4px rgba(200,129,157,.14)}

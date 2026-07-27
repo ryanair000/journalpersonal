@@ -7,6 +7,8 @@
   const AUTHENTICATED_KEY = "mll.authenticatedBefore";
   const MAX_PAYLOAD_BYTES = 4_500_000;
   const POLL_MS = 30_000;
+  const LOGIN_USERNAME = "Charry";
+  const USERNAME_LOGIN_ENDPOINT = config?.url ? `${config.url}/functions/v1/journal-username-login` : "";
   const ignoredExact = new Set([
     META_KEY,
     KEY_TIMES_KEY,
@@ -33,6 +35,18 @@
     } catch {
       return fallback;
     }
+  };
+
+  const callUsernameAuth = async (payload) => {
+    if (!USERNAME_LOGIN_ENDPOINT) throw new Error("Username login is not configured.");
+    const response = await fetch(USERNAME_LOGIN_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data?.error || "Username login is temporarily unavailable.");
+    return data;
   };
 
   const nativeSetItem = Storage.prototype.setItem;
@@ -315,13 +329,9 @@
         <span class="mll-auth-mark">✳</span>
         <p class="eyebrow">my little life</p>
         <h1 id="mllAuthTitle">Your private space, everywhere.</h1>
-        <p class="mll-auth-copy" data-mll-auth-copy>Sign in once on your phone and laptop. Your journal stays available offline and synchronizes when you reconnect.</p>
-        <div class="mll-auth-tabs" role="tablist" data-mll-auth-tabs>
-          <button class="mll-auth-tab active" type="button" data-mll-auth-mode="signin">Sign in</button>
-          <button class="mll-auth-tab" type="button" data-mll-auth-mode="signup">Create account</button>
-        </div>
+        <p class="mll-auth-copy" data-mll-auth-copy>Use your private username and password on your phone or laptop.</p>
         <form class="mll-auth-form">
-          <label class="mll-auth-field" data-mll-email-field>Email<input type="email" name="email" autocomplete="email" required placeholder="you@example.com"></label>
+          <label class="mll-auth-field" data-mll-username-field>Username<input type="text" name="username" autocomplete="username" required value="${LOGIN_USERNAME}" placeholder="Your username"></label>
           <label class="mll-auth-field">Password<input type="password" name="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></label>
           <button class="mll-auth-submit" type="submit">Sign in securely</button>
           <button class="mll-auth-secondary" type="button" data-mll-reset>Forgot password?</button>
@@ -337,23 +347,20 @@
     const password = form.elements.password;
     const title = gate.querySelector("#mllAuthTitle");
     const copy = gate.querySelector("[data-mll-auth-copy]");
-    const tabs = gate.querySelector("[data-mll-auth-tabs]");
-    const emailField = gate.querySelector("[data-mll-email-field]");
+    const usernameField = gate.querySelector("[data-mll-username-field]");
     const reset = gate.querySelector("[data-mll-reset]");
 
     const setMode = (mode) => {
       authMode = mode;
-      gate.querySelectorAll("[data-mll-auth-mode]").forEach((button) => button.classList.toggle("active", button.dataset.mllAuthMode === mode));
       const recovering = mode === "recovery";
-      tabs.hidden = recovering;
-      emailField.hidden = recovering;
+      usernameField.hidden = recovering;
       reset.hidden = recovering;
       title.textContent = recovering ? "Choose a new password." : "Your private space, everywhere.";
       copy.textContent = recovering
         ? "Make it memorable and private. Once saved, use it to sign in on your phone and laptop."
-        : "Sign in once on your phone and laptop. Your journal stays available offline and synchronizes when you reconnect.";
-      submit.textContent = recovering ? "Save new password" : mode === "signup" ? "Create my account" : "Sign in securely";
-      password.autocomplete = mode === "signup" || recovering ? "new-password" : "current-password";
+        : "Use your private username and password on your phone or laptop.";
+      submit.textContent = recovering ? "Save new password" : "Sign in securely";
+      password.autocomplete = recovering ? "new-password" : "current-password";
       password.value = "";
       message.textContent = "";
       message.className = "mll-auth-message";
@@ -361,28 +368,29 @@
     gate.showRecovery = () => setMode("recovery");
     gate.showSignIn = () => setMode("signin");
 
-    gate.querySelectorAll("[data-mll-auth-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mllAuthMode)));
-
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!client) return;
       submit.disabled = true;
-      message.textContent = authMode === "recovery" ? "Saving your new password…" : authMode === "signup" ? "Creating your private account…" : "Signing you in…";
+      message.textContent = authMode === "recovery" ? "Saving your new password…" : "Signing you in…";
       message.className = "mll-auth-message";
-      const credentials = { email: form.elements.email.value.trim(), password: password.value };
       try {
-        const result = authMode === "recovery"
-          ? await client.auth.updateUser({ password: password.value })
-          : authMode === "signup"
-            ? await client.auth.signUp({ ...credentials, options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}` } })
-            : await client.auth.signInWithPassword(credentials);
-        if (result.error) throw result.error;
         if (authMode === "recovery") {
+          const result = await client.auth.updateUser({ password: password.value });
+          if (result.error) throw result.error;
           message.textContent = "Password updated. Opening your journal…";
           await setSignedIn(session);
-        } else if (authMode === "signup" && !result.data.session) {
-          message.textContent = "Account created. Check your email to confirm it, then return here to sign in.";
         } else {
+          const authData = await callUsernameAuth({
+            action: "login",
+            username: form.elements.username.value.trim(),
+            password: password.value
+          });
+          const result = await client.auth.setSession({
+            access_token: authData.access_token,
+            refresh_token: authData.refresh_token
+          });
+          if (result.error) throw result.error;
           message.textContent = "Welcome back. Loading your journal…";
         }
       } catch (error) {
@@ -394,15 +402,23 @@
     });
 
     gate.querySelector("[data-mll-reset]").addEventListener("click", async () => {
-      const email = form.elements.email.value.trim();
-      if (!email) {
-        message.textContent = "Enter your email first, then choose Forgot password.";
+      const username = form.elements.username.value.trim();
+      if (!username) {
+        message.textContent = "Enter your username first, then choose Forgot password.";
         message.className = "mll-auth-message error";
         return;
       }
-      const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}${window.location.pathname}` });
-      message.textContent = error ? error.message : "Password-reset email sent.";
-      message.className = `mll-auth-message${error ? " error" : ""}`;
+      reset.disabled = true;
+      try {
+        const result = await callUsernameAuth({ action: "recover", username });
+        message.textContent = result.message || "If the username is correct, a reset link has been sent.";
+        message.className = "mll-auth-message";
+      } catch (error) {
+        message.textContent = error?.message || "Password recovery is temporarily unavailable.";
+        message.className = "mll-auth-message error";
+      } finally {
+        reset.disabled = false;
+      }
     });
 
     return gate;
@@ -420,7 +436,7 @@
       nativeSetItem.call(localStorage, AUTHENTICATED_KEY, "true");
       document.body.classList.remove("mll-auth-locked");
       if (gate) gate.hidden = true;
-      if (email) email.textContent = session.user.email || "Signed in";
+      if (email) email.textContent = LOGIN_USERNAME;
       if (signOut) signOut.hidden = false;
       if (syncButton) syncButton.hidden = false;
       if (passwordButton) passwordButton.hidden = false;

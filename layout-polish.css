@@ -269,3 +269,596 @@
     justify-self: end;
   }
 }
+
+/* Dashboard-wide card system for legacy sections that previously rendered flat. */
+:is(
+  .archive-entry-list > article,
+  .meal-log-grid > article,
+  .finance-detail-grid > article,
+  .study-tools-grid > article,
+  .exam-prep-list > article,
+  .pipeline-grid > article,
+  .resource-grid > article,
+  .career-grid > article,
+  .savings-grid > article,
+  .meal-history-grid > article,
+  .calendar-layout > article,
+  .review-grid > article,
+  .overview-grid > article,
+  .insights-grid > article,
+  .metric-stack > article,
+  .analytics-bottom > article,
+  .routine-grid > article,
+  .exam-layout > article,
+  .kanban-grid > article,
+  .monthly-grid > article,
+  .goal-card,
+  .vision-card,
+  .mood-history-card,
+  .custom-habits-card,
+  .search-box,
+  .due-list,
+  .capture-form,
+  .analytics-main,
+  .account-performance,
+  .data-management-card
+) {
+  border: 1px solid rgba(84, 59, 71, 0.09);
+  border-radius: 20px;
+  box-shadow: 0 10px 26px rgba(84, 59, 71, 0.05);
+}
+
+.archive-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.archive-actions input {
+  min-width: 190px;
+  padding: 9px 12px;
+  border: 1px solid rgba(84, 59, 71, 0.13);
+  border-radius: 999px;
+  background: #fff;
+  color: #513b47;
+  font: inherit;
+}
+
+.archive-entry-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.archive-entry-list > article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  min-width: 0;
+  padding: 15px 17px;
+  background: rgba(255, 252, 254, 0.92);
+}
+
+.archive-entry-date {
+  display: grid;
+  min-width: 54px;
+  min-height: 38px;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff0f3;
+  color: #a35e76;
+  font: 500 0.65rem "DM Mono", monospace;
+}
+
+.archive-entry-list > article > div {
+  min-width: 0;
+}
+
+.archive-entry-list strong,
+.archive-entry-list small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.archive-entry-list small {
+  margin-top: 4px;
+  color: #967f8b;
+  font-size: 0.73rem;
+}
+
+.archive-entry-list article > button {
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff4f6;
+  color: #806773;
+}
+
+.meal-log-grid,
+.finance-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+.meal-log-grid > article,
+.finance-detail-grid > article {
+  min-width: 0;
+  padding: 21px;
+  background: rgba(255, 252, 254, 0.92);
+}
+
+.nutrition-card,
+.budget-detail-card {
+  background: linear-gradient(145deg, #f8f2fb, #fffafc) !important;
+}
+
+.meal-log-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.meal-log-list > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(84, 59, 71, 0.07);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.meal-log-list > div > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff3f5;
+}
+
+.meal-log-list section,
+.meal-log-list strong,
+.meal-log-list small {
+  min-width: 0;
+}
+
+.meal-log-list strong,
+.meal-log-list small {
+  display: block;
+}
+
+.meal-log-list small {
+  margin-top: 3px;
+  color: #96808a;
+  font-size: 0.72rem;
+}
+
+.meal-log-list b {
+  color: #a88795;
+  font-size: 0.72rem;
+}
+
+.nutrition-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.nutrition-card textarea {
+  width: 100%;
+  min-height: 145px;
+  margin-top: 15px;
+  padding: 13px;
+  resize: vertical;
+  border: 1px solid rgba(84, 59, 71, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #513b47;
+  font: inherit;
+}
+
+.nutrition-card .detail-link {
+  align-self: flex-start;
+}
+
+.category-card {
+  display: grid;
+  gap: 9px;
+}
+
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: #765967;
+  font-size: 0.78rem;
+}
+
+.category-track {
+  height: 7px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eee6eb;
+}
+
+.category-track i {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d7869c, #c66f87);
+}
+
+.budget-detail-card {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+}
+
+.budget-detail-card > strong {
+  display: block;
+  margin: 12px 0 3px;
+  color: #513b47;
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.budget-detail-card > small,
+.budget-detail-card > p {
+  color: #927b87;
+  line-height: 1.5;
+}
+
+.budget-ring {
+  display: grid;
+  width: 92px;
+  height: 92px;
+  margin: 18px 0;
+  place-items: center;
+  border: 9px solid #efdfe6;
+  border-top-color: #ca748b;
+  border-radius: 50%;
+  background: #fff;
+  color: #765967;
+  font: 600 0.78rem "DM Mono", monospace;
+}
+
+.study-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+.study-tools-grid > article {
+  min-width: 0;
+  min-height: 255px;
+  padding: 20px;
+  background: rgba(255, 252, 254, 0.92);
+}
+
+.study-tools-grid .timer-card {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  background: linear-gradient(145deg, #f4effb, #fffafd);
+}
+
+.timer-card > strong {
+  margin: 22px 0 16px;
+  color: #513b47;
+  font: 500 2.6rem/1 "DM Mono", monospace;
+  letter-spacing: -0.06em;
+}
+
+.timer-card > div {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-card button {
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: #765967;
+  color: #fff;
+  cursor: pointer;
+}
+
+.timer-card button + button {
+  background: #fff;
+  color: #765967;
+}
+
+.timer-card > small {
+  max-width: 220px;
+  margin-top: 15px;
+  color: #927d87;
+  line-height: 1.45;
+}
+
+.schedule-entries,
+.study-session-log {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.schedule-entries > *,
+.study-session-log > * {
+  margin: 0;
+  padding: 10px 11px;
+  border-radius: 12px;
+  background: #fff7f9;
+  color: #765967;
+  font-size: 0.76rem;
+}
+
+.study-tools-grid > .study-week-card {
+  grid-column: 1 / -1;
+  min-height: 175px;
+}
+
+.exam-prep-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.exam-prep-list > article {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 1fr) auto auto;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px 16px;
+  background: rgba(255, 252, 254, 0.92);
+}
+
+.exam-prep-list > article > div:first-child,
+.exam-prep-list strong,
+.exam-prep-list small {
+  min-width: 0;
+}
+
+.exam-prep-list strong,
+.exam-prep-list small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.exam-prep-list small {
+  margin-top: 4px;
+  color: #927c86;
+  font-size: 0.72rem;
+}
+
+.prep-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eee5eb;
+}
+
+.prep-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a78bc7, #d5879c);
+}
+
+.exam-prep-list > article > b {
+  min-width: 42px;
+  color: #765967;
+  font: 500 0.72rem "DM Mono", monospace;
+  text-align: right;
+}
+
+.exam-prep-list .edit-controls {
+  margin: 0;
+}
+
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.pipeline-grid > article {
+  min-width: 0;
+  min-height: 220px;
+  padding: 15px;
+  background: rgba(255, 252, 254, 0.92);
+}
+
+.pipeline-grid > article:nth-child(2) {
+  background: #fff9ee;
+}
+
+.pipeline-grid > article:nth-child(3) {
+  background: #f7f2fc;
+}
+
+.pipeline-grid > article:nth-child(4) {
+  background: #f1f8f3;
+}
+
+.pipeline-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(84, 59, 71, 0.08);
+  color: #624d58;
+  font-size: 0.78rem;
+}
+
+.pipeline-post {
+  margin-top: 8px;
+  padding: 11px;
+  border: 1px solid rgba(84, 59, 71, 0.07);
+  border-radius: 13px;
+  background: #fff;
+}
+
+.pipeline-post strong,
+.pipeline-post small {
+  display: block;
+}
+
+.pipeline-post small {
+  margin-top: 4px;
+  color: #927d87;
+}
+
+.data-management-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(145deg, #fff8fa, #fffdfd);
+}
+
+.data-management-card > p,
+.data-management-card > div,
+.data-management-card > span:not(:empty) {
+  flex-basis: 100%;
+}
+
+.data-management-card > p {
+  margin: 0 0 4px;
+  color: #806b76;
+  line-height: 1.55;
+}
+
+.data-management-card > button {
+  padding: 8px 12px;
+  border: 1px solid rgba(84, 59, 71, 0.11);
+  border-radius: 999px;
+  background: #fff;
+  color: #765967;
+  font: inherit;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.data-management-card > #clearAllData {
+  border-color: rgba(185, 78, 104, 0.18);
+  background: #fff0f3;
+  color: #a54f68;
+}
+
+.resource-grid > article,
+.career-grid > article,
+.savings-grid > article,
+.meal-history-grid > article,
+.calendar-layout > article,
+.review-grid > article,
+.overview-grid > article,
+.insights-grid > article,
+.metric-stack > article,
+.analytics-bottom > article,
+.routine-grid > article,
+.exam-layout > article,
+.kanban-grid > article,
+.monthly-grid > article,
+.goal-card,
+.vision-card,
+.mood-history-card,
+.custom-habits-card {
+  overflow: hidden;
+}
+
+.custom-habit,
+.search-result {
+  border: 1px solid rgba(84, 59, 71, 0.08);
+  border-radius: 14px;
+}
+
+.mood-history-card,
+.custom-habits-card,
+.search-box {
+  overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+  .study-tools-grid,
+  .pipeline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meal-log-grid,
+  .finance-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .archive-actions {
+    width: 100%;
+  }
+
+  .archive-actions input {
+    width: 100%;
+  }
+
+  .archive-entry-list > article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .archive-entry-list article > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .study-tools-grid,
+  .pipeline-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .study-tools-grid > .study-week-card {
+    grid-column: auto;
+  }
+
+  .exam-prep-list > article {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .exam-prep-list .prep-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .exam-prep-list > article > b {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .exam-prep-list .edit-controls {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .meal-log-grid > article,
+  .finance-detail-grid > article,
+  .study-tools-grid > article,
+  .data-management-card {
+    padding: 16px;
+  }
+}

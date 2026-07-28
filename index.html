@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="creator-center.css" />
   <link rel="stylesheet" href="life-command.css" />
   <link rel="stylesheet" href="layout-polish.css?v=25" />
+  <link rel="stylesheet" href="focus-plan.css?v=31" />
 </head>
 <body>
   <aside class="sidebar">
@@ -178,6 +179,27 @@
     <section class="study-tools-section section" id="studyTools">
       <div class="section-title"><div><p class="eyebrow">Study tools</p><h2>Make focused time easier.</h2></div></div>
       <div class="study-tools-grid"><article class="timetable-editor-card"><div class="advanced-heading"><div><p class="eyebrow">My added timetable</p><h3>Classes, study, exams</h3></div><button class="mini-add" id="addScheduleEntry">＋</button></div><div id="scheduleEntries" class="schedule-entries"></div></article><article class="timer-card"><p class="eyebrow">Focus timer</p><strong id="studyTimerDisplay">25:00</strong><div><button id="startStudyTimer">Start</button><button id="resetStudyTimer">Reset</button></div><small>Use a focused block, then record what you learned.</small></article><article class="study-log-card"><div class="advanced-heading"><div><p class="eyebrow">Study log</p><h3>What you covered</h3></div><button class="mini-add" id="addStudyLog">＋</button></div><div id="studySessionLog" class="study-session-log"></div></article></div>
+    </section>
+
+    <section class="focus-plan-section section" id="focusPlan">
+      <div class="section-title focus-plan-title">
+        <div><p class="eyebrow">Revision + business sprint</p><h2>Your plan to the first exam.</h2></div>
+        <div class="focus-plan-title-actions"><button class="small-link" id="showTodayFocusPlan" type="button">Today</button><button class="small-link focus-plan-primary" id="addFocusPlanBlock" type="button">+ Add block</button></div>
+      </div>
+      <p class="focus-plan-intro">Every pending unit receives one focused first pass before 6 August. Attachment searches stay protected on Tuesday and Thursday, while Exampoa work is contained in short evening blocks.</p>
+      <div class="focus-plan-stats" id="focusPlanStats" aria-live="polite"></div>
+      <div class="focus-plan-methods" aria-label="How to use each focus block">
+        <article><span class="focus-plan-method-icon study">01</span><div><strong>Study block · 90 min</strong><small>15 min recall · 35 min fill gaps · 25 min questions · 15 min error log</small></div></article>
+        <article><span class="focus-plan-method-icon attachment">02</span><div><strong>Attachment search</strong><small>Shortlist · tailor applications · contact facilities · record the follow-up</small></div></article>
+        <article><span class="focus-plan-method-icon business">03</span><div><strong>Exampoa block · 60 min</strong><small>Choose one launch deliverable, finish it, then record the next action</small></div></article>
+      </div>
+      <div class="focus-plan-toolbar">
+        <label>Show<select id="focusPlanTypeFilter"><option value="all">All blocks</option><option value="study">Study</option><option value="attachment">Attachment</option><option value="business">Exampoa</option><option value="review">Mixed review</option></select></label>
+        <label>Status<select id="focusPlanStatusFilter"><option value="all">All statuses</option><option value="open">Still open</option><option value="done">Completed</option><option value="skipped">Skipped</option></select></label>
+        <label>Day<select id="focusPlanDateFilter"><option value="all">All days</option></select></label>
+      </div>
+      <div class="focus-plan-days" id="focusPlanDays"></div>
+      <p class="focus-plan-save-note" id="focusPlanSaveNote">Saved privately on this device and included in phone-laptop synchronization.</p>
     </section>
 
     <section class="exam-prep-section section" id="examPrep">
@@ -370,5 +392,6 @@
   <script src="school-cloud.js?v=29"></script>
   <script src="creator-center.js"></script>
   <script src="life-command.js"></script>
+  <script src="focus-plan.js?v=31"></script>
 </body>
 </html>

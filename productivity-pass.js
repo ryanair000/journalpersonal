@@ -57,6 +57,7 @@
   }
 
   function renderStudyPlanner() {
+    if (qs('#focusPlan')) { qs('#autoStudyPlanner')?.remove(); return; }
     const host = qs('#studyTools'); if (!host) return;
     let plan = null; try { plan = JSON.parse(localStorage.getItem('autoStudyPlan') || 'null'); } catch { plan = null; }
     const signature = getUpcomingExams().map((item) => `${item.code}:${item.date}`).join('|'); if (!plan?.blocks?.length || plan.signature !== signature) plan = buildStudyPlan();

@@ -93,8 +93,10 @@
     if (!host) return;
     const complete = documents.filter((item) => Number(item.progress) === 100).length;
     const pastPapers = documents.filter((item) => item.category === "Past paper").length;
+    const quizzes = documents.filter((item) => item.category === "Quiz").length;
     host.innerHTML = `
       <span><strong>${documents.length}</strong> uploaded</span>
+      <span><strong>${quizzes}</strong> quizzes</span>
       <span><strong>${pastPapers}</strong> past papers</span>
       <span><strong>${complete}</strong> completed</span>
       <span><strong>${filtered.length}</strong> visible</span>`;
@@ -241,7 +243,7 @@
       }
       saveArray(DOCUMENTS_KEY, documents);
       form.reset();
-      document.querySelector("#schoolFileSummary").textContent = "PDF, Word, PowerPoint, images or text · up to 20 MB each";
+      document.querySelector("#schoolFileSummary").textContent = "PDF, Word, PowerPoint, spreadsheet, image, text, CSV or JSON · up to 20 MB each";
       populateUnitCodes();
       renderDocuments();
       setDocumentStatus(`${uploaded} document${uploaded === 1 ? "" : "s"} uploaded securely.`, "success");
@@ -377,10 +379,22 @@
   }
 
   function bindEvents() {
+    const openReferenceUploader = (category) => {
+      const library = document.querySelector("#schoolDocuments");
+      const type = document.querySelector("#schoolDocumentType");
+      const files = document.querySelector("#schoolDocumentFiles");
+      if (!library || !type || !files) return;
+      type.value = category;
+      library.scrollIntoView({ behavior: "smooth", block: "start" });
+      setDocumentStatus(`${category} selected. Choose your file, add its unit code, then upload securely.`);
+      files.click();
+    };
+    document.querySelector("#uploadReferencePdf")?.addEventListener("click", () => openReferenceUploader("Reference"));
+    document.querySelector("#uploadQuizFile")?.addEventListener("click", () => openReferenceUploader("Quiz"));
     document.querySelector("#schoolDocumentForm")?.addEventListener("submit", uploadDocuments);
     document.querySelector("#schoolDocumentFiles")?.addEventListener("change", (event) => {
       const files = [...event.currentTarget.files];
-      document.querySelector("#schoolFileSummary").textContent = files.length ? `${files.length} selected · ${formatSize(files.reduce((total, file) => total + file.size, 0))} total` : "PDF, Word, PowerPoint, images or text · up to 20 MB each";
+      document.querySelector("#schoolFileSummary").textContent = files.length ? `${files.length} selected · ${formatSize(files.reduce((total, file) => total + file.size, 0))} total` : "PDF, Word, PowerPoint, spreadsheet, image, text, CSV or JSON · up to 20 MB each";
     });
     ["#schoolDocumentSearch", "#schoolDocumentTypeFilter", "#schoolDocumentProgressFilter"].forEach((selector) => document.querySelector(selector)?.addEventListener(selector.includes("Search") ? "input" : "change", renderDocuments));
     document.querySelector("#schoolDocumentList")?.addEventListener("change", (event) => {

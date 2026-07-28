@@ -1,7 +1,7 @@
-const CACHE_NAME = 'my-little-life-v28';
+const CACHE_NAME = 'my-little-life-v29';
 const ASSETS = [
   './', './index.html', './style.css', './mobile.css', './content.css', './analytics.css',
-  './details.css', './advanced.css', './settings.css', './backup.css?v=26', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './school-overview.css', './productivity-pass.css', './auth-sync.css', './school-cloud.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css?v=23', './form-actions.css?v=27', './creator-center.css', './life-command.css', './layout-polish.css?v=25', './script.js?v=28', './form-actions.js?v=28', './productivity-pass.js', './supabase-config.js', './auth-sync.js?v=20', './records-safety.js?v=26', './school-cloud.js', './creator-center.js', './life-command.js', './manifest.json'
+  './details.css', './advanced.css', './settings.css', './backup.css?v=26', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './school-overview.css', './productivity-pass.css', './auth-sync.css', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css?v=23', './form-actions.css?v=27', './creator-center.css', './life-command.css', './layout-polish.css?v=25', './script.js?v=28', './form-actions.js?v=28', './productivity-pass.js', './supabase-config.js', './auth-sync.js?v=20', './records-safety.js?v=26', './school-cloud.js?v=29', './creator-center.js', './life-command.js', './manifest.json'
 ];
 self.addEventListener('install', (event) => {
   event.waitUntil(

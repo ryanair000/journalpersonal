@@ -44,6 +44,7 @@
   <link rel="stylesheet" href="life-command.css" />
   <link rel="stylesheet" href="layout-polish.css?v=25" />
   <link rel="stylesheet" href="focus-plan.css?v=31" />
+  <link rel="stylesheet" href="business-planner.css?v=33" />
 </head>
 <body>
   <aside class="sidebar">
@@ -354,6 +355,23 @@
       <div class="work-layout"><article class="advanced-card business-card"><div class="advanced-heading"><div><p class="eyebrow">Your businesses</p><h3>Active work</h3></div><span class="unit-count">2 active</span></div><div id="businessList" class="business-list"><div><span class="business-badge coral-badge">CC</span><section><strong>Claudia Creates</strong><small>Content & social media · Since Jan 2026</small></section><b>Growing</b></div><div><span class="business-badge purple-badge">ST</span><section><strong>Student tutoring</strong><small>Education · 6 months</small></section><b>Steady</b></div></div></article><article class="advanced-card goals-card"><div class="advanced-heading"><div><p class="eyebrow">Work goals</p><h3>This month's direction</h3></div><button class="mini-add" id="addWorkGoal">＋</button></div><div id="workGoalList" class="work-goals"><label><input type="checkbox"> Post 8 pieces of content</label><label><input type="checkbox"> Earn ₵ 5,000 from work</label><label><input type="checkbox"> Create a simple portfolio</label></div></article><article class="advanced-card work-metrics"><p class="eyebrow">Work snapshot</p><div class="work-metric-row"><span>Hours this month</span><strong>42h</strong></div><div class="work-metric-row"><span>Income this month</span><strong>₵ 3,850</strong></div><div class="work-metric-row"><span>Projects completed</span><strong>06</strong></div><button class="detail-link" id="addWorkLog">＋ Log work session</button></article></div>
     </section>
 
+    <section class="business-studio section" id="businessStudio" aria-labelledby="businessStudioTitle">
+      <div class="section-title business-studio-heading"><div><p class="eyebrow">Business studio</p><h2 id="businessStudioTitle">Plan each venture properly.</h2><p class="business-studio-intro">Choose a business, then manage its goals, tasks, milestones, work sessions, performance and notes in one saved page.</p></div><button class="small-link" id="bpEditProfile" type="button">Edit business details</button></div>
+      <div class="bp-tabs" id="bpTabs" role="tablist" aria-label="Business planners"></div>
+      <article class="bp-hero" id="bpHero" aria-live="polite"></article>
+      <div class="bp-summary" id="bpSummary"></div>
+      <div class="bp-board">
+        <article class="bp-card bp-tasks-card"><div class="bp-card-heading"><div><p class="eyebrow">Action plan</p><h3>Tasks & next steps</h3></div><button type="button" class="bp-action" data-bp-action="task">＋ Add task</button></div><div class="bp-filter-row"><button type="button" class="is-active" data-bp-task-filter="all">All</button><button type="button" data-bp-task-filter="open">Open</button><button type="button" data-bp-task-filter="done">Done</button></div><div class="bp-list" id="bpTaskList"></div></article>
+        <article class="bp-card"><div class="bp-card-heading"><div><p class="eyebrow">Direction</p><h3>Goals & milestones</h3></div><button type="button" class="bp-action" data-bp-action="goal">＋ Add goal</button></div><div class="bp-list" id="bpGoalList"></div></article>
+        <article class="bp-card"><div class="bp-card-heading"><div><p class="eyebrow">Time invested</p><h3>Work sessions</h3></div><button type="button" class="bp-action" data-bp-action="session">＋ Log session</button></div><div class="bp-list" id="bpSessionList"></div></article>
+        <article class="bp-card"><div class="bp-card-heading"><div><p class="eyebrow">Performance</p><h3>Metrics that matter</h3></div><button type="button" class="bp-action" data-bp-action="kpi">＋ Add metric</button></div><div class="bp-list" id="bpKpiList"></div></article>
+        <article class="bp-card bp-notes-card"><div class="bp-card-heading"><div><p class="eyebrow">Thinking space</p><h3>Ideas & working notes</h3></div><span class="bp-save-state" id="bpNoteState">Saved</span></div><textarea id="bpNotes" rows="7" maxlength="5000" placeholder="Ideas, research, decisions, links, launch thoughts, lessons..."></textarea><button type="button" class="bp-action bp-save-notes" id="bpSaveNotes">Save notes</button></article>
+        <article class="bp-card bp-week-card"><div class="bp-card-heading"><div><p class="eyebrow">This week</p><h3>Protect your work time</h3></div><button type="button" class="bp-action" id="bpSetCapacity">Set capacity</button></div><div class="bp-capacity" id="bpCapacity"></div><p class="bp-card-note">Your study plan stays the priority; use these hours for focused business blocks around it.</p></article>
+      </div>
+    </section>
+
+    <dialog class="bp-dialog" id="bpDialog" aria-labelledby="bpDialogTitle"><form method="dialog" class="bp-dialog-card" id="bpForm"><div class="bp-dialog-heading"><div><p class="eyebrow" id="bpDialogEyebrow">Business planner</p><h2 id="bpDialogTitle">Add item</h2><p id="bpDialogDescription"></p></div><button type="button" class="bp-dialog-close" id="bpDialogClose" aria-label="Close">×</button></div><div class="bp-form-fields" id="bpFormFields"></div><p class="bp-form-error" id="bpFormError" role="alert"></p><div class="bp-dialog-actions"><button type="button" class="bp-cancel" id="bpDialogCancel">Cancel</button><button type="submit" class="bp-submit" id="bpDialogSubmit">Save</button></div></form></dialog>
+
     <section class="advanced-section section" id="peopleHub">
       <div class="section-title"><div><p class="eyebrow">People in your life</p><h2>Care for your circle.</h2></div><button class="small-link" id="addPerson">＋ Add person</button></div>
       <div class="people-layout"><article class="advanced-card people-card"><div class="people-tabs"><button class="people-tab active">Family</button><button class="people-tab">Friends</button><button class="people-tab">Relationships</button></div><div id="peopleList" class="people-list"><div><span class="person-avatar peach">M</span><section><strong>Mum</strong><small>Last checked in: Today</small></section><button>Message →</button></div><div><span class="person-avatar lavender">A</span><section><strong>Aisha</strong><small>Last checked in: 3 days ago</small></section><button>Plan a catch-up →</button></div><div><span class="person-avatar sage">♡</span><section><strong>My relationship space</strong><small>Boundaries, needs, and hopes</small></section><button>Reflect →</button></div></div></article><article class="advanced-card connection-card"><p class="eyebrow">Connection check-in</p><h3>How do your relationships feel?</h3><div class="connection-scale"><button>🌱<small>Healthy</small></button><button>☁<small>Needs care</small></button><button>♡<small>Feeling loved</small></button><button>↺<small>Need space</small></button></div><textarea id="peopleNote" placeholder="A note about your people, boundaries, or what you need..."></textarea><button class="detail-link" id="savePeopleNote">Save private reflection →</button></article></div>
@@ -411,5 +429,6 @@
   <script src="creator-center.js"></script>
   <script src="life-command.js"></script>
   <script src="focus-plan.js?v=32"></script>
+  <script src="business-planner.js?v=33"></script>
 </body>
 </html>

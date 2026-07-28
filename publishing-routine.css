@@ -114,7 +114,7 @@
 .dpr-workflow span { display: grid; grid-template-columns: 25px minmax(0, 1fr); gap: 7px; }
 .dpr-workflow b { color: #aa6c85; font: 600 9px "DM Mono", monospace; }
 
-.dpr-routine-tabs { display: flex; gap: 6px; margin-top: 15px; padding-bottom: 4px; overflow-x: auto; scrollbar-width: none; }
+.dpr-routine-tabs { display: flex; flex-direction: row; gap: 6px; margin-top: 15px; padding-bottom: 4px; overflow-x: auto; scrollbar-width: none; }
 .dpr-routine-tabs::-webkit-scrollbar { display: none; }
 .dpr-routine-tabs button { flex: 0 0 auto; min-height: 35px; padding: 7px 10px; border: 1px solid rgba(181, 125, 151, .16); border-radius: 99px; background: #fbf6f8; color: #7d6a74; font-size: 9.5px; font-weight: 700; white-space: nowrap; }
 .dpr-routine-tabs button.active { background: #c86e8f; color: #fff; }

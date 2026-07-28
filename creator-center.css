@@ -115,9 +115,12 @@
 .creator-tab-list {
   min-width: 0;
   overflow-x: auto;
+  flex-direction: row;
   flex-wrap: nowrap;
   scrollbar-width: none;
 }
+
+.creator-toolbar > .creator-primary { align-self: center; }
 
 .creator-tab-list::-webkit-scrollbar { display: none; }
 

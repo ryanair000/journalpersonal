@@ -1,0 +1,224 @@
+/* Final alignment layer: keep every card readable without flattening intentional scrollers. */
+html,
+body {
+  max-width: 100%;
+}
+
+.dashboard,
+.dashboard > *,
+.section,
+.section > *,
+.advanced-card,
+.detail-card,
+.module-card,
+.creator-card,
+.bp-card,
+.epc-card,
+.form-action-card,
+.modal-card,
+.settings-card {
+  min-width: 0;
+}
+
+.section-title,
+.advanced-heading,
+.school-cloud-heading,
+.attachment-application-heading,
+.unit-resource-center-heading,
+.unit-saved-resource-heading,
+.creator-panel-heading,
+.epc-panel-heading {
+  flex-wrap: wrap;
+}
+
+.section-title > :first-child,
+.advanced-heading > :first-child,
+.school-cloud-heading > :first-child,
+.attachment-application-heading > :first-child,
+.creator-panel-heading > :first-child,
+.epc-panel-heading > :first-child {
+  min-width: 0;
+}
+
+.section-title h2,
+.advanced-heading h3,
+.school-cloud-heading h3,
+.attachment-application-heading h3,
+.creator-panel-heading h3,
+.epc-panel-heading h3 {
+  overflow-wrap: anywhere;
+}
+
+.tracker-grid > *,
+.life-grid > *,
+.content-grid > *,
+.details-grid > *,
+.school-layout > *,
+.work-layout > *,
+.people-layout > *,
+.calendar-layout > *,
+.business-kpi-grid > *,
+.creator-account-grid > *,
+.dpr-main-grid > *,
+.epc-summary > *,
+.epc-focus > *,
+.epc-resource-list > * {
+  min-width: 0;
+}
+
+.business-list,
+.business-list > div,
+.business-list section {
+  min-width: 0;
+}
+
+.business-list strong,
+.business-list small {
+  overflow-wrap: anywhere;
+}
+
+.school-document-copy strong,
+.unit-saved-resource-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.savings-contribution-card,
+.savings-pace30c {
+  display: grid;
+  gap: 7px;
+}
+
+.savings-contribution-card > strong,
+.savings-pace30c > strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.savings-contribution-card > small {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  margin-top: 0 !important;
+}
+
+.savings-contribution-card .detail-link {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.creator-account-list,
+.creator-tab-list,
+.dpr-routine-tabs,
+.bp-tabs,
+.epc-tabs,
+.people-tabs,
+.people-filter-tabs {
+  flex-direction: row;
+}
+
+.creator-account-list,
+.creator-tab-list,
+.dpr-routine-tabs,
+.bp-tabs,
+.epc-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.creator-account-switch,
+.creator-tab,
+.dpr-routine-tab,
+.bp-tab,
+.epc-tab {
+  flex: 0 0 auto;
+}
+
+.form-action-card input,
+.form-action-card select,
+.form-action-card textarea,
+.school-upload-form input,
+.school-upload-form select,
+.attachment-form input,
+.attachment-form select,
+.attachment-form textarea,
+.unit-resource-form input,
+.unit-resource-form select,
+.unit-resource-form textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 720px) {
+  .section-title {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .section-title > button,
+  .section-title > a,
+  .section-title > .inline-actions,
+  .section-title > .calendar-actions,
+  .section-title > .vision-actions {
+    flex: 0 1 auto;
+  }
+
+  .school-document-row,
+  .unit-saved-resource-row,
+  .attachment-application-row {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .school-document-copy strong,
+  .unit-saved-resource-copy strong {
+    line-height: 1.45;
+  }
+
+  .school-document-actions,
+  .unit-resource-folder-actions,
+  .attachment-row-actions,
+  .creator-post-actions,
+  .epc-post-actions {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .suite-dialog-card,
+  .growth-dialog-card,
+  .creator-dialog-card,
+  .epc-dialog-card,
+  .form-action-card,
+  .settings-card,
+  .modal-card {
+    width: min(100%, calc(100vw - 28px));
+    max-width: calc(100vw - 28px);
+    overflow-x: hidden;
+  }
+
+  .savings-contribution-card > small {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+  .section-title > .inline-actions,
+  .section-title > .calendar-actions,
+  .section-title > .vision-actions {
+    width: 100%;
+  }
+
+  .section-title > .inline-actions > *,
+  .section-title > .calendar-actions > *,
+  .section-title > .vision-actions > * {
+    max-width: 100%;
+  }
+}

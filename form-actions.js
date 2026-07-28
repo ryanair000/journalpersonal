@@ -138,7 +138,7 @@
     mergeLegacyList("contentAccounts", state.lists.accounts, (item) => ({ platform: item.platform, username: item.username, followers: item.followers }), (item) => `${item.platform}|${item.username}`);
     mergeLegacyList("customUnits", state.lists.units, (item) => ({ code: item.code, name: item.name, lecturer: item.lecturer, year: item.year }), (item) => `${item.code}|${item.name}`);
     mergeLegacyList("schoolStudyItems", state.lists.study, (item) => ({ value: item.title, meta: item.meta || "New session", icon: "◒" }), (item) => `${item.value}|${item.meta}`);
-    mergeLegacyList("schoolResearchItems", state.lists.research, (item) => ({ value: item.title, meta: item.meta || "New reference", icon: "NOTE" }), (item) => `${item.value}|${item.meta}`);
+    mergeLegacyList("schoolResearchItems", state.lists.research, (item) => ({ value: item.title, meta: item.meta || "New reference", icon: item.type || "NOTE" }), (item) => `${item.value}|${item.meta}`);
     mergeLegacyList("classEntries", state.lists.classes, (item) => ({ day: item.day, time: item.time, subject: item.subject }), (item) => `${item.day}|${item.time}|${item.subject}`);
     mergeLegacyList("personalBusinesses", state.lists.businesses, (item) => ({ name: item.name, type: item.detail, duration: "" }), (item) => item.name);
     mergeLegacyList("workGoals", state.lists.workGoals, (item) => ({ title: item.text, done: Boolean(item.done) }), (item) => item.title);
@@ -606,15 +606,21 @@
     {
       selector: "#addResearch",
       create: () => ({
-        title: "Add research resource",
-        description: "Save a paper, link, note, or research question.",
-        submitLabel: "Add resource",
-        success: "Research resource added.",
+        title: "Add reference note",
+        description: "Keep the source and your own thinking together so the reference remains useful when you revise or write.",
+        submitLabel: "Save reference note",
+        success: "Reference note saved.",
         fields: [
-          { name: "type", label: "Type", type: "select", required: true, options: ["PDF", "LINK", "NOTE"], value: "NOTE" },
-          { name: "title", label: "Title or question", type: "textarea", rows: 3, maxlength: 300, required: true }
+          { name: "type", label: "Reference type", type: "select", required: true, options: ["NOTE", "PDF", "LINK", "BOOK", "ARTICLE"], value: "NOTE" },
+          { name: "title", label: "Title, topic, or research question", maxlength: 300, required: true, placeholder: "e.g. Adverse drug reaction reporting" },
+          { name: "unit", label: "Unit or course", maxlength: 120, placeholder: "e.g. PBCU001 Research Methods" },
+          { name: "source", label: "Source, author, or link", maxlength: 500, placeholder: "Author, textbook, journal, or optional URL" },
+          { name: "notes", label: "Your reference notes", type: "textarea", rows: 6, maxlength: 3000, placeholder: "Key ideas, definitions, quotations to revisit, questions, or how this source supports your work" }
         ],
-        save: (values, state) => state.lists.research.push({ id: createId(), type: values.type.slice(0, 10).toUpperCase(), title: values.title.slice(0, 300), meta: "New reference" })
+        save: (values, state) => {
+          const details = [values.unit, values.source, values.notes].filter(Boolean).join(" · ");
+          state.lists.research.push({ id: createId(), type: values.type.slice(0, 10).toUpperCase(), title: values.title.slice(0, 300), unit: values.unit.slice(0, 120), source: values.source.slice(0, 500), notes: values.notes.slice(0, 3000), meta: details || "Reference note" });
+        }
       })
     },
     {

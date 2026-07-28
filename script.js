@@ -1159,7 +1159,7 @@ window.addEventListener('load', () => {
   const customUnits = readList('customUnits');
   customUnits.forEach((unit) => appendHtml('#unitList', `<div class="saved-custom-row"><span>${escapeText(unit.code)}</span><strong>${escapeText(unit.name)}</strong><small>${escapeText(unit.lecturer)} · ${escapeText(unit.year)}</small></div>`));
   readList('schoolStudyItems').forEach((item) => appendHtml('#studyList', `<div class="saved-custom-row"><span>${escapeText(item.icon || '◒')}</span><strong>${escapeText(item.value)}</strong><small>${escapeText(item.meta)}</small></div>`));
-  readList('schoolResearchItems').forEach((item) => appendHtml('#researchList', `<p class="saved-custom-row"><span>NOTE</span> ${escapeText(item.value)} <small>${escapeText(item.meta)}</small></p>`));
+  readList('schoolResearchItems').forEach((item) => appendHtml('#researchList', `<p class="saved-custom-row"><span>${escapeText(item.icon || item.type || 'NOTE')}</span> ${escapeText(item.value)} <small>${escapeText(item.meta)}</small></p>`));
   const savedProject = JSON.parse(localStorage.getItem('schoolProjectDetails') || 'null');
   if (savedProject) { const title = document.querySelector('#projectTitle'); const notes = document.querySelector('#projectNotes'); if (title) title.textContent = savedProject.title; if (notes) notes.textContent = savedProject.next; }
   const classEntries = readList('classEntries');

@@ -8,6 +8,7 @@
   const MAX_PAYLOAD_BYTES = 4_500_000;
   const POLL_MS = 30_000;
   const LOGIN_USERNAME = "Charry";
+  const LOCAL_TEST_MODE = ["127.0.0.1", "localhost"].includes(window.location.hostname) && new URLSearchParams(window.location.search).has("mllTest");
   const USERNAME_LOGIN_ENDPOINT = config?.url ? `${config.url}/functions/v1/journal-username-login` : "";
   const ignoredExact = new Set([
     META_KEY,
@@ -156,6 +157,17 @@
     return [...keys].every((key) => (first.values[key] ?? null) === (second.values[key] ?? null) && (first.keyUpdatedAt[key] || "") === (second.keyUpdatedAt[key] || ""));
   };
 
+  const changedSnapshotKeys = (before, after) => {
+    const first = normalizeSnapshot(before);
+    const second = normalizeSnapshot(after);
+    const keys = new Set([...Object.keys(first.values), ...Object.keys(second.values), ...Object.keys(first.keyUpdatedAt), ...Object.keys(second.keyUpdatedAt)]);
+    return [...keys].filter((key) => (first.values[key] ?? null) !== (second.values[key] ?? null) || (first.keyUpdatedAt[key] || "") !== (second.keyUpdatedAt[key] || ""));
+  };
+
+  const notifyDataChanged = (keys, source = "cloud") => {
+    window.dispatchEvent(new CustomEvent("mll:data-changed", { detail: { keys, source } }));
+  };
+
   const clearSyncableLocal = () => {
     const keys = [];
     for (let index = 0; index < localStorage.length; index += 1) {
@@ -245,7 +257,7 @@
       if (!data) {
         await pushSnapshot(local);
         if (!quiet) showCloudAlert("Your journal is now connected to cloud sync.");
-        if (accountChanged) window.setTimeout(() => window.location.reload(), 700);
+        if (accountChanged) notifyDataChanged(Object.keys(local.values));
         return;
       }
 
@@ -263,8 +275,8 @@
       }
 
       if (remoteChanges) {
-        showCloudAlert("Newer changes were received from another device. Refreshing your dashboard…");
-        window.setTimeout(() => window.location.reload(), 700);
+        showCloudAlert("Newer changes were received from another device. Your dashboard was updated quietly.");
+        notifyDataChanged(changedSnapshotKeys(local, merged));
       } else if (!quiet) {
         showCloudAlert("Everything is up to date.");
       }
@@ -465,6 +477,11 @@
 
   const start = async () => {
     createAccountCard();
+    if (LOCAL_TEST_MODE) {
+      document.body.classList.remove("mll-auth-locked");
+      updateAccountCard("local", "Local test mode. Cloud login is not used.");
+      return;
+    }
     createAuthGate();
 
     if (!config?.url || !config?.publishableKey || !window.supabase?.createClient) {

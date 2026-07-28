@@ -322,6 +322,47 @@
     return values;
   }
 
+  const actionDataKeys = {
+    addTask: [STORAGE_KEY],
+    addContent: [STORAGE_KEY, "contentIdeas"], overviewIdea: [STORAGE_KEY, "contentIdeas"], addDraft: [STORAGE_KEY, "contentIdeas"],
+    updateAnalytics: [STORAGE_KEY, "contentAnalytics", "analyticsHistory"], addAccount: [STORAGE_KEY, "contentAccounts"],
+    addPlanner: [STORAGE_KEY], addExpense: [STORAGE_KEY, "weeklyExpenses"], overviewExpense: [STORAGE_KEY, "weeklyExpenses"],
+    addSocial: [STORAGE_KEY], addSocialLink: [STORAGE_KEY], addMemory: [STORAGE_KEY, "savedMemory"], overviewMemory: [STORAGE_KEY, "savedMemory"],
+    addUnit: [STORAGE_KEY, "customUnits"], addStudy: [STORAGE_KEY, "schoolStudyItems"], addReading: [STORAGE_KEY, "schoolStudyItems"],
+    addResearch: [STORAGE_KEY, "schoolResearchItems"], addProject: [STORAGE_KEY, "schoolProjectDetails"], addClass: [STORAGE_KEY, "classEntries"],
+    addBusiness: [STORAGE_KEY, "personalBusinesses"], addWorkGoal: [STORAGE_KEY, "workGoals"], addWorkLog: [STORAGE_KEY, "workLogEntries"],
+    addResource: ["pharmacyResources"], addExam: ["examEntries"], addExamPrep: ["examPrepItems"], addBusinessKpi: ["businessKpis"],
+    addCareerTask: ["careerTasks"], addCustomHabit: ["customHabits"], addVisionCard: ["visionItems"], addArchiveEntry: ["archiveEntries"],
+    addMealLog: ["mealLogs"], addCategorizedExpense: ["categoryExpenses", "expenseLedger", "weeklyExpenses"], addScheduleEntry: ["scheduleEntries"],
+    addStudyLog: ["studySessions"], addPipelinePost: ["pipelinePosts"], addSavingsGoal: ["savingsGoals"], addDueItem: ["dueItems"],
+    addCalendarEvent: ["calendarEvents"], addRoutine: ["routines"], addBoardProject: ["boardProjects"], addPerson: [STORAGE_KEY, "peopleDirectory"],
+    addMentalNoteThirty: ["mentalHealthNotes"]
+  };
+
+  function savedActionDetail(action, opener, values) {
+    const triggerId = opener?.id || "";
+    const keys = new Set(actionDataKeys[triggerId] || []);
+    if (action.kind === "calendar-event") keys.add("calendarEvents");
+    if (opener?.matches?.(".log-pill")) keys.add(STORAGE_KEY);
+    if (opener?.matches?.("[data-exam-next30b]")) {
+      keys.add("examNextActions");
+      keys.add("examActionPlans");
+    }
+    if (opener?.matches?.("[data-tool]")) {
+      keys.add(STORAGE_KEY);
+      keys.add("relationshipItems");
+    }
+    return {
+      source: "form",
+      keys: [...keys],
+      triggerId,
+      logType: opener?.dataset?.log || "",
+      toolType: opener?.dataset?.tool || "",
+      examUnit: opener?.dataset?.examUnit30b || "",
+      values
+    };
+  }
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     if (!activeAction) return;
@@ -335,12 +376,16 @@
     }
 
     try {
+      const completedAction = activeAction;
+      const completedOpener = formOpener;
       const state = loadState();
-      activeAction.save(values, state);
+      completedAction.save(values, state);
       storeState(state);
-      sessionStorage.setItem(NOTICE_KEY, activeAction.success || "Saved locally.");
+      const success = completedAction.success || "Saved locally.";
+      const detail = savedActionDetail(completedAction, completedOpener, values);
       closeForm();
-      globalThis.location.reload();
+      showToast(success);
+      window.dispatchEvent(new CustomEvent("mll:data-changed", { detail }));
     } catch (error) {
       console.error("Unable to save form data.", error);
       errorMessage.textContent = "This item could not be saved. Please try again.";
@@ -914,7 +959,7 @@
           { name: "amount", label: "Amount (KSh)", type: "number", min: 0.01, max: 100000000, step: 0.01, required: true },
           { name: "note", label: "What was it for?", maxlength: 240 }
         ],
-        validate: (values) => Number.isFinite(Number(values.amount)) && Number(values.amount) > 0 ? "Enter a positive amount." : "",
+        validate: (values) => Number.isFinite(Number(values.amount)) && Number(values.amount) > 0 ? "" : "Enter a positive amount.",
         save: (values) => {
           const amount = Number(values.amount);
           const categories = { food: 0, transport: 0, school: 0, personal: 0, other: 0 };

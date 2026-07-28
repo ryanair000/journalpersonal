@@ -306,6 +306,25 @@
     return field;
   }
 
+  function presentDialog(dialog, focusSelector) {
+    if (!dialog) return false;
+    const ensureOpen = () => {
+      if (dialog.open) return true;
+      try {
+        dialog.showModal();
+        dialog.classList.remove("epc-dialog-fallback");
+      } catch (error) {
+        dialog.setAttribute("open", "");
+        dialog.classList.add("epc-dialog-fallback");
+      }
+      return dialog.open;
+    };
+    ensureOpen();
+    window.setTimeout(ensureOpen, 80);
+    window.requestAnimationFrame(() => dialog.querySelector(focusSelector)?.focus({ preventScroll: true }));
+    return dialog.open;
+  }
+
   function openPost(id) {
     const post = byId.get(id);
     if (!post) return;
@@ -402,7 +421,7 @@
     noteField.append(textarea);
     notes.append(noteField);
     body.append(overview, scriptSection, tasks, analytics, notes);
-    qs("#epcPostDialog").showModal();
+    presentDialog(qs("#epcPostDialog"), "[data-epc-close='post']");
   }
 
   function savePost(event) {
@@ -464,7 +483,7 @@
     });
     taskSection.append(checklist);
     fields.append(taskSection);
-    qs("#epcResourceDialog").showModal();
+    presentDialog(qs("#epcResourceDialog"), "[data-epc-close='resource']");
   }
 
   function saveResource(event) {
@@ -599,7 +618,7 @@
         card.append(heading, node("p", "", section.note), node("small", "", section.coverage));
         return card;
       }));
-      qs("#epcGuideDialog").showModal();
+      presentDialog(qs("#epcGuideDialog"), "[data-epc-close='guide']");
       return;
     }
     body.replaceChildren(...rows.filter((row) => row.some((value) => value !== "" && value !== null)).map((row) => {
@@ -624,7 +643,7 @@
       });
       body.append(sourceCard);
     }
-    qs("#epcGuideDialog").showModal();
+    presentDialog(qs("#epcGuideDialog"), "[data-epc-close='guide']");
   }
 
   function showView(view) {
@@ -638,7 +657,9 @@
   function closeDialog(name) {
     const dialog = ({ post: "#epcPostDialog", resource: "#epcResourceDialog", guide: "#epcGuideDialog" })[name];
     const element = qs(dialog);
-    if (element?.open) element.close();
+    if (!element?.open) return;
+    try { element.close(); } catch (error) { element.removeAttribute("open"); }
+    element.classList.remove("epc-dialog-fallback");
   }
 
   function renderAll() {
@@ -666,7 +687,12 @@
     const target = event.target.closest("button, [data-epc-open-post]");
     if (!target) return;
     if (target.dataset.epcView) showView(target.dataset.epcView);
-    if (target.dataset.epcOpenPost) openPost(target.dataset.epcOpenPost);
+    if (target.dataset.epcOpenPost) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openPost(target.dataset.epcOpenPost);
+      return;
+    }
     if (target.dataset.epcClose) closeDialog(target.dataset.epcClose);
     if (target.dataset.epcEditResource) openResource(target.dataset.epcEditResource);
     if (target.dataset.epcRemoveResource) {

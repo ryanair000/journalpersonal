@@ -761,6 +761,39 @@
       })
     },
     {
+      selector: "[data-exam-next30b]",
+      create: (trigger) => {
+        const unit = trigger.dataset.examUnit30b || trigger.closest("article")?.querySelector("strong")?.textContent?.trim() || "This exam";
+        const savedActions = safeParse(localStorage.getItem("examNextActions"), {});
+        const savedPlans = safeParse(localStorage.getItem("examActionPlans"), {});
+        const current = savedPlans[unit] || {};
+        return {
+          title: "Plan the next exam-prep action",
+          description: `Choose one clear, realistic next step for ${unit}.`,
+          submitLabel: "Save next action",
+          success: `Next action saved for ${unit}.`,
+          fields: [
+            { name: "action", label: "Next action", type: "textarea", rows: 4, maxlength: 500, required: true, placeholder: "e.g. Complete 30 autonomic pharmacology questions and review every mistake" },
+            { name: "method", label: "Study method", type: "select", options: ["Reading", "Past papers", "Practice questions", "Summaries", "Flashcards", "Recall session", "Group study", "Other"], value: current.method || "Reading" },
+            { name: "targetDate", label: "Target date", type: "date" },
+            { name: "duration", label: "Planned minutes", type: "number", min: 5, max: 600, step: 5, value: current.duration || 45 },
+            { name: "priority", label: "Priority", type: "select", options: ["High", "Medium", "Low"], value: current.priority || "Medium" },
+            { name: "notes", label: "Preparation notes", type: "textarea", rows: 3, maxlength: 800, placeholder: "Topics, materials, question range, or anything needed before starting" }
+          ],
+          values: { action: current.action || savedActions[unit] || "", method: current.method || "Reading", targetDate: current.targetDate || "", duration: current.duration || 45, priority: current.priority || "Medium", notes: current.notes || "" },
+          validate: (values) => Number(values.duration) >= 5 && Number(values.duration) <= 600 ? "" : "Planned time must be between 5 and 600 minutes.",
+          save: (values) => {
+            const actions = safeParse(localStorage.getItem("examNextActions"), {});
+            const plans = safeParse(localStorage.getItem("examActionPlans"), {});
+            actions[unit] = values.action.slice(0, 500);
+            plans[unit] = { action: values.action.slice(0, 500), method: values.method, targetDate: values.targetDate || "", duration: Number(values.duration), priority: values.priority, notes: values.notes.slice(0, 800), updatedAt: new Date().toISOString() };
+            localStorage.setItem("examNextActions", JSON.stringify(actions));
+            localStorage.setItem("examActionPlans", JSON.stringify(plans));
+          }
+        };
+      }
+    },
+    {
       selector: "#addBusinessKpi",
       create: () => ({
         title: "Add business KPI",

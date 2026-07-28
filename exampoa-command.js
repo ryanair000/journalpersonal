@@ -49,6 +49,15 @@
   let editingResourceId = null;
   let removeResourceId = null;
 
+  function starterResources() {
+    return (source.resourceBacklog || []).map((item) => ({
+      ...item,
+      tasks: Array(8).fill(false),
+      createdAt: "2026-07-28T00:00:00.000Z",
+      updatedAt: "2026-07-28T00:00:00.000Z"
+    }));
+  }
+
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -56,10 +65,14 @@
         saved.posts = saved.posts && typeof saved.posts === "object" ? saved.posts : {};
         saved.resources = Array.isArray(saved.resources) ? saved.resources : [];
         saved.reviews = saved.reviews && typeof saved.reviews === "object" ? saved.reviews : {};
+        if (Number(saved.version || 1) < 2) {
+          if (!saved.resources.length) saved.resources = starterResources();
+          saved.version = 2;
+        }
         return saved;
       }
     } catch { /* start safely below */ }
-    return { version: 1, posts: {}, resources: [], reviews: {} };
+    return { version: 2, posts: {}, resources: starterResources(), reviews: {} };
   }
 
   let state = loadState();
@@ -570,13 +583,25 @@
   }
 
   function openGuide(type) {
+    const isWorkbook = type === "workbook";
     const isStrategy = type === "strategy";
     const rows = isStrategy ? source.launchStrategy : source.platformPlaybooks;
-    qs("#epcGuideEyebrow").textContent = isStrategy ? "Imported launch strategy" : "Imported production standards";
-    qs("#epcGuideTitle").textContent = isStrategy ? "ExamPoa demo-first launch strategy" : "Platform playbooks & production standards";
-    qs("#epcGuideIntro").textContent = isStrategy ? "The campaign direction, pillar balance, platform roles and publishing rules from your workbook." : "The exact platform formats, creative rules, recording checklist and website destinations from your workbook.";
+    qs("#epcGuideEyebrow").textContent = isWorkbook ? "Complete workbook import" : isStrategy ? "Imported launch strategy" : "Imported production standards";
+    qs("#epcGuideTitle").textContent = isWorkbook ? "Everything carried into your dashboard" : isStrategy ? "ExamPoa demo-first launch strategy" : "Platform playbooks & production standards";
+    qs("#epcGuideIntro").textContent = isWorkbook ? "All six workbook sections are stored here. The calendar and scripts match every source field, and every destination link is preserved." : isStrategy ? "The campaign direction, pillar balance, platform roles and publishing rules from your workbook." : "The exact platform formats, creative rules, recording checklist and website destinations from your workbook.";
     const body = qs("#epcGuideBody");
     body.className = "epc-guide-grid";
+    if (isWorkbook) {
+      body.replaceChildren(...(source.workbookSections || []).map((section) => {
+        const card = node("article", "epc-guide-row epc-workbook-section");
+        const heading = node("div", "epc-workbook-section-head");
+        heading.append(node("strong", "", section.title), node("span", "", section.sheet));
+        card.append(heading, node("p", "", section.note), node("small", "", section.coverage));
+        return card;
+      }));
+      qs("#epcGuideDialog").showModal();
+      return;
+    }
     body.replaceChildren(...rows.filter((row) => row.some((value) => value !== "" && value !== null)).map((row) => {
       const card = node("article", "epc-guide-row");
       const values = row.filter((value) => value !== "" && value !== null);
@@ -673,6 +698,7 @@
   qs("#epcPostForm")?.addEventListener("submit", savePost);
   qs("#epcResourceForm")?.addEventListener("submit", saveResource);
   qs("#epcAddResource")?.addEventListener("click", () => openResource());
+  qs("#epcOpenWorkbook")?.addEventListener("click", () => openGuide("workbook"));
   qs("#epcOpenStrategy")?.addEventListener("click", () => openGuide("strategy"));
   qs("#epcOpenPlaybooks")?.addEventListener("click", () => openGuide("playbooks"));
   qsa(".epc-dialog").forEach((dialog) => dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); }));

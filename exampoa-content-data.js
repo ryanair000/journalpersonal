@@ -11,6 +11,148 @@ window.EXAMPOA_CONTENT_SOURCE = {
     "totalPosts": 40,
     "postsPerPlatform": 10
   },
+  "workbookSections": [
+    {
+      "sheet": "Launch Strategy",
+      "title": "ExamPoa 30-Day Demo-First Launch Strategy",
+      "note": "Campaign period: 28 July–26 August 2026 (Africa/Nairobi). Forty posts: exactly ten each for Instagram, Facebook, TikTok and WhatsApp.",
+      "coverage": "Campaign direction, content pillars, platform roles, publishing rules and source links"
+    },
+    {
+      "sheet": "30-Day Calendar",
+      "title": "30-Day Publishing Calendar",
+      "note": "Every day has at least one post. Times are recommended starting points in East Africa Time; adjust after the first 7 days using actual performance.",
+      "coverage": "40 posts across 30 days, with exact dates, EAT times, platforms, audiences, hooks, CTAs, destinations and KPIs"
+    },
+    {
+      "sheet": "Scripts & Shot Lists",
+      "title": "Ready-to-Record Scripts & Shot Lists",
+      "note": "Use these as production briefs. Keep delivery natural; do not read captions word-for-word if that sounds forced.",
+      "coverage": "40 complete production briefs with scenes, captions, on-screen text, CTAs and asset checklists"
+    },
+    {
+      "sheet": "Platform Playbooks",
+      "title": "Platform Playbooks & Production Standards",
+      "note": "Use this sheet before recording, approving or scheduling any post.",
+      "coverage": "Instagram, Facebook, TikTok and WhatsApp format rules, quality checks and publishing standards"
+    },
+    {
+      "sheet": "KPI Tracker",
+      "title": "Performance Tracker",
+      "note": "Enter results 48–72 hours after publishing. Compare each platform against its own baseline; do not judge every format by the same metric.",
+      "coverage": "Per-post reach, views, engagement, clicks, sign-ups, purchases and learning notes"
+    },
+    {
+      "sheet": "Weekly Review",
+      "title": "Weekly Learning Loop",
+      "note": "The goal is not to post blindly for 30 days. Review performance every seven days and make one controlled improvement.",
+      "coverage": "Four weekly reviews, a final check and six decision rules for improving the next week"
+    }
+  ],
+  "resourceBacklog": [
+    {
+      "id": "resource-grade6-maths-starter",
+      "title": "Grade 6 Mathematics free revision starter",
+      "level": "Grade 6",
+      "subject": "Mathematics",
+      "type": "Revision Notes",
+      "stage": "Idea",
+      "topic": "One focused topic with worked examples and short practice",
+      "targetDate": "2026-08-02",
+      "answerSupport": "Needed",
+      "linkedPosts": "TT-02, IG-03",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Create a mobile-friendly free sample: learning outcome, concise explanation, two worked examples, five practice questions and a clear next step on ExamPoa.",
+      "references": "Confirm the exact Grade 6 curriculum scope and retain source notes before drafting.",
+      "owner": "Charry"
+    },
+    {
+      "id": "resource-marking-scheme-guide",
+      "title": "How to learn from a marking scheme",
+      "level": "Upper primary to Form 4",
+      "subject": "All subjects",
+      "type": "Study Guide",
+      "stage": "Idea",
+      "topic": "Correcting errors and building a reusable mistake log",
+      "targetDate": "2026-08-07",
+      "answerSupport": "Not required",
+      "linkedPosts": "FB-03, TT-07",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Explain a repeatable correction routine: mark honestly, classify the error, write the correct method, retry without notes and schedule a review.",
+      "references": "Use original examples or appropriately licensed material; do not reproduce copyrighted papers without permission.",
+      "owner": "Charry"
+    },
+    {
+      "id": "resource-kpsea-weekly-pack",
+      "title": "KPSEA weekly practice pack",
+      "level": "Grade 6",
+      "subject": "Mixed subjects",
+      "type": "Revision Paper",
+      "stage": "Idea",
+      "topic": "A balanced one-week practice routine",
+      "targetDate": "2026-08-10",
+      "answerSupport": "Needed",
+      "linkedPosts": "IG-05, WA-04, TT-05, WA-05",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Build a manageable weekly pack with short daily sections, an answer guide and a progress box for topics that need another attempt.",
+      "references": "Verify current KPSEA curriculum coverage and label all practice as revision support, not predicted exam content.",
+      "owner": "Charry"
+    },
+    {
+      "id": "resource-kjsea-diagnostic",
+      "title": "Grade 9 KJSEA diagnostic practice pack",
+      "level": "Grade 9",
+      "subject": "Mixed subjects",
+      "type": "Revision Paper",
+      "stage": "Idea",
+      "topic": "Diagnose strengths and priority gaps before revision",
+      "targetDate": "2026-08-15",
+      "answerSupport": "Needed",
+      "linkedPosts": "TT-06, FB-06, WA-06",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Create a short diagnostic with clear scoring guidance, topic tags and a three-day follow-up plan based on the learner's weakest areas.",
+      "references": "Confirm Grade 9 learning outcomes and avoid claims that the pack predicts official KJSEA questions.",
+      "owner": "Charry"
+    },
+    {
+      "id": "resource-kcse-mistake-log",
+      "title": "KCSE past-paper mistake log",
+      "level": "Form 4",
+      "subject": "All subjects",
+      "type": "Study Guide",
+      "stage": "Idea",
+      "topic": "Turn one past paper into a targeted revision plan",
+      "targetDate": "2026-08-19",
+      "answerSupport": "Not required",
+      "linkedPosts": "TT-07, WA-07",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Design a printable and mobile-friendly log for question, topic, error type, correct method, confidence and review date.",
+      "references": "Use the tracker as original ExamPoa material and link learners to legally available papers and marking schemes.",
+      "owner": "Charry"
+    },
+    {
+      "id": "resource-term3-planner",
+      "title": "Term 3 seven-day revision planner",
+      "level": "Grade 4 to Form 4",
+      "subject": "All subjects",
+      "type": "Study Guide",
+      "stage": "Idea",
+      "topic": "Restart school with one clear weekly revision rhythm",
+      "targetDate": "2026-08-24",
+      "answerSupport": "Not required",
+      "linkedPosts": "IG-09, TT-09, FB-09, TT-10, FB-10, WA-09",
+      "draftLink": "",
+      "publishedUrl": "",
+      "outline": "Include one priority subject, three short sessions, one notes or paper block, a mistake-correction block and a Sunday review.",
+      "references": "Keep the routine adaptable by learner level and workload; avoid presenting one timetable as suitable for every learner.",
+      "owner": "Charry"
+    }
+  ],
   "calendar": [
     {
       "Post ID": "WA-01",
@@ -2408,4 +2550,3 @@ window.EXAMPOA_CONTENT_SOURCE = {
     }
   ]
 };
-

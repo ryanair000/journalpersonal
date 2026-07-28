@@ -1,0 +1,274 @@
+/* Final readability layer: keep the soft palette while making daily-use text easy to scan. */
+:root {
+  --ink: #2f2730;
+  --ink-soft: #493f4b;
+  --muted: #746773;
+  --rose: #bd5f84;
+  --rose-dark: #93415f;
+  --line: #dfd2da;
+}
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { font-size: 15px; line-height: 1.58; }
+
+.dashboard p,
+.dashboard li,
+.dashboard label,
+.dashboard dd,
+.dashboard textarea,
+.dashboard input,
+.dashboard select,
+.settings-card p,
+.modal-card p { line-height: 1.55; }
+
+.dashboard small,
+.settings-card small,
+.modal-card small,
+.auth-card small {
+  color: #746671 !important;
+  font-size: 10.5px !important;
+  line-height: 1.5 !important;
+}
+
+.dashboard .eyebrow,
+.sidebar .side-label,
+.modal-card .eyebrow,
+.settings-card .eyebrow {
+  color: #765d6b !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  letter-spacing: .11em !important;
+}
+
+.dashboard button,
+.dashboard select,
+.settings-card button,
+.modal-card button {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.dashboard input,
+.dashboard textarea,
+.dashboard select,
+.settings-card input,
+.settings-card textarea,
+.settings-card select,
+.modal-card input,
+.modal-card textarea,
+.modal-card select {
+  color: #473c43;
+  font-size: 12px;
+}
+
+.dashboard input::placeholder,
+.dashboard textarea::placeholder,
+.settings-card input::placeholder,
+.modal-card input::placeholder,
+.modal-card textarea::placeholder { color: #8b7b84; opacity: 1; }
+
+.sidebar { background: rgba(255, 250, 253, .94); }
+.sidebar nav a { color: #655962; font-size: 12px; font-weight: 650; }
+.sidebar nav a.active { color: #352e36; }
+.sidebar .little-reminder { color: #6f5f68; }
+
+.section-title h2 { color: #332b33; }
+.section-title > div > p:not(.eyebrow),
+.detail-hint,
+.vision-intro,
+.business-studio-intro,
+.focus-plan-subtitle,
+.epc-title > div:first-child > p:last-child {
+  color: #6e6069 !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+
+.advanced-card,
+.detail-card,
+.module-card,
+.bp-card,
+.epc-card,
+.epc-post-card,
+.epc-review-card { border-color: rgba(163, 119, 139, .22); }
+
+/* School, work and relationship cards previously used 7–9px supporting text. */
+.timetable > span,
+.timetable > b,
+.class-cell,
+.class-cell small,
+.unit-summary small,
+.unit-list span,
+.unit-list small,
+.study-list small,
+.study-tag,
+.project-meta,
+.research-list p span,
+.research-list small,
+.business-list small,
+.business-list b,
+.work-metric-row,
+.people-list small,
+.people-list button,
+.connection-scale small,
+.rebrand-plan label,
+.relationship-tool,
+.relationship-list li {
+  color: #6f6069 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+}
+
+.class-cell { font-weight: 650; }
+.unit-list strong,
+.study-list strong,
+.business-list strong,
+.people-list strong { color: #493f48; font-size: 12px; line-height: 1.4; }
+
+/* Creator center and analytics. */
+.account-row small,
+.account-stat small,
+.idea-item small,
+.analytics-label,
+.analytics-card small,
+.creator-post-card small,
+.creator-calendar-day header small,
+.creator-calendar-item strong,
+.creator-calendar-item small,
+.creator-checkboxes label,
+.pipeline-post small,
+.summary-chip,
+.history-mini-card small {
+  color: #6f6069 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+}
+
+/* Today command center and study plan. */
+.life-attention-line small,
+.life-category-card p,
+.life-category-card small,
+.life-review-priorities span,
+.life-review-priorities small,
+.life-review-label,
+.focus-plan-block-copy small,
+.focus-plan-stat span,
+.focus-plan-filter,
+.focus-plan-status,
+.focus-plan-save-note {
+  color: #6e6069 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+}
+
+/* Business Studio. */
+.bp-pill,
+.bp-objective span,
+.bp-objective small,
+.bp-stat span,
+.bp-row small,
+.bp-priority,
+.bp-goal-progress span,
+.bp-save-state,
+.bp-capacity small,
+.bp-card-note,
+.business-list .business-open-planner,
+.bp-dialog-heading p:not(.eyebrow),
+.bp-field,
+.bp-form-error {
+  color: #6e6069 !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+}
+
+.bp-row strong { color: #4b4047; font-size: 12px; }
+.bp-tab { font-size: 11px; }
+.bp-action,
+.business-open-planner { font-size: 10.5px; }
+
+/* Exampoa execution center. */
+.epc-source-note span,
+.epc-source-note small,
+.epc-stat span,
+.epc-focus p,
+.epc-focus-posts button,
+.epc-panel-heading > p,
+.epc-day-label span,
+.epc-post-copy > span,
+.epc-post-copy small,
+.epc-task-meter,
+.epc-status-select,
+.epc-column-head span,
+.epc-mini-post span,
+.epc-mini-post small,
+.epc-resource-stat span,
+.epc-resource-top span,
+.epc-resource-card p,
+.epc-resource-progress > div,
+.epc-resource-actions button,
+.epc-resource-actions a,
+.epc-review-head span,
+.epc-review-fields label,
+.epc-rule strong,
+.epc-rule p,
+.epc-dialog-head p:not(.eyebrow),
+.epc-detail dt,
+.epc-detail dd,
+.epc-production-tasks label,
+.epc-form-field,
+.epc-dialog-status,
+.epc-form-error,
+.epc-guide-row strong,
+.epc-guide-row p,
+.epc-workbook-section-head span,
+.epc-workbook-section small,
+.epc-source-link {
+  color: #675861 !important;
+  font-size: 10.5px !important;
+  line-height: 1.5 !important;
+}
+
+.epc-post-copy strong { color: #443a40; font-size: 12.5px; }
+.epc-platform { font-size: 10px; }
+.epc-tabs button,
+.epc-open-post,
+.epc-primary,
+.epc-secondary { font-size: 11px; }
+.epc-toolbar input,
+.epc-toolbar select { color: #554850; font-size: 11.5px; }
+
+/* Formal forms need strong labels and clear controls. */
+.form-action-label,
+.form-action-field label,
+.settings-grid label,
+.school-cloud-form label,
+.attachment-form label {
+  color: #5f5059 !important;
+  font-size: 11px !important;
+  font-weight: 700;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-color: rgba(151, 61, 96, .48);
+  outline-width: 3px;
+}
+
+@media (max-width: 760px) {
+  body { font-size: 15px; }
+  .dashboard { line-height: 1.6; }
+  .dashboard small,
+  .settings-card small,
+  .modal-card small { font-size: 11px !important; }
+  .dashboard button,
+  .dashboard input,
+  .dashboard textarea,
+  .dashboard select { font-size: 12px; }
+  .sidebar nav a { font-size: 12px; }
+  .epc-post-copy strong,
+  .bp-row strong { font-size: 12.5px; }
+}

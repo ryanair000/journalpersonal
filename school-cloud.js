@@ -2,9 +2,37 @@
 
 (() => {
   const DOCUMENTS_KEY = "schoolCloudDocuments";
+  const UNIT_RESOURCES_KEY = "schoolUnitResources";
   const APPLICATIONS_KEY = "attachmentApplications";
   const BUCKET = "journal-documents";
   const MAX_FILE_SIZE = 20 * 1024 * 1024;
+  const unitCatalog = [
+    ["BPL3103", "Pharmacology II (Autonomic Pharmacology)", "2026-08-06"],
+    ["BPL3102", "Pharmacology I (Introduction to Pharmacology)", "2026-08-07"],
+    ["BPC4102", "Pharmaceutical Chemistry VII (NMR)", "2026-08-07"],
+    ["BPC4101", "Spectroscopy III", "2026-08-08"],
+    ["BPL5101", "Clinical Pharmacy V", "2026-08-10"],
+    ["BPL4201", "Pharmacology IX (Chemotherapy I)", "2026-08-11"],
+    ["BPL4106", "Pharmacology VIII (GIT)", "2026-08-11"],
+    ["BPC3103", "Pharmaceutical Chemistry III (Analytical Methods I)", "2026-08-12"],
+    ["BPL4105", "Pharmacology VII (CVS)", "2026-08-12"],
+    ["BPC4204", "Pharmaceutical Chemistry XII (ANS)", "2026-08-13"],
+    ["BPL4104", "Pharmacology VI (Respiratory and Renal)", "2026-08-13"],
+    ["BCH2206", "Spectroscopy II", "2026-08-14"],
+    ["BPL4205", "Clinical Pharmacy IV", "2026-08-14"],
+    ["BPT3102", "Pharmaceutics II (Drug Standards and GMP)", "2026-08-15"],
+    ["BPA2204", "Human Pathology IV", "2026-08-16"],
+    ["BMM2102", "Immunology", "2026-08-16"],
+    ["BPT4204", "Pharmacy Management III", "2026-08-17"],
+    ["BPT4103", "Pharmacy Management I", "2026-08-17"],
+    ["BPA2203", "Human Pathology III", "2026-08-18"],
+    ["BPC3202", "Pharmaceutical Chemistry V (CNS Drugs)", "2026-08-19"],
+    ["PBCU001", "Research Methods", "2026-08-19"],
+    ["BPL4103", "Clinical Pharmacy II", "2026-08-19"],
+    ["BPC4202", "Pharmaceutical Chemistry X (NSAIDs and Antihistamines)", "2026-08-20"],
+    ["BPL4203", "Pharmacology XI (Vitamins and Endocrine)", "2026-08-21"],
+    ["BPT4102", "Pharmaceutics VI (Unit Operations)", "2026-08-21"]
+  ];
   const progressLabels = {
     0: "Not started",
     25: "Started",
@@ -15,6 +43,7 @@
   let client = null;
   let session = null;
   let documents = readArray(DOCUMENTS_KEY);
+  let unitResources = readArray(UNIT_RESOURCES_KEY);
   let applications = readArray(APPLICATIONS_KEY);
 
   const escapeText = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
@@ -72,23 +101,34 @@
 
   function populateUnitCodes() {
     const list = document.querySelector("#schoolUnitCodes");
+    const filter = document.querySelector("#schoolDocumentUnitFilter");
     if (!list) return;
-    const known = new Set([
-      "BPC4102", "BPC4101", "BPL4106", "BPL4105", "BPL4104", "BMM2102",
-      "BPT4103", "BPL4103", "BPT4102", "BPL5101", "BPL4201", "BPC4204",
-      "BPL4205", "BPT3102", "BPT4204", "BPA2203", "PBCU001", "BPC4202",
-      "BPL4203", "BPC3103", "BPC3202", "BCH2206", "BPL3103", "BPL3102", "BPA2204"
-    ]);
+    const known = new Set(unitCatalog.map(([code]) => code));
     readArray("examEntries").forEach((item) => item.code && known.add(String(item.code).toUpperCase()));
     documents.forEach((item) => item.unit && known.add(String(item.unit).toUpperCase()));
+    unitResources.forEach((item) => item.unit && known.add(String(item.unit).toUpperCase()));
     list.replaceChildren(...[...known].sort().map((code) => {
       const option = document.createElement("option");
       option.value = code;
       return option;
     }));
+    if (filter) {
+      const selected = filter.value;
+      filter.replaceChildren();
+      const all = document.createElement("option");
+      all.value = "all";
+      all.textContent = "All units";
+      filter.append(all, ...[...known].sort().map((code) => {
+        const option = document.createElement("option");
+        option.value = code;
+        option.textContent = code;
+        return option;
+      }));
+      filter.value = [...known].includes(selected) ? selected : "all";
+    }
   }
 
-  function renderDocumentSummary(filtered) {
+  function renderDocumentSummary(filtered, filteredResources = unitResources) {
     const host = document.querySelector("#schoolDocumentSummary");
     if (!host) return;
     const complete = documents.filter((item) => Number(item.progress) === 100).length;
@@ -96,25 +136,177 @@
     const quizzes = documents.filter((item) => item.category === "Quiz").length;
     host.innerHTML = `
       <span><strong>${documents.length}</strong> uploaded</span>
+      <span><strong>${unitResources.length}</strong> links & notes</span>
       <span><strong>${quizzes}</strong> quizzes</span>
       <span><strong>${pastPapers}</strong> past papers</span>
       <span><strong>${complete}</strong> completed</span>
-      <span><strong>${filtered.length}</strong> visible</span>`;
+      <span><strong>${filtered.length + filteredResources.length}</strong> visible</span>`;
+  }
+
+  const averageProgress = (items) => items.length ? Math.round(items.reduce((total, item) => total + (Number(item.progress) || 0), 0) / items.length) : 0;
+
+  function renderUnitResourceCenter() {
+    unitResources = readArray(UNIT_RESOURCES_KEY);
+    const stats = document.querySelector("#schoolUnitResourceStats");
+    const grid = document.querySelector("#schoolUnitResourceGrid");
+    if (!stats || !grid) return;
+    const query = document.querySelector("#schoolUnitResourceSearch")?.value.trim().toLowerCase() || "";
+    const currentCodes = new Set(unitCatalog.map(([code]) => code));
+    const combined = [...documents, ...unitResources].filter((item) => currentCodes.has(String(item.unit || "").toUpperCase()));
+    const materialUnits = new Set(combined.map((item) => String(item.unit || "").toUpperCase()).filter(Boolean));
+    stats.innerHTML = `<span><strong>${materialUnits.size}/${unitCatalog.length}</strong> units with materials</span><span><strong>${documents.length}</strong> private files</span><span><strong>${unitResources.length}</strong> links or notes</span><span><strong>${averageProgress(combined)}%</strong> average review</span>`;
+    const visibleUnits = unitCatalog.filter(([code, name]) => !query || `${code} ${name}`.toLowerCase().includes(query));
+    grid.innerHTML = visibleUnits.map(([code, name, examDate]) => {
+      const files = documents.filter((item) => String(item.unit).toUpperCase() === code);
+      const saved = unitResources.filter((item) => String(item.unit).toUpperCase() === code);
+      const materials = [...files, ...saved];
+      const progress = averageProgress(materials);
+      return `<article class="unit-resource-folder ${materials.length ? "has-materials" : ""}" data-unit-folder="${escapeText(code)}"><header><code>${escapeText(code)}</code><b>${materials.length} item${materials.length === 1 ? "" : "s"}</b></header><strong>${escapeText(name)}</strong><small>Exam ${escapeText(formatDate(examDate))} · ${files.length} file${files.length === 1 ? "" : "s"} · ${saved.length} link/note${saved.length === 1 ? "" : "s"}</small><div class="unit-resource-folder-progress"><i style="width:${progress}%"></i></div><div class="unit-resource-folder-actions"><button type="button" data-unit-upload="${escapeText(code)}">Upload file</button><button type="button" data-unit-resource-add="${escapeText(code)}">Add link/note</button><button type="button" data-unit-resource-view="${escapeText(code)}">View</button></div></article>`;
+    }).join("") || '<div class="unit-resource-empty">No unit matches that search.</div>';
+  }
+
+  function filteredUnitResources() {
+    const query = document.querySelector("#schoolDocumentSearch")?.value.trim().toLowerCase() || "";
+    const type = document.querySelector("#schoolDocumentTypeFilter")?.value || "all";
+    const progress = document.querySelector("#schoolDocumentProgressFilter")?.value || "all";
+    const unit = document.querySelector("#schoolDocumentUnitFilter")?.value || "all";
+    return unitResources
+      .filter((item) => !query || `${item.title} ${item.unit} ${item.kind} ${item.notes}`.toLowerCase().includes(query))
+      .filter((item) => unit === "all" || String(item.unit).toUpperCase() === unit)
+      .filter((item) => type === "all" || item.kind === type)
+      .filter((item) => progress === "all" || Number(item.progress) === Number(progress))
+      .sort((left, right) => String(right.updatedAt || right.createdAt).localeCompare(String(left.updatedAt || left.createdAt)));
+  }
+
+  function renderSavedUnitResources(filtered = filteredUnitResources()) {
+    const list = document.querySelector("#schoolUnitResourceList");
+    if (!list) return;
+    if (!filtered.length) {
+      list.innerHTML = `<div class="unit-resource-empty">${unitResources.length ? "No saved links or notes match these filters." : "Add a trusted link, a short summary, or a study note for any unit."}</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map((item) => {
+      const progressValue = Number(item.progress) || 0;
+      return `<article class="unit-saved-resource-row" data-unit-resource-id="${escapeText(item.id)}"><span class="unit-saved-resource-icon">${item.kind === "Link" ? "LINK" : item.kind === "Summary" ? "SUM" : "NOTE"}</span><div class="unit-saved-resource-copy"><strong>${escapeText(item.title)}</strong><small>${escapeText(item.unit)} · ${escapeText(item.kind)}</small>${item.notes ? `<p>${escapeText(item.notes)}</p>` : ""}</div><div class="school-document-progress"><select data-unit-resource-progress="${escapeText(item.id)}" aria-label="Progress for ${escapeText(item.title)}">${Object.entries(progressLabels).map(([value, label]) => `<option value="${value}" ${Number(value) === progressValue ? "selected" : ""}>${label}</option>`).join("")}</select><span class="school-progress-track"><i style="width:${progressValue}%"></i></span><b>${progressValue}%</b></div><div class="school-document-actions">${item.kind === "Link" ? `<button type="button" data-unit-resource-open="${escapeText(item.id)}">Open</button>` : ""}<button type="button" data-unit-resource-edit="${escapeText(item.id)}">Edit</button><button type="button" class="danger" data-unit-resource-delete="${escapeText(item.id)}">Delete</button></div></article>`;
+    }).join("");
+  }
+
+  function updateUnitResourceUrlField() {
+    const isLink = document.querySelector("#schoolUnitResourceType")?.value === "Link";
+    const field = document.querySelector("#schoolUnitResourceUrlField");
+    const input = document.querySelector("#schoolUnitResourceUrl");
+    if (field) field.hidden = !isLink;
+    if (input) input.required = isLink;
+  }
+
+  function openUnitResourceForm(item = null, unit = "") {
+    const form = document.querySelector("#schoolUnitResourceForm");
+    if (!form) return;
+    form.hidden = false;
+    document.querySelector("#schoolUnitResourceEditingId").value = item?.id || "";
+    document.querySelector("#schoolUnitResourceUnit").value = item?.unit || unit || document.querySelector("#schoolDocumentUnitFilter")?.value.replace("all", "") || "";
+    document.querySelector("#schoolUnitResourceType").value = item?.kind || "Link";
+    document.querySelector("#schoolUnitResourceTitle").value = item?.title || "";
+    document.querySelector("#schoolUnitResourceUrl").value = item?.url || "";
+    document.querySelector("#schoolUnitResourceProgress").value = String(Number(item?.progress) || 0);
+    document.querySelector("#schoolUnitResourceNotes").value = item?.notes || "";
+    form.querySelector('button[type="submit"]').textContent = item ? "Save changes" : "Save resource";
+    updateUnitResourceUrlField();
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.querySelector("#schoolUnitResourceTitle").focus();
+  }
+
+  function closeUnitResourceForm() {
+    const form = document.querySelector("#schoolUnitResourceForm");
+    if (!form) return;
+    form.reset();
+    form.hidden = true;
+    document.querySelector("#schoolUnitResourceEditingId").value = "";
+    updateUnitResourceUrlField();
+  }
+
+  function safeResourceUrl(value) {
+    try {
+      const url = new URL(String(value).trim());
+      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function saveUnitResource(event) {
+    event.preventDefault();
+    const id = document.querySelector("#schoolUnitResourceEditingId").value || crypto.randomUUID();
+    const kind = document.querySelector("#schoolUnitResourceType").value;
+    const url = kind === "Link" ? safeResourceUrl(document.querySelector("#schoolUnitResourceUrl").value) : "";
+    if (kind === "Link" && !url) {
+      setDocumentStatus("Use a complete http:// or https:// link.", "error");
+      return;
+    }
+    const existing = unitResources.find((item) => item.id === id);
+    const item = {
+      id,
+      unit: document.querySelector("#schoolUnitResourceUnit").value.trim().toUpperCase(),
+      kind,
+      title: document.querySelector("#schoolUnitResourceTitle").value.trim(),
+      url,
+      progress: Number(document.querySelector("#schoolUnitResourceProgress").value) || 0,
+      notes: document.querySelector("#schoolUnitResourceNotes").value.trim(),
+      createdAt: existing?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    const index = unitResources.findIndex((resource) => resource.id === id);
+    if (index >= 0) unitResources[index] = item;
+    else unitResources.push(item);
+    saveArray(UNIT_RESOURCES_KEY, unitResources);
+    closeUnitResourceForm();
+    populateUnitCodes();
+    renderDocuments();
+    setDocumentStatus(`${kind} saved for ${item.unit}.`, "success");
+  }
+
+  function openUnitResource(id) {
+    const item = unitResources.find((resource) => resource.id === id);
+    if (!item) return;
+    if (item.kind !== "Link") { openUnitResourceForm(item); return; }
+    const url = safeResourceUrl(item.url);
+    if (!url) { setDocumentStatus("This saved link is not valid.", "error"); return; }
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function deleteUnitResource(button, id) {
+    if (button.dataset.confirmed !== "true") {
+      button.dataset.confirmed = "true";
+      button.classList.add("confirming");
+      button.textContent = "Confirm delete";
+      window.setTimeout(() => { button.dataset.confirmed = "false"; button.classList.remove("confirming"); button.textContent = "Delete"; }, 4000);
+      return;
+    }
+    unitResources = unitResources.filter((item) => item.id !== id);
+    saveArray(UNIT_RESOURCES_KEY, unitResources);
+    renderDocuments();
+    setDocumentStatus("Unit resource deleted.", "success");
   }
 
   function renderDocuments() {
     const list = document.querySelector("#schoolDocumentList");
     if (!list) return;
     documents = readArray(DOCUMENTS_KEY);
+    unitResources = readArray(UNIT_RESOURCES_KEY);
     const query = document.querySelector("#schoolDocumentSearch")?.value.trim().toLowerCase() || "";
     const type = document.querySelector("#schoolDocumentTypeFilter")?.value || "all";
     const progress = document.querySelector("#schoolDocumentProgressFilter")?.value || "all";
+    const unit = document.querySelector("#schoolDocumentUnitFilter")?.value || "all";
     const filtered = documents
       .filter((item) => !query || `${item.name} ${item.unit} ${item.category}`.toLowerCase().includes(query))
+      .filter((item) => unit === "all" || String(item.unit).toUpperCase() === unit)
       .filter((item) => type === "all" || item.category === type)
       .filter((item) => progress === "all" || Number(item.progress) === Number(progress))
       .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
-    renderDocumentSummary(filtered);
+    const visibleResources = filteredUnitResources();
+    renderDocumentSummary(filtered, visibleResources);
+    renderUnitResourceCenter();
+    renderSavedUnitResources(visibleResources);
     if (!filtered.length) {
       list.innerHTML = `<div class="school-empty">${documents.length ? "No documents match these filters." : "Your uploaded notes and papers will appear here."}</div>`;
       return;
@@ -378,6 +570,26 @@
     setDocumentStatus(session?.user ? "Private storage ready." : "Sign in to upload and open private files.", session?.user ? "success" : "");
   }
 
+  function focusUnitResources(unit, action = "view") {
+    const code = String(unit || "").trim().toUpperCase();
+    if (!code) return;
+    const filter = document.querySelector("#schoolDocumentUnitFilter");
+    const uploadUnit = document.querySelector("#schoolDocumentUnit");
+    if (filter && [...filter.options].some((option) => option.value === code)) filter.value = code;
+    if (uploadUnit) uploadUnit.value = code;
+    renderDocuments();
+    document.querySelector("#schoolDocuments")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (action === "upload") {
+      setDocumentStatus(`${code} selected. Choose files to upload securely.`);
+      document.querySelector("#schoolDocumentFiles")?.click();
+    } else if (action === "add") {
+      openUnitResourceForm(null, code);
+    } else {
+      const count = [...documents, ...unitResources].filter((item) => String(item.unit).toUpperCase() === code).length;
+      setDocumentStatus(count ? `Showing ${count} resource${count === 1 ? "" : "s"} for ${code}.` : `${code} has no saved materials yet. Upload a file or add a link or note.`);
+    }
+  }
+
   function bindEvents() {
     const openReferenceUploader = (category) => {
       const library = document.querySelector("#schoolDocuments");
@@ -396,7 +608,7 @@
       const files = [...event.currentTarget.files];
       document.querySelector("#schoolFileSummary").textContent = files.length ? `${files.length} selected · ${formatSize(files.reduce((total, file) => total + file.size, 0))} total` : "PDF, Word, PowerPoint, spreadsheet, image, text, CSV or JSON · up to 20 MB each";
     });
-    ["#schoolDocumentSearch", "#schoolDocumentTypeFilter", "#schoolDocumentProgressFilter"].forEach((selector) => document.querySelector(selector)?.addEventListener(selector.includes("Search") ? "input" : "change", renderDocuments));
+    ["#schoolDocumentSearch", "#schoolDocumentUnitFilter", "#schoolDocumentTypeFilter", "#schoolDocumentProgressFilter"].forEach((selector) => document.querySelector(selector)?.addEventListener(selector.includes("Search") ? "input" : "change", renderDocuments));
     document.querySelector("#schoolDocumentList")?.addEventListener("change", (event) => {
       const id = event.target.dataset.documentProgress;
       if (!id) return;
@@ -413,6 +625,39 @@
       if (openId) openDocument(openId);
       if (deleteId) deleteDocument(event.target, deleteId);
     });
+    document.querySelector("#schoolUnitResourceSearch")?.addEventListener("input", renderUnitResourceCenter);
+    document.querySelector("#addSchoolUnitResource")?.addEventListener("click", () => openUnitResourceForm());
+    document.querySelector("#addSchoolUnitResourceSecondary")?.addEventListener("click", () => openUnitResourceForm());
+    document.querySelector("#cancelSchoolUnitResource")?.addEventListener("click", closeUnitResourceForm);
+    document.querySelector("#schoolUnitResourceType")?.addEventListener("change", updateUnitResourceUrlField);
+    document.querySelector("#schoolUnitResourceForm")?.addEventListener("submit", saveUnitResource);
+    document.querySelector("#schoolUnitResourceGrid")?.addEventListener("click", (event) => {
+      const upload = event.target.dataset.unitUpload;
+      const add = event.target.dataset.unitResourceAdd;
+      const view = event.target.dataset.unitResourceView;
+      if (upload) focusUnitResources(upload, "upload");
+      if (add) focusUnitResources(add, "add");
+      if (view) focusUnitResources(view, "view");
+    });
+    document.querySelector("#schoolUnitResourceList")?.addEventListener("change", (event) => {
+      const id = event.target.dataset.unitResourceProgress;
+      if (!id) return;
+      const item = unitResources.find((resource) => resource.id === id);
+      if (!item) return;
+      item.progress = Number(event.target.value);
+      item.updatedAt = new Date().toISOString();
+      saveArray(UNIT_RESOURCES_KEY, unitResources);
+      renderDocuments();
+    });
+    document.querySelector("#schoolUnitResourceList")?.addEventListener("click", (event) => {
+      const openId = event.target.dataset.unitResourceOpen;
+      const editId = event.target.dataset.unitResourceEdit;
+      const deleteId = event.target.dataset.unitResourceDelete;
+      if (openId) openUnitResource(openId);
+      if (editId) openUnitResourceForm(unitResources.find((item) => item.id === editId));
+      if (deleteId) deleteUnitResource(event.target, deleteId);
+    });
+    document.addEventListener("mll:open-unit-resources", (event) => focusUnitResources(event.detail?.unit, event.detail?.action || "view"));
 
     document.querySelector("#toggleAttachmentForm")?.addEventListener("click", () => openAttachmentForm());
     document.querySelector("#cancelAttachmentForm")?.addEventListener("click", closeAttachmentForm);

@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="school-overview.css" />
   <link rel="stylesheet" href="productivity-pass.css" />
   <link rel="stylesheet" href="auth-sync.css" />
-  <link rel="stylesheet" href="school-cloud.css" />
+  <link rel="stylesheet" href="school-cloud.css?v=32" />
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="vision.css" />
   <link rel="stylesheet" href="goals.css" />
@@ -231,6 +231,21 @@
       <div class="resource-grid" id="resourceList"><article><span class="resource-type">PDF</span><div><strong>WHO pharmacovigilance guide</strong><small>Reference · add a link or file note</small></div><button>Open →</button></article><article><span class="resource-type">NOTE</span><div><strong>Questions for Dr. Wanjiku</strong><small>Research · follow up</small></div><button>Review →</button></article><article><span class="resource-type">LINK</span><div><strong>Drug interactions reading list</strong><small>Pharmacology · useful links</small></div><button>Open →</button></article></div>
       <section class="school-cloud-card" id="schoolDocuments" aria-labelledby="schoolDocumentsTitle">
         <div class="school-cloud-heading"><div><p class="eyebrow">Private document library</p><h3 id="schoolDocumentsTitle">PDFs, quizzes, notes and course files</h3><p>Upload once, open from your phone or laptop, and track what you have reviewed.</p></div><span class="school-cloud-lock">Private cloud</span></div>
+        <section class="unit-resource-center" aria-labelledby="unitResourceCenterTitle">
+          <div class="unit-resource-center-heading"><div><p class="eyebrow">Resources by unit</p><h4 id="unitResourceCenterTitle">Build a revision library for every exam.</h4></div><div class="unit-resource-center-actions"><input id="schoolUnitResourceSearch" type="search" placeholder="Find a unit" aria-label="Find a unit resource folder"><button type="button" id="addSchoolUnitResource">+ Add link or note</button></div></div>
+          <div class="unit-resource-stats" id="schoolUnitResourceStats"></div>
+          <div class="unit-resource-grid" id="schoolUnitResourceGrid"></div>
+          <form class="unit-resource-form" id="schoolUnitResourceForm" hidden>
+            <input id="schoolUnitResourceEditingId" type="hidden">
+            <label>Unit code<input id="schoolUnitResourceUnit" list="schoolUnitCodes" maxlength="30" placeholder="e.g. BPL4203" required></label>
+            <label>Resource type<select id="schoolUnitResourceType"><option>Link</option><option>Summary</option><option>Study note</option></select></label>
+            <label class="unit-resource-title-field">Title<input id="schoolUnitResourceTitle" maxlength="220" placeholder="e.g. Endocrine pharmacology summary" required></label>
+            <label id="schoolUnitResourceUrlField">Web link<input id="schoolUnitResourceUrl" type="url" maxlength="900" placeholder="https://..."></label>
+            <label>Review progress<select id="schoolUnitResourceProgress"><option value="0">Not started</option><option value="25">Started</option><option value="50">Halfway</option><option value="75">Reviewing</option><option value="100">Complete</option></select></label>
+            <label class="unit-resource-notes-field">Notes<textarea id="schoolUnitResourceNotes" rows="3" maxlength="1200" placeholder="Key topics, why this is useful, or what to review next"></textarea></label>
+            <div class="unit-resource-form-actions"><button type="button" id="cancelSchoolUnitResource">Cancel</button><button type="submit">Save resource</button></div>
+          </form>
+        </section>
         <form class="school-upload-form" id="schoolDocumentForm">
           <label class="school-file-picker"><input id="schoolDocumentFiles" type="file" multiple required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.json,image/jpeg,image/png,image/webp"><span>↑ Choose PDFs, quizzes or notes</span><small id="schoolFileSummary">PDF, Word, PowerPoint, spreadsheet, image, text, CSV or JSON · up to 20 MB each</small></label>
           <label>Unit code<input id="schoolDocumentUnit" list="schoolUnitCodes" placeholder="e.g. BPL4203" maxlength="30" required></label>
@@ -241,12 +256,15 @@
         </form>
         <div class="school-document-toolbar">
           <input id="schoolDocumentSearch" type="search" placeholder="Search files or unit codes" aria-label="Search uploaded documents">
-          <select id="schoolDocumentTypeFilter" aria-label="Filter documents by type"><option value="all">All file types</option><option>Notes</option><option>Quiz</option><option>Past paper</option><option>Research</option><option>Assignment</option><option>Reference</option><option>Attachment document</option></select>
+          <select id="schoolDocumentUnitFilter" aria-label="Filter resources by unit"><option value="all">All units</option></select>
+          <select id="schoolDocumentTypeFilter" aria-label="Filter resources by type"><option value="all">All resource types</option><option>Notes</option><option>Quiz</option><option>Past paper</option><option>Research</option><option>Assignment</option><option>Reference</option><option>Attachment document</option><option>Link</option><option>Summary</option><option>Study note</option></select>
           <select id="schoolDocumentProgressFilter" aria-label="Filter documents by progress"><option value="all">All progress</option><option value="0">Not started</option><option value="25">Started</option><option value="50">Halfway</option><option value="75">Reviewing</option><option value="100">Complete</option></select>
         </div>
         <p class="school-cloud-status" id="schoolDocumentStatus" aria-live="polite">Sign in to upload and open private files.</p>
         <div class="school-document-summary" id="schoolDocumentSummary"></div>
         <div class="school-document-list" id="schoolDocumentList"></div>
+        <div class="unit-saved-resource-heading"><div><p class="eyebrow">Links and written notes</p><h4>Saved unit resources</h4></div><button type="button" id="addSchoolUnitResourceSecondary">+ Add link or note</button></div>
+        <div class="unit-saved-resource-list" id="schoolUnitResourceList"></div>
       </section>
     </section>
 
@@ -389,9 +407,9 @@
   <script src="supabase-config.js"></script>
   <script src="auth-sync.js?v=20"></script>
   <script src="records-safety.js?v=26"></script>
-  <script src="school-cloud.js?v=29"></script>
+  <script src="school-cloud.js?v=32"></script>
   <script src="creator-center.js"></script>
   <script src="life-command.js"></script>
-  <script src="focus-plan.js?v=31"></script>
+  <script src="focus-plan.js?v=32"></script>
 </body>
 </html>

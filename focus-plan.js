@@ -244,7 +244,7 @@
           <input class="focus-plan-check" type="checkbox" data-focus-complete aria-label="Mark ${escapeText(block.title)} complete" ${block.done ? "checked" : ""} ${block.skipped ? "disabled" : ""}>
           <div class="focus-plan-time"><span>${escapeText(formatTime(block.start))}</span><small>${minutesBetween(block.start, block.end)} min</small></div>
           <div class="focus-plan-block-copy"><span class="focus-plan-type ${escapeText(block.type)}">${escapeText(typeLabel(block.type))}</span>${block.code ? `<span class="focus-plan-code">${escapeText(block.code)}</span>` : ""}<strong>${escapeText(block.title)}</strong><small>${escapeText(block.detail || "Add preparation notes")}${block.examDate ? ` · Exam ${escapeText(formatDate(block.examDate, { month: "short", day: "numeric" }))}` : ""}</small></div>
-          <div class="focus-plan-block-actions"><button type="button" data-focus-edit>Edit</button><button type="button" data-focus-skip>${block.skipped ? "Restore" : "Skip"}</button></div>
+          <div class="focus-plan-block-actions">${block.type === "study" ? '<button type="button" data-focus-resources>Resources</button>' : ""}<button type="button" data-focus-edit>Edit</button><button type="button" data-focus-skip>${block.skipped ? "Restore" : "Skip"}</button></div>
         </div>`).join("")}</div>
       </article>`;
     }).join("");
@@ -351,6 +351,7 @@
       const row = event.target.closest("[data-focus-id]");
       const block = plan.find((item) => item.id === row?.dataset.focusId);
       if (!block) return;
+      if (event.target.closest("[data-focus-resources]")) document.dispatchEvent(new CustomEvent("mll:open-unit-resources", { detail: { unit: block.code, action: "view" } }));
       if (event.target.closest("[data-focus-edit]")) dialog.open(block);
       if (event.target.closest("[data-focus-skip]")) {
         block.skipped = !block.skipped;

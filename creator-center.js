@@ -11,12 +11,12 @@
     {
       id: "playmechi", name: "PlayMechi", phase: "Monetized · active", accent: "#c96888",
       goal: "Earn the first platform paycheck and build a loyal sports community.", platforms: ["Facebook"],
-      pillars: ["Sports news", "Match recaps", "Opinions", "Player stories"], weeklyTarget: 5, revenueGoal: 5000, handle: ""
+      pillars: ["Sports news", "Match recaps", "Opinions", "Player stories"], weeklyTarget: 70, revenueGoal: 5000, handle: ""
     },
     {
       id: "exampoa", name: "Exampoa", phase: "Launch phase", accent: "#8f7ac1",
-      goal: "Launch publicly, grow search traffic and turn revision resources into revenue.", platforms: ["Website", "Facebook"],
-      pillars: ["Revision tips", "Past papers", "KCSE", "Subject guides"], weeklyTarget: 3, revenueGoal: 10000, handle: ""
+      goal: "Launch publicly, grow search traffic and turn revision resources into revenue.", platforms: ["Instagram", "TikTok", "Facebook", "WhatsApp", "Website"],
+      pillars: ["Revision tips", "Past papers", "KCSE", "Subject guides"], weeklyTarget: 70, revenueGoal: 10000, handle: ""
     },
     {
       id: "medical-influencing", name: "Medical Influencing", phase: "Planned · attachment", accent: "#6f9b82",
@@ -54,7 +54,7 @@
 
   function defaultState() {
     return {
-      version: 1,
+      version: 2,
       accounts: ACCOUNT_DEFAULTS.map((account) => ({ ...account, platforms: [...account.platforms], pillars: [...account.pillars] })),
       posts: [], assets: [], revenue: [], webMetrics: [], reviews: [],
       calendarView: "week", calendarDate: todayKey(), activeTab: "today", migrated: false
@@ -77,8 +77,18 @@
       return { ...fallback, ...saved, platforms: safeArray(saved.platforms).length ? saved.platforms : [...fallback.platforms], pillars: safeArray(saved.pillars).length ? saved.pillars : [...fallback.pillars] };
     });
     savedAccounts.filter((account) => account?.id && !accounts.some((item) => item.id === account.id)).forEach((account) => accounts.push(account));
+    if (Number(source.version || 1) < 2) {
+      const playmechi = accounts.find((account) => account.id === "playmechi");
+      const exampoa = accounts.find((account) => account.id === "exampoa");
+      if (playmechi) playmechi.weeklyTarget = 70;
+      if (exampoa) {
+        exampoa.weeklyTarget = 70;
+        exampoa.platforms = ["Instagram", "TikTok", "Facebook", "WhatsApp", "Website"];
+      }
+    }
     return {
       ...base, ...source, accounts,
+      version: 2,
       posts: safeArray(source.posts), assets: safeArray(source.assets), revenue: safeArray(source.revenue),
       webMetrics: safeArray(source.webMetrics), reviews: safeArray(source.reviews)
     };

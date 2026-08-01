@@ -4,6 +4,7 @@
   const STORAGE_KEY = "myLittleLife.dailyPlanner.v1";
   const COMPLETION_KEY = "myLittleLife.scheduleCompletions.v1";
   const NOTIFIED_KEY = "myLittleLife.scheduleNotified.v1";
+  const BLANK_SLATE_KEY = "myLittleLife.blankSlate.v1";
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
   const uid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -416,18 +417,84 @@
     window.addEventListener("hashchange", route);
     window.addEventListener("mll:data-changed", (event) => {
       if (event.detail?.source === "daily-planner") return;
+      if (localStorage.getItem(BLANK_SLATE_KEY) === "true") applyBlankSlate();
       if ((location.hash.slice(1) || "home") === "home") renderHome();
     });
   }
 
+  const blankSectionNames = {
+    trackers: "wellness trackers", content: "content workspace", journal: "journal", analytics: "analytics",
+    accountInsights: "account insights", details: "life details", journalArchive: "journal archive", mealLog: "meal log",
+    financeBreakdown: "money records", studyTools: "study tools", focusPlan: "study plan", examPrep: "exam preparation",
+    businessKpis: "business analytics", peopleDetails: "relationship records", contentPipeline: "content pipeline",
+    resourceVault: "resource library", careerTracker: "career planner", savingsGoals: "savings goals", dueSoon: "reminders",
+    mealHistory: "meal history", moodHistory: "mood history", calendar: "calendar", quickCapture: "quick capture",
+    weeklyReview: "weekly review", schoolHub: "school center", workHub: "work planner", businessStudio: "business studio",
+    exampoaContentCenter: "content calendar", peopleHub: "people records", visionBoard: "vision board", goalsHub: "goals",
+    customHabits: "habits", routines: "routines", examTracker: "exam tracker", projectBoard: "projects",
+    lifeInsights: "life insights", monthlySummary: "monthly summary", dashboardSearch: "search records"
+  };
+
+  function purgeBlankSlateRecords() {
+    const keys = [];
+    for (let index = 0; index < localStorage.length; index += 1) {
+      const key = localStorage.key(index);
+      const fallbackRecord = key && !["mll.sync.meta.v1", "mll.sync.keyTimes.v1", "mll.authenticatedBefore", "privacyPinHash"].includes(key) && !["sb-", "supabase.", "mll.auth."].some((prefix) => key.startsWith(prefix));
+      if (key !== BLANK_SLATE_KEY && (window.mllRecordsSafety?.isRecordKey?.(key) ?? fallbackRecord)) keys.push(key);
+    }
+    if (!keys.length) return;
+    const remove = () => keys.forEach((key) => localStorage.removeItem(key));
+    if (window.mllRecordsSafety?.runWithoutSnapshots) window.mllRecordsSafety.runWithoutSnapshots(remove);
+    else remove();
+    window.mllCloudSync?.syncNow?.().catch(() => {});
+  }
+
+  function applyBlankSlate() {
+    if (localStorage.getItem(BLANK_SLATE_KEY) !== "true") return;
+    document.body.classList.add("mll-blank-slate");
+    purgeBlankSlateRecords();
+    const main = qs("main.dashboard");
+    qsa(":scope > section", main).forEach((section) => {
+      if (["simpleHome", "dataManagement"].includes(section.id)) return;
+      section.dataset.mllBlank = "true";
+      if (qs(":scope > .mll-blank-card", section)) return;
+      const label = blankSectionNames[section.id] || "dashboard area";
+      const card = document.createElement("div");
+      card.className = "mll-blank-card";
+      const icon = document.createElement("span");
+      icon.textContent = "○";
+      const eyebrow = document.createElement("p");
+      eyebrow.className = "eyebrow";
+      eyebrow.textContent = label;
+      const heading = document.createElement("h2");
+      heading.textContent = `Ready for your new ${label}.`;
+      const copy = document.createElement("p");
+      copy.textContent = "This area is empty. Your new information will be added here when you provide it.";
+      card.append(icon, eyebrow, heading, copy);
+      section.append(card);
+    });
+    const greeting = qs(".topbar h1");
+    if (greeting) greeting.textContent = "Welcome ♡";
+    const avatar = qs(".topbar .avatar");
+    if (avatar) avatar.textContent = "♡";
+    ["settingName", "settingCourse", "settingYear", "settingTotalUnits", "settingCompletedUnits", "settingStudyMethods"].forEach((id) => {
+      const field = qs(`#${id}`);
+      if (field) field.value = "";
+    });
+  }
+
   function init() {
+    const localBlankTest = ["127.0.0.1", "localhost"].includes(location.hostname) && new URLSearchParams(location.search).has("mllBlankTest");
+    if (localBlankTest) localStorage.setItem(BLANK_SLATE_KEY, "true");
     document.body.classList.add("mll-focus-shell");
     replaceNavigation();
     ensureHome();
     ensureDialog();
     bindEvents();
+    applyBlankSlate();
     route();
     window.addEventListener("load", () => {
+      applyBlankSlate();
       if ((location.hash.slice(1) || "home") === "home") renderHome();
     });
     checkNotifications();

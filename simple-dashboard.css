@@ -100,6 +100,23 @@ body.mll-focus-shell.mll-home-view .dashboard > .topbar > div:first-child { disp
 .mll-quick-links a { padding: 12px; border: 1px solid var(--focus-line); border-radius: 14px; color: #6e5963; background: #fffafb; font-size: .75rem; font-weight: 700; text-decoration: none; }
 .mll-quick-links a:hover { border-color: #dab7c3; color: var(--focus-rose); }
 
+.mll-blank-card {
+  display: grid;
+  min-height: 360px;
+  padding: 56px;
+  place-content: center;
+  border: 1px solid var(--focus-line);
+  border-radius: 28px;
+  background: rgba(255,255,255,.78);
+  color: var(--focus-muted);
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(91,61,74,.05);
+}
+body.mll-blank-slate main.dashboard > section[data-mll-blank="true"] > :not(.mll-blank-card) { display: none !important; }
+.mll-blank-card > span { display: grid; width: 48px; height: 48px; margin: 0 auto 17px; place-items: center; border-radius: 16px; background: var(--focus-rose-soft); color: var(--focus-rose); font-size: 1.3rem; }
+.mll-blank-card h2 { max-width: 650px; margin: 5px auto 10px; color: var(--focus-ink); font-family: Georgia,"Times New Roman",serif; font-size: clamp(2rem,4vw,3rem); font-weight: 500; }
+.mll-blank-card > p:last-child { max-width: 540px; margin: 0 auto; line-height: 1.6; }
+
 .mll-planner-dialog { width: min(590px,calc(100vw - 28px)); max-height: calc(100vh - 30px); padding: 0; border: 0; border-radius: 25px; background: transparent; color: var(--focus-ink); overflow: visible; }
 .mll-planner-dialog::backdrop { background: rgba(46,34,40,.52); backdrop-filter: blur(4px); }
 .mll-planner-form { max-height: calc(100vh - 30px); padding: 26px; border-radius: 25px; background: #fffafb; box-shadow: 0 24px 70px rgba(48,33,40,.25); overflow: auto; }
@@ -153,6 +170,7 @@ body.mll-focus-shell.mll-home-view .dashboard > .topbar > div:first-child { disp
   .mll-planner-form { padding: 21px 17px; }
   .mll-dialog-actions { flex-wrap: wrap; }
   .mll-dialog-actions .danger { margin-right: 0; order: 3; width: 100%; }
+  .mll-blank-card { min-height: 300px; padding: 34px 20px; }
 }
 
 @media print {

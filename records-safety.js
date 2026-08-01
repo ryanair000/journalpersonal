@@ -126,6 +126,13 @@
     finally { snapshotsSuspended = false; scheduleSnapshot(); }
   };
 
+  const clearSnapshots = async () => {
+    clearTimeout(autoTimer);
+    await runStore('readwrite', (store) => store.clear());
+    lastChecksum = '';
+    refreshRecoveryCard();
+  };
+
   const previousSetItem = Storage.prototype.setItem;
   const previousRemoveItem = Storage.prototype.removeItem;
   const previousClear = Storage.prototype.clear;
@@ -194,7 +201,7 @@
     refreshRecoveryCard();
   };
 
-  window.mllRecordsSafety = { isRecordKey, collectRecordData, checksumData, createBackupEnvelope, createSnapshot, getSnapshots, runWithoutSnapshots };
+  window.mllRecordsSafety = { isRecordKey, collectRecordData, checksumData, createBackupEnvelope, createSnapshot, getSnapshots, clearSnapshots, runWithoutSnapshots };
   window.addEventListener('load', async () => {
     setupRecoveryCard();
     try {

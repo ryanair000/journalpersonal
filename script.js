@@ -1210,12 +1210,16 @@ const clearData = async (keys, label) => {
 document.querySelector('#clearJournalData')?.addEventListener('click', () => clearData(['quickNote', 'journalEntries', 'archiveEntries', 'memoryEntries', 'gratitudeHistory'], 'journal data'));
 document.querySelector('#clearTrackingData')?.addEventListener('click', () => clearData(['dailyMood', 'habitStreak', 'habitLastComplete', 'customHabits', 'customHabitHistory', 'routineHistory', 'routines', 'mealLogs', 'nutritionNote', 'nutritionHistory', 'studySessions', 'studyTimerSeconds', 'studyTimerHistory', 'weeklyExpenses', 'categoryExpenses', 'expenseLedger', 'incomeEntries', 'prayerHistory', 'moodHistory', 'mentalHealthHistory', 'workoutHistory', 'rhythmHistory', 'unitProgress', 'contentAccounts', 'accountAnalyticsHistory', 'selectedCreatorAccount', 'contentIdeas', 'myLittleLife.creatorCenter.v1', 'myLittleLife.creatorAccount.active', 'myLittleLife.lifeCommand.v1', 'customUnits', 'schoolStudyItems', 'schoolResearchItems', 'schoolProjectDetails', 'projectMilestones', 'classEntries', 'examEntries', 'personalBusinesses', 'businessStatuses', 'workGoals', 'workDeadlines', 'workLogEntries', 'peopleDirectory', 'peopleCheckins', 'peopleContactHistory', 'peopleNoteHistory', 'relationshipFeelHistory', 'relationshipDates', 'examPrepItems', 'examNextActions', 'examActionPlans', 'businessKpis', 'careerTasks', 'analyticsHistory', 'recurringExpenses', 'recurringEvents', 'savingsContributions', 'monthlyBudget'], 'tracking and added items'));
 document.querySelector('#clearAllData')?.addEventListener('click', async () => {
-  if (!confirm('Clear every saved dashboard record? A device recovery point will be saved first, and your sign-in will stay connected.')) return;
-  const protectedFirst = await createDestructiveSafetyPoint('all dashboard records');
-  if (!protectedFirst && !confirm('A recovery point could not be created in this browser. Continue only if you already exported a backup.')) return;
-  const removeAllRecords = () => Object.keys(collectSafeBackupData()).forEach((key) => localStorage.removeItem(key));
+  if (!confirm('Permanently delete every saved dashboard record and start with a blank website? Your sign-in will stay connected, but the old details cannot be restored.')) return;
+  const blankSlateKey = 'myLittleLife.blankSlate.v1';
+  const removeAllRecords = () => {
+    const records = window.mllRecordsSafety?.collectRecordData?.() || collectSafeBackupData();
+    Object.keys(records).forEach((key) => localStorage.removeItem(key));
+    localStorage.setItem(blankSlateKey, 'true');
+  };
   if (window.mllRecordsSafety?.runWithoutSnapshots) await window.mllRecordsSafety.runWithoutSnapshots(removeAllRecords);
   else removeAllRecords();
+  await window.mllRecordsSafety?.clearSnapshots?.().catch(() => {});
   await window.mllCloudSync?.syncNow?.().catch(() => {});
   window.location.reload();
 });

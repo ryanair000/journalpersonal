@@ -3,6 +3,7 @@
 (() => {
   const STORAGE_KEY = "mllFocusPlanV1";
   const SEED_KEY = "mllFocusPlanSeededV1";
+  const BLANK_SLATE_KEY = "myLittleLife.blankSlate.v1";
   const CALENDAR_SOURCE = "revision-business-sprint-v1";
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -314,7 +315,7 @@
 
   const initializePlan = () => {
     plan = readPlan();
-    if (!plan.length && localStorage.getItem(SEED_KEY) !== "true") {
+    if (!plan.length && localStorage.getItem(SEED_KEY) !== "true" && localStorage.getItem(BLANK_SLATE_KEY) !== "true") {
       plan = seedBlocks();
       writePlan(plan);
       localStorage.setItem(SEED_KEY, "true");

@@ -5,6 +5,7 @@
   const STORE_NAME = 'snapshots';
   const MAX_SNAPSHOTS = 20;
   const AUTO_DELAY = 1800;
+  const BLANK_SLATE_KEY = 'myLittleLife.blankSlate.v1';
   const EXCLUDED_KEYS = new Set([
     'mll.sync.meta.v1',
     'mll.sync.keyTimes.v1',
@@ -205,6 +206,10 @@
   window.addEventListener('load', async () => {
     setupRecoveryCard();
     try {
+      if (localStorage.getItem(BLANK_SLATE_KEY) === 'true') {
+        await clearSnapshots();
+        return;
+      }
       const existing = await getSnapshots();
       lastChecksum = existing[0]?.checksum || '';
       await createSnapshot('automatic baseline');

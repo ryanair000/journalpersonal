@@ -5,6 +5,7 @@
   const COMPLETION_KEY = "myLittleLife.scheduleCompletions.v1";
   const NOTIFIED_KEY = "myLittleLife.scheduleNotified.v1";
   const BLANK_SLATE_KEY = "myLittleLife.blankSlate.v1";
+  let blankSlateSyncTimer = null;
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
   const uid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -446,7 +447,8 @@
     const remove = () => keys.forEach((key) => localStorage.removeItem(key));
     if (window.mllRecordsSafety?.runWithoutSnapshots) window.mllRecordsSafety.runWithoutSnapshots(remove);
     else remove();
-    window.mllCloudSync?.syncNow?.().catch(() => {});
+    window.clearTimeout(blankSlateSyncTimer);
+    blankSlateSyncTimer = window.setTimeout(() => window.mllCloudSync?.syncNow?.().catch(() => {}), 250);
   }
 
   function applyBlankSlate() {

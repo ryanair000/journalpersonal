@@ -1212,10 +1212,12 @@ document.querySelector('#clearTrackingData')?.addEventListener('click', () => cl
 document.querySelector('#clearAllData')?.addEventListener('click', async () => {
   if (!confirm('Permanently delete every saved dashboard record and start with a blank website? Your sign-in will stay connected, but the old details cannot be restored.')) return;
   const blankSlateKey = 'myLittleLife.blankSlate.v1';
+  const blankSlateResetPendingKey = 'myLittleLife.blankSlateResetPending.v1';
   const removeAllRecords = () => {
     const records = window.mllRecordsSafety?.collectRecordData?.() || collectSafeBackupData();
     Object.keys(records).forEach((key) => localStorage.removeItem(key));
     localStorage.setItem(blankSlateKey, 'true');
+    localStorage.setItem(blankSlateResetPendingKey, 'true');
   };
   if (window.mllRecordsSafety?.runWithoutSnapshots) await window.mllRecordsSafety.runWithoutSnapshots(removeAllRecords);
   else removeAllRecords();

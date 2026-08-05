@@ -5,7 +5,6 @@
   const COMPLETION_KEY = "myLittleLife.scheduleCompletions.v1";
   const NOTIFIED_KEY = "myLittleLife.scheduleNotified.v1";
   const BLANK_SLATE_KEY = "myLittleLife.blankSlate.v1";
-  let blankSlateSyncTimer = null;
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
   const uid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -436,25 +435,9 @@
     lifeInsights: "life insights", monthlySummary: "monthly summary", dashboardSearch: "search records"
   };
 
-  function purgeBlankSlateRecords() {
-    const keys = [];
-    for (let index = 0; index < localStorage.length; index += 1) {
-      const key = localStorage.key(index);
-      const fallbackRecord = key && !["mll.sync.meta.v1", "mll.sync.keyTimes.v1", "mll.authenticatedBefore", "privacyPinHash"].includes(key) && !["sb-", "supabase.", "mll.auth."].some((prefix) => key.startsWith(prefix));
-      if (key !== BLANK_SLATE_KEY && (window.mllRecordsSafety?.isRecordKey?.(key) ?? fallbackRecord)) keys.push(key);
-    }
-    if (!keys.length) return;
-    const remove = () => keys.forEach((key) => localStorage.removeItem(key));
-    if (window.mllRecordsSafety?.runWithoutSnapshots) window.mllRecordsSafety.runWithoutSnapshots(remove);
-    else remove();
-    window.clearTimeout(blankSlateSyncTimer);
-    blankSlateSyncTimer = window.setTimeout(() => window.mllCloudSync?.syncNow?.().catch(() => {}), 250);
-  }
-
   function applyBlankSlate() {
     if (localStorage.getItem(BLANK_SLATE_KEY) !== "true") return;
     document.body.classList.add("mll-blank-slate");
-    purgeBlankSlateRecords();
     const main = qs("main.dashboard");
     qsa(":scope > section", main).forEach((section) => {
       if (["simpleHome", "dataManagement"].includes(section.id)) return;

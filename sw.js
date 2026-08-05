@@ -1,8 +1,8 @@
-const CACHE_NAME = 'my-little-life-v45';
+const CACHE_NAME = 'my-little-life-v46';
 const ASSETS = [
   './', './index.html', './style.css', './mobile.css', './content.css', './analytics.css',
   './details.css', './advanced.css', './settings.css', './backup.css?v=26', './calendar.css', './review.css', './capture.css', './progress.css', './academic.css', './school-overview.css', './productivity-pass.css', './auth-sync.css', './school-cloud.css?v=32', './theme.css', './vision.css', './goals.css', './habits.css', './routines.css', './projects.css', './search.css', './monthly.css', './next10.css', './insights.css', './next20.css', './refinements.css', './nextpass.css?v=30', './form-actions.css?v=27', './creator-center.css?v=39', './publishing-routine.css?v=39', './life-command.css', './layout-polish.css?v=25', './focus-plan.css?v=31', './business-planner.css?v=33', './exampoa-command.css?v=41', './readability.css?v=36', './alignment-pass.css?v=40', './simple-dashboard.css?v=43', './script.js?v=42', './form-actions.js?v=42', './productivity-pass.js?v=42', './supabase-config.js', './auth-sync.js?v=42', './records-safety.js?v=26', './school-cloud.js?v=32', './creator-center.js?v=39', './publishing-routine.js?v=39', './life-command.js', './focus-plan.js?v=32', './business-planner.js?v=33', './exampoa-content-data.js?v=37', './exampoa-command.js?v=41', './simple-dashboard.js?v=43', './manifest.json'
-  , './simple-dashboard.css?v=45', './script.js?v=45', './blank-slate-bootstrap.js?v=45', './records-safety.js?v=45', './focus-plan.js?v=45', './simple-dashboard.js?v=45'
+  , './simple-dashboard.css?v=46', './blank-slate-boot-guard.js?v=46', './script.js?v=46', './auth-sync.js?v=46', './blank-slate-bootstrap.js?v=46', './records-safety.js?v=46', './focus-plan.js?v=46', './simple-dashboard.js?v=46'
 ];
 self.addEventListener('install', (event) => {
   event.waitUntil(

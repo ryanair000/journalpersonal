@@ -50,8 +50,8 @@
     return data;
   };
 
-  const nativeSetItem = Storage.prototype.setItem;
-  const nativeRemoveItem = Storage.prototype.removeItem;
+  const nativeSetItem = window.__mllBlankBootNative?.setItem || Storage.prototype.setItem;
+  const nativeRemoveItem = window.__mllBlankBootNative?.removeItem || Storage.prototype.removeItem;
 
   const shouldSyncKey = (key) => {
     const name = String(key || "");
@@ -88,6 +88,7 @@
   };
 
   Storage.prototype.setItem = function setItem(key, value) {
+    if (this === localStorage && window.__mllBlankBootLocked && shouldSyncKey(key)) return;
     nativeSetItem.call(this, key, value);
     if (this === localStorage) markLocalChange(String(key));
   };

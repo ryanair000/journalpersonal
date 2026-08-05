@@ -2,10 +2,15 @@
 
 (() => {
   const BLANK_SLATE_KEY = "myLittleLife.blankSlate.v1";
+  const RESET_PENDING_KEY = "myLittleLife.blankSlateResetPending.v1";
   if (localStorage.getItem(BLANK_SLATE_KEY) !== "true") return;
+
+  document.body.classList.add("mll-blank-slate");
+  if (localStorage.getItem(RESET_PENDING_KEY) !== "true") return;
 
   const preservedKeys = new Set([
     BLANK_SLATE_KEY,
+    RESET_PENDING_KEY,
     "mll.sync.meta.v1",
     "mll.sync.keyTimes.v1",
     "mll.authenticatedBefore",
@@ -21,5 +26,5 @@
   }
 
   keysToRemove.forEach((key) => localStorage.removeItem(key));
-  document.body.classList.add("mll-blank-slate");
+  localStorage.removeItem(RESET_PENDING_KEY);
 })();
